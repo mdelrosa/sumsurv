@@ -12,3 +12,9 @@ exports.about = function(req, res) {
 		title: 'Stolk-vey'
 	});
 }
+
+exports.survey = function(req, res){
+  res.render('survey', {
+        title: 'This Survey'
+  });
+};
