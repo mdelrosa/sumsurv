@@ -8,7 +8,7 @@ exports.save_response = function(req, res) {
 	console.log(req.body)
 	Response.find().exec(function(err, response_db) {
 		if(err) {console.log('Unable to find responses'); return false}
-		var newID = 0 + response_db.length;
+		var newID = response_db.length;
 		console.log('newID', newID);
 		var new_response = new Response({id: newID, results: req.body.results});
 		new_response.save(function(err) {

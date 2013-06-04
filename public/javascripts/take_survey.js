@@ -18,7 +18,7 @@ $(document).ready(function() {
 			//find checked button in response
 			for (j=0;j<answers.length;j++) {
 				if (answers[j].checked) {
-					res = j;
+					res = j+1;
 				}
 			}
 			results.push(res);
