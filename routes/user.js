@@ -13,7 +13,6 @@ exports.about = function(req, res) {
 	});
 }
 
-
 exports.survey = function(req, res){
   res.render('survey', {
         title: 'This Survey'
@@ -32,3 +31,8 @@ exports.survey = function(req, res) {
 	});
 }
 
+exports.survey_success = function(req, res) {
+	res.render('response_success', {
+		title: "Stolk-vey"
+	});
+}
