@@ -61,9 +61,9 @@ function parseCSV(str) {
 
 exports.exportcsv1 = function(req, res){
     Response.find({},function(err, response_db){
-    	var csvstr = ['Id, Question1, Question2, Question3, Question4, Question5, Question6, Question7, Question8, Question9, Question10, Question11, Question12, Question13, Question14, Question15, Question16'];
+    	var csvstr = [' , Id, Question1, Question2, Question3, Question4, Question5, Question6, Question7, Question8, Question9, Question10, Question11, Question12, Question13, Question14, Question15, Question16, '];
     	for(i=1; i < response_db.length+1; i++) {
-			csvstr[i] = response_db[i-1].id + "," + response_db[i-1].results.join(",");
+			csvstr[i] = " ," + response_db[i-1].id + "," + response_db[i-1].results.join(",") + ", ";
 		}
         res.header('Content-type', 'text/csv');
         res.send(csvstr);
