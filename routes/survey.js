@@ -59,7 +59,7 @@ function parseCSV(str) {
     return arr;
 }
 
-<<<<<<< HEAD
+
 exports.exportcsv1 = function(req, res){
     Response.find({},function(err, response_db){
     	var csvstr = [' , Id, Question1, Question2, Question3, Question4, Question5, Question6, Question7, Question8, Question9, Question10, Question11, Question12, Question13, Question14, Question15, Question16, '];
@@ -71,15 +71,4 @@ exports.exportcsv1 = function(req, res){
         console.log(csvstr);
     });
 };
-=======
-exports.exportcsv = function(req, res) {
-	Response.find().exec(function(err, response_db) {
-		var csvstr = [];
-		for(i=0; i < response_db.length; i++) {
-			csvstr[i] = response_db[i].id.toString() + "," + response_db[i].results.join(",") +"\n";
-		}	
-	var uriContent = "data:text/csv;charset=utf-8," + encodeURIComponent(parseCSV(csvstr)[0] + "\n"); 
-	res.render('_csvexport.jade', {content: uriContent})
-	})
-}
->>>>>>> b476b043f95502735822fb1ee9506618cfe47d16
+
