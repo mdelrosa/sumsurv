@@ -1,10 +1,33 @@
 extends layout
 
 block content
-	div.fluid-row
-		div.span4
-			h1 About Us
-			p This is the about page. We're gonna put our epic stories here.
-		div.offset2.pad
-			a.button.btn-info.btn-large(href='/')
-				Click For Cookies
+
+	div.container
+
+		div.page-header
+			| <h1>Autonomous Human Labs <small>About the team</small></h1>
+
+		ul.thumbnails
+			li.span3
+				div.thumbnail
+					img.about-img(data-src='holder.js/300x200', alt='', src='http://i3.researchgate.net/i/profile/9fcfd511e5535194ec_l_3a14c.jpg')
+					| <h4>Jon Stolk <small>aka J-Sizzle</small></h4>
+					p Snappy dresser, movie enthusiast, and hater of morning.
+			li.span3
+				div.thumbnail
+					img.about-img(data-src='holder.js/300x200', alt='', src='http://cdn.backyardchickens.com/4/40/409912b8_huge-beard-man.jpeg')
+					| <h4> Alex Dillon <small>aka Smooth Plotz</small></h4>
+					p Coffee connoussier, bearded warrior, and master of charts.
+			li.span3
+				div.thumbnail
+					img.about-img(data-src='holder.js/300x200', alt='', src='https://fbcdn-sphotos-h-a.akamaihd.net/hphotos-ak-ash3/733835_10200776964168725_1349741006_n.jpg')
+					| <h4> Doyung Lee <small>aka Dolla D Piles</small></h4>
+					p Graphic artist, voice actor, and kisser of equestrians.
+			li.span3
+				div.thumbnail
+					img.about-img(data-src='holder.js/300x200', alt='', src='https://sphotos-b.xx.fbcdn.net/hphotos-frc1/419274_10200659618883791_1489128388_n.jpg')
+					| <h4> Mason del Rosario <small>aka Chronic Mase</small></h4>
+					p Google junkie, Japan-ophile, and swinger of fire
+
+		- var html = "<script>var width = $('img.about-img').width(); $('img.about-img').css({'height':width+'px'})</script>"
+		| !{html}
