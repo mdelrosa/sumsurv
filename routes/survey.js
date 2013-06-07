@@ -59,6 +59,7 @@ function parseCSV(str) {
     return arr;
 }
 
+
 exports.exportcsv1 = function(req, res){
     Response.find({},function(err, response_db){
     	var csvstr = [' , Id, Question1, Question2, Question3, Question4, Question5, Question6, Question7, Question8, Question9, Question10, Question11, Question12, Question13, Question14, Question15, Question16, '];
@@ -70,3 +71,4 @@ exports.exportcsv1 = function(req, res){
         console.log(csvstr);
     });
 };
+
