@@ -6,10 +6,11 @@ block scripts
 block content
   div.container#main-container
     br
-    h1 THE SITUATIONAL MOTIVATION SCALE (SIMS)
+    h1 The Situational Motivation Scale (SIMS)
     br
+
     div#survey-container
-      ul.nav.nav-tabs#myTab
+      ul.nav.nav-pills#myTab
         li.active
           a(href='#demographic', data-toggle='pill') Demographic
         li
@@ -18,56 +19,61 @@ block content
           a(href='#questions', data-toggle='pill') Questions
         li
           a(href='#comments', data-toggle='pill') Comments
- 
+   
       .tab-content#formHolder
         #demographic.tab-pane.active
           div.row-fluid
-            div.span3
-              table.table.table-striped.table-condensed.table-hover.table-question
-                form
-                  tr
-                    th With regard to gender, I identify as:
-                  tr
-                    td
-                      input.mult-choice(type='radio', name="gender", value="Female")
-                      p.inline Female
-                  tr
-                    td
-                      input.mult-choice(type='radio', name="gender", value="Male")
-                      p.inline Male
-                  tr
-                    td
-                      input.mult-choice(type='radio', name="gender", value="Other")
-                      p.inline Other
-                  tr
-                    td
-                      input.mult-choice(type='radio', name="gender", value="unspecified")
-                      p.inline Do not care to specify
-            div.span4
-              table.table.table-striped.table-condensed.table-hover.table-question
-                form
-                  tr
-                    th Please specify your year of study.
-                  tr
-                    td
-                      input.mult-choice(type='radio', name="year", value="First-year")
-                      p.inline First-year
-                  tr
-                    td
-                      input.mult-choice(type='radio', name="year", value="Sophomore")
-                      p.inline Sophomore
-                  tr
-                    td
-                      input.mult-choice(type='radio', name="year", value="Junior")
-                      p.inline Junior
-                  tr
-                    td
-                      input.mult-choice(type='radio', name="year", value="Senior")
-                      p.inline Senior
+            div.span3.table-question
+              table.table.table-striped.table-condensed.table-hover#table-question1
+                tr
+                  th With regard to gender, I identify as:
+                tr
+                  td
+                    input.mult-choice(type='radio', name="gender", value="Female")
+                    p.inline Female
+                tr
+                  td
+                    input.mult-choice(type='radio', name="gender", value="Male")
+                    p.inline Male
+                tr
+                  td
+                    input.mult-choice(type='radio', name="gender", value="Other")
+                    p.inline Other
+                tr
+                  td
+                    input.mult-choice(type='radio', name="gender", value="unspecified")
+                    p.inline Do not care to specify
+            div.span3.table-question
+              table.table.table-striped.table-condensed.table-hover#table-question2
+                tr
+                  th Please specify your year of study.
+                tr
+                  td
+                    input.mult-choice(type='radio', name="year", value="First-year")
+                    p.inline First-year
+                tr
+                  td
+                    input.mult-choice(type='radio', name="year", value="Sophomore")
+                    p.inline Sophomore
+                tr
+                  td
+                    input.mult-choice(type='radio', name="year", value="Junior")
+                    p.inline Junior
+                tr
+                  td
+                    input.mult-choice(type='radio', name="year", value="Senior")
+                    p.inline Senior
+          div.pull-right.pad-top.tab-control
+            a.btn.btn-info(href="#status") Next
         #status.tab-pane
           div.text-question
             h4 Provide a brief description of your current activities in the course.
             textarea.status-text(placeholder='Open-ended project work, laboratory experiments, research, lectures, problem sets, etc.')
+          div.fluid-row
+            div.pull-left.tab-control
+              a.btn.btn-info(href="#demographic") Previous
+            div.pull-right.tab-control
+              a.btn.btn-info(href="#questions") Next
         #questions.tab-pane
           h5 Directions: Read each item carefully. Using the scale below, please circle the number that best describes the reason why you are currently engaged in this activity. Answer each item according to the following scale: 1: corresponds not at all; 2: corresponds a very little; 3: corresponds a little; 4: corresponds moderately; 5: corresponds enough; 6: corresponds a lot; 7: corresponds exactly.
           br
@@ -450,11 +456,20 @@ block content
                        input#optionsRadios6(type='radio', name='optionsRadios16', value='option6')
                    td
                      label.radio
-                       input#optionsRadios7(type='radio', name='optionsRadios16', value='option7')            
+                       input#optionsRadios7(type='radio', name='optionsRadios16', value='option7')          
+          div.fluid-row
+            div.pull-left.tab-control
+              a.btn.btn-info(href="#status") Previous
+            div.pull-right.tab-control
+              a.btn.btn-info(href="#comments") Next  
         #comments.tab-pane
           div.text-question
             h4 Is there any part of your experiences in this class since the last survey that sticks out in your mind?
-            textarea(placeholder='Optional')
+            textarea.comment-text(placeholder='Optional')
             div
+          div.fluid-row
+            div.pull-left.tab-control
+              a.btn.btn-info(href="#demographic") Previous
+            div.pull-right.tab-control
               a.btn.btn-info.btn-large(id = 'submitform', value = 'Submit', name = 'submitform') Submit 
-              div.pull-right#alertDiv
+          div.pull-right#alertDiv

@@ -25,6 +25,17 @@ a {
 	min-width: 100%
 }
 
+<<<<<<< HEAD
+=======
+.about-img {
+	width: 100%;
+}
+
+.inline {
+	display: inline;
+	margin-left: 1em
+}
+
 .hero-unit1 {
 	padding: 60px;
 	margin-bottom: 30px;
@@ -36,4 +47,13 @@ a {
 	-moz-border-radius: 6px;
 	border-radius: 6px;
 	background-image: url(linedbanner.png)
+}
+
+textarea {
+	min-width: 50%;
+	max-width: 100%;
+}
+
+.incomplete {
+	background-color: rgb(250, 242, 204);
 }
