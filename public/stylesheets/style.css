@@ -25,8 +25,7 @@ a {
 	min-width: 100%
 }
 
-<<<<<<< HEAD
-=======
+
 .about-img {
 	width: 100%;
 }
@@ -51,4 +50,15 @@ a {
 
 textarea {
 	min-width: 50%
+}
+
+#optionsRadios1 {
+	display: inline-block;
+	margin-left: 35%;
+	margin-right: auto;
+}
+
+.radio input[type="radio"] {
+float: left;
+margin-left: 35%;
 }

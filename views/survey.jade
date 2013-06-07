@@ -69,20 +69,35 @@ block content
             h4 Provide a brief description of your current activities in the course.
             textarea.status-text(placeholder='Open-ended project work, laboratory experiments, research, lectures, problem sets, etc.')
         #questions.tab-pane
-          h5 Directions: Read each item carefully. Using the scale below, please circle the number that best describes the reason why you are currently engaged in this activity. Answer each item according to the following scale: 1: corresponds not at all; 2: corresponds a very little; 3: corresponds a little; 4: corresponds moderately; 5: corresponds enough; 6: corresponds a lot; 7: corresponds exactly.
+          h5 Directions: Read each item carefully. Using the scale below, please circle the number that best describes the reason why you are currently engaged in this activity. Answer each item according to the following scale: 
+          | 1: corresponds not at all;
+          br 
+          | 2: corresponds very little; 
           br
+          | 3: corresponds a little; 
+          br
+          | 4: corresponds moderately; 
+          br
+          | 5: corresponds enough; 
+          br
+          | 6: corresponds a lot; 
+          br
+          | 7: corresponds exactly.
+          br
+          h5 Why are you currently engaged in this activity?
           div#container
             form(method='post', action='/', id='surveyform')   
-              table.table.table-striped.table-condensed.table-hover
+              table.table.table-striped.table-condensed.table-hover         
                  tr
                   th Questions:
-                  th 1
-                  th 2
-                  th 3
-                  th 4
-                  th 5
-                  th 6
-                  th 7  
+                  <th><P ALIGN="center"><small> 1 -corresponds not at all<small></td></P> 
+                  <th><P ALIGN="center"><small> 2 -corresponds very little<small></td></P> 
+                  <th><P ALIGN="center"><small> 3 -corresponds a little<small></td></P> 
+                  <th><P ALIGN="center"><small> 4 -corresponds moderately<small></td></P> 
+                  <th><P ALIGN="center"><small> 5 -corresponds enough<small></td></P> 
+                  <th><P ALIGN="center"><small> 6 -corresponds a lot<small></td></P> 
+                  <th><P ALIGN="center"><small> 7 -corresponds exactly<small></td></P>
+                 
                  tr#question1.question
                    td 1. Because I think this activity is interesting
                    td
