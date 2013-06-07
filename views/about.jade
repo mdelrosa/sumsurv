@@ -1,6 +1,13 @@
 extends layout
 
 block content
+	div.fluid-row
+		div.span4
+			h1 About Us
+			p This is the about page. We're gonna put our epic stories here.
+		div.offset2.pad
+			a.button.btn-info.btn-large(href='/')
+				Click Take Survey
 
 	div.container
 
@@ -32,3 +39,4 @@ block content
 
 		- var html = "<script>var width = $('img.about-img').width(); $('img.about-img').css({'height':width+'px'})</script>"
 		| !{html}
+

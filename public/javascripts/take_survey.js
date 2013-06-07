@@ -19,10 +19,56 @@ $(document).ready(function() {
 
 		$('div.alert').remove();
 
+<<<<<<< HEAD
 		var resultsArray = checkInputs(),
 			results = resultsArray[0],
 			$demoQuest = resultsArray[1][0],
 			$radioQuest = resultsArray[1][2];
+=======
+		var $demoQuest = $('form table.table-question')
+			, $statusQuest = $('textfield.status-text')
+			, $radioQuest = $('form tr.question')
+			, results = new Array;
+
+		// ** NOTE: Each of these for loops will most likely become a helper **
+		// ** function once we write the generalized code **
+
+		// Demographic tab
+		for (i=0;i<$demoQuest.length;i++) {
+			// grab demographic responses
+			var answers = $demoQuest[i].getElementsByTagName('input'),
+				res = undefined
+
+			//find checked button in response
+			for (j=0;j<answers.length;j++) {
+				if (answers[j].checked) {
+					res = answers[j].getAttribute("text");
+				}
+			}
+			results.push(res);
+		}
+
+		// Status tab
+		console.log('Status text',$('textarea.status-text').val());
+
+		// Questions tab
+		for (i=0;i<$radioQuest.length;i++) {
+			// grab questions from table
+			var answers = $radioQuest[i].getElementsByTagName('input'),
+				res = undefined;
+			
+			//find checked button in response
+			for (j=0;j<answers.length;j++) {
+				if (answers[j].checked) {
+					res = j+1;
+				}
+			}
+			results.push(res);
+		}
+
+		// Comments tab
+		console.log('comments', $('textarea.comments-text').val())
+>>>>>>> b651f98b7437b6cef5cd8fadfb2c777ed569ba1b
 
 		if (results.indexOf(undefined) > -1) {
 			// survey was not completed, notify user

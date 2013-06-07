@@ -43,6 +43,10 @@ app.get('/about', user.about);
 app.get('/splash', user.splash);
 app.get('/survey', user.survey);
 app.get('/survey/success', user.survey_success);
+app.get('/export', user.exportcsv);
+
+//exporting page route(s)
+app.get('/export/csv', survey.exportcsv1);
 
 // handling survey objects
 app.post('/survey/success', survey.save_response);

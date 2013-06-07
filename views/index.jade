@@ -1,11 +1,14 @@
 extends layout
 
 block content
-	div.fluid-row
-		div.span4
-			h1= title
-			p This is the home page. We're gonna put a big old photo here.
-		div.offset2.pad
-			br
-			a.button.btn-info.btn-large(href='/survey')
-				Click For Cookies
+	br
+	br
+	.hero-unit1(style='linedbanner.png')
+		div.fluid-row
+			div.span4
+				h1= title
+				p This is the home page. This is a not so big ol' photo.
+			div.row-fluid.pad-top(style='right')
+				br
+				a.button.btn-info.btn-large(href='/survey')
+					Click Take Survey

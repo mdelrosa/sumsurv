@@ -36,3 +36,9 @@ exports.survey_success = function(req, res) {
 		title: "Stolk-vey"
 	});
 }
+
+exports.exportcsv = function(req, res) {
+	res.render('exportcsv', {
+		title: 'Stolk-vey'
+	});
+}
