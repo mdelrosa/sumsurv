@@ -1,0 +1,22 @@
+//- login.jade
+
+extends layout
+
+block content
+	.login-container.hero
+		.row-fluid
+			.span6
+				form.form-horizontal.form-login
+					fieldset
+						legend Log In
+						.control-group
+							label.control-label Username
+							.controls
+								input(type="text", placeholder="Enter username or email")
+						.control-group
+							label.control-label Password
+							.controls
+								input(type="text", placeholder="Enter password")
+						.control-group
+							.controls
+								a.btn.btn-large Submit

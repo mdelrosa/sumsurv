@@ -9,8 +9,24 @@ var express = require('express')
   , survey = require('./routes/survey')
   , http = require('http')
   , path = require('path')
+  , passport = require('passport')
   , mongoose = require('mongoose')
-  , MongoStore = require('connect-mongo')(express);
+  , MongoStore = require('connect-mongo')(express)
+  , Models = require('./models/models')
+  , User = Models.User;
+
+// Seed the admin
+var admin = new User({
+    username: 'stolktacular',
+    email: "Whoop@gmail.com",
+    password: "jsizzle"});
+admin.save(function(err) {
+  if(err) {
+    console.log(err);
+  } else {
+    console.log("admin: " + user.username + " saved");
+  }
+});
 
 var app = express();
 
@@ -27,6 +43,8 @@ app.configure(function(){
   app.use(express.methodOverride());
   app.use(express.cookieParser(app.get('secret')));
   app.use(express.session({ secret: '2fast2furious' }));
+  app.use(passport.initialize());
+  app.use(passport.session());
   app.use(app.router);
   app.use(express.static(path.join(__dirname, 'public')));
 });
@@ -35,15 +53,16 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
-
 // static page routes
 app.get('/', routes.index);
 app.get('/users', user.list);
 app.get('/about', user.about);
 app.get('/splash', user.splash);
 app.get('/survey', user.survey);
-app.get('/survey/success', user.survey_success);
-app.get('/export', user.exportcsv);
+app.get('/export', ensureAuthenticated, user.exportcsv);
+
+// user routes
+app.get('/login', user.login);
 
 //exporting page route(s)
 app.get('/export/csv', survey.exportcsv1);
@@ -54,3 +73,9 @@ app.post('/survey/success', survey.save_response);
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
+
+// Login middleware
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {return next()}
+  res.redirect('/login');
+}

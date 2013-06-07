@@ -55,3 +55,7 @@ textarea {
 .incomplete {
 	background-color: rgb(250, 242, 204);
 }
+
+.login-container {
+	padding: 1em;
+}

@@ -31,14 +31,16 @@ exports.survey = function(req, res) {
 	});
 }
 
-exports.survey_success = function(req, res) {
-	res.render('response_success', {
-		title: "Stolk-vey"
-	});
-}
-
 exports.exportcsv = function(req, res) {
 	res.render('exportcsv', {
 		title: 'Stolk-vey'
 	});
+}
+
+// Handle auth
+
+exports.login = function(req, res) {
+	res.render("login", {
+		title: 'Stolk-vey'
+	})
 }
