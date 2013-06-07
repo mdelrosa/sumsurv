@@ -59,16 +59,37 @@ function parseCSV(str) {
     return arr;
 }
 
+//This function takes away commas to prevent issues in csv
+String.prototype.sliceCharacterFromString = function(char)  {
+        	var i = 0
+            	, newString = "";
+	        while (i < this.length) {
+    	        if (this[i] !== char) {
+        	        newString = newString + this[i];
+            	}
+            	else {
+            		newString = newString + '|>';
+            	}
+	            i = i + 1;
+	        }
+    	    return newString
+}
+
+function decommafy(str) {
+	return str.sliceCharacterFromString(",");	
+
+}
 
 exports.exportcsv1 = function(req, res){
     Response.find({},function(err, response_db){
-    	var csvstr = [' , Id, Gender, Year, Status, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Comment, '];
+    	var csvstr = [' , Id, Gender, Year, Status, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Comment, '];    	
     	for(i=1; i < response_db.length+1; i++) {
+    		response_db[i-1].results[2] = decommafy(response_db[i-1].results[2]);
+    		response_db[i-1].results[19] = decommafy(response_db[i-1].results[19]);
 			csvstr[i] = " ," + response_db[i-1].id + "," + response_db[i-1].results.join(",") + ", ";
 		}
         res.header('Content-type', 'text/csv');
         res.send(csvstr);
-        console.log(csvstr);
     });
 };
 
