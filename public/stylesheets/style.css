@@ -59,6 +59,10 @@ textarea {
 }
 
 .radio input[type="radio"] {
-float: left;
-margin-left: 35%;
+	float: left;
+	margin-left: 35%;
+}
+
+.incomplete {
+	background-color: rgb(250, 242, 204);
 }
