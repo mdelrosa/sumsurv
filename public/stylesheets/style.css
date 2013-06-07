@@ -48,5 +48,10 @@ a {
 }
 
 textarea {
-	min-width: 50%
+	min-width: 50%;
+	max-width: 100%;
+}
+
+.incomplete {
+	background-color: rgb(250, 242, 204);
 }
