@@ -4,5 +4,10 @@
  */
 
 exports.index = function(req, res){
-  res.render('index', { title: 'Stolk-vey' });
+  if (req.user) { var user = req.user.username }
+  else { var user = null }
+  res.render('index', {
+  	title: 'Stolk-vey',
+  	user: user
+  });
 };

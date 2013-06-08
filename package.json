@@ -10,6 +10,9 @@
     "jade": "*",
     "mongoose": "~3.6.4",
     "sessions": "0.0.2-7",
-    "connect-mongo": "~0.3.2"
+    "connect-mongo": "~0.3.2",
+    "bcrypt": ">= 0.0.0",
+    "passport": ">= 0.0.0",
+    "passport-local": ">= 0.0.0"
   }
 }

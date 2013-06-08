@@ -9,36 +9,45 @@ exports.list = function(req, res){
 
 exports.about = function(req, res) {
 	res.render('about', {
-		title: 'Stolk-vey'
+		title: 'Stolk-vey',
+		user: req.user
 	});
 }
 
 exports.survey = function(req, res){
   res.render('survey', {
-        title: 'This Survey'
+        title: 'This Survey',
+        user: req.user
   });
 };
 
 exports.splash = function(req, res) {
 	res.render('splash', {
-		title: 'Stolk-vey'
+		title: 'Stolk-vey',
+		user: req.user
 	});
 }
 
 exports.survey = function(req, res) {
 	res.render('survey', {
-		title: 'Stolk-vey'
-	});
-}
-
-exports.survey_success = function(req, res) {
-	res.render('response_success', {
-		title: "Stolk-vey"
+		title: 'Stolk-vey',
+		user: req.user
 	});
 }
 
 exports.exportcsv = function(req, res) {
 	res.render('exportcsv', {
-		title: 'Stolk-vey'
+		title: 'Stolk-vey',
+		user: req.user.username
 	});
+}
+
+// Handle auth
+
+exports.login = function(req, res) {
+	res.render("login", {
+		title: 'Stolk-vey',
+		message: req.session.messages
+	})
+	req.session.messages = null;
 }
