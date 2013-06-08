@@ -6,17 +6,19 @@ block content
 	.login-container.hero
 		.row-fluid
 			.span6
-				form.form-horizontal.form-login
+				form.form-horizontal.form-login(action="/login", method="post")
 					fieldset
 						legend Log In
 						.control-group
 							label.control-label Username
 							.controls
-								input(type="text", placeholder="Enter username or email")
+								input(type="text", placeholder="Enter username or email", name="username")
 						.control-group
 							label.control-label Password
 							.controls
-								input(type="text", placeholder="Enter password")
+								input(type="password", placeholder="Enter password", name="password")
 						.control-group
 							.controls
-								a.btn.btn-large Submit
+								input.btn.btn-large(type="submit", value="Submit") Submit
+				if message
+					div.alert #{message}

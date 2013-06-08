@@ -10,6 +10,7 @@ var express = require('express')
   , http = require('http')
   , path = require('path')
   , passport = require('passport')
+  , LocalStrategy = require('passport-local').Strategy
   , mongoose = require('mongoose')
   , MongoStore = require('connect-mongo')(express)
   , Models = require('./models/models')
@@ -27,6 +28,33 @@ admin.save(function(err) {
     console.log("admin: " + user.username + " saved");
   }
 });
+
+// Passport session setup.
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+})
+
+passport.deserializeUser(function(id, done) {
+  User.findById(id, function(err, user) {
+    done(err, user);
+  })
+})
+
+// Passport set up local strategy
+passport.use(new LocalStrategy(function(username, password, done) {
+  User.findOne({ username: username }, function(err, user) {
+    if (err) { return done(err); }
+    if (!user) {return done(null, false, { message: 'Unknown user ' + username}); }
+    user.comparePassword(password, function(err, isMatch) {
+      if (err) return done(err)
+      if (isMatch) {
+        return done(null, user);
+      } else {
+        return done(null, false, { message: 'Invalid password'});
+      }
+    })
+  })
+}))
 
 var app = express();
 
@@ -63,6 +91,11 @@ app.get('/export', ensureAuthenticated, user.exportcsv);
 
 // user routes
 app.get('/login', user.login);
+app.get('/logout', function(req, res) {
+  req.logout();
+  req.session.destroy();
+  res.redirect('/')
+})
 
 //exporting page route(s)
 app.get('/export/csv', survey.exportcsv1);
@@ -79,3 +112,22 @@ function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {return next()}
   res.redirect('/login');
 }
+
+// Login auth @ post /login
+app.post('/login', function(req, res, next) {
+  passport.authenticate('local', function(err, user, info) {
+    console.log('user', user)
+    if (err) { return next(err) }
+    if (!user) {
+      console.log('login failed')
+      req.session.messages =  [info.message];
+      return res.redirect('/login')
+    }
+    req.logIn(user, function(err) {
+      console.log('successful login')
+      if (err) { return next(err); }
+      req.session.user = user;
+      return res.redirect('/');
+    });
+  })(req, res, next);
+});
