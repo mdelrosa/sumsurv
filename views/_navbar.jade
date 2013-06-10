@@ -10,3 +10,17 @@ div(class="navbar navbar-inverse navbar-fixed-top")
 					a(href='/splash') Survey
 				li
 					a(href='/about') About
+			ul.nav.pull-right
+				if !user
+					li
+						a(href='/login') Log In
+				else
+					li.dropdown
+						a.dropdown-toggle(href='/export', data-toggle="dropdown") Hi, #{user}
+							b.caret
+						ul.dropdown-menu
+							li
+								a(href='/export') Export Data
+							li
+								a(href='/logout') Log Out
+
