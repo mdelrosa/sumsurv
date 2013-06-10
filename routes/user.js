@@ -8,34 +8,44 @@ exports.list = function(req, res){
 };
 
 exports.about = function(req, res) {
+	if (req.user) { var user = req.user.username }
+	else { var user = null }
 	res.render('about', {
 		title: 'Stolk-vey',
-		user: req.user
+		user: user
 	});
 }
 
 exports.survey = function(req, res){
+  if (req.user) { var user = req.user.username }
+  else { var user = null }
   res.render('survey', {
         title: 'This Survey',
-        user: req.user
+        user: user
   });
 };
 
 exports.splash = function(req, res) {
+	if (req.user) { var user = req.user.username }
+	else { var user = null }
 	res.render('splash', {
 		title: 'Stolk-vey',
-		user: req.user
+		user: user
 	});
 }
 
 exports.survey = function(req, res) {
+	if (req.user) { var user = req.user.username }
+	else { var user = null }
 	res.render('survey', {
 		title: 'Stolk-vey',
-		user: req.user
+		user: user
 	});
 }
 
 exports.exportcsv = function(req, res) {
+	if (req.user) { var user = req.user.username }
+	else { var user = null }
 	res.render('exportcsv', {
 		title: 'Stolk-vey',
 		user: req.user.username
