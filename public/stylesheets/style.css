@@ -1,5 +1,5 @@
 body {
-  padding: 50px;
+  padding-top: 40px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
@@ -15,6 +15,10 @@ a {
 
 .pad {
 	padding: 1em;
+}
+
+.margin {
+	margin: 0.5em;
 }
 
 .pad-top {
@@ -58,4 +62,39 @@ textarea {
 
 .login-container {
 	padding: 1em;
+}
+
+/*footer stuff*/
+
+.footer {
+  text-align: center;
+  padding: 30px 0;
+  margin-top: 70px;
+  border-top: 1px solid #e5e5e5;
+  background-color: #f5f5f5;
+  margin-left: -20px;
+  margin-right: -20px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+.footer p {
+  margin-bottom: 0;
+  color: #777;
+}
+.footer-links {
+  margin: 10px 0;
+  display: inline;
+}
+.footer-links li {
+  display: inline;
+  padding: 0 2px;
+}
+.footer-links li:first-child {
+  padding-left: 0;
+}
+
+/* Outlines for testing */
+.outline {
+	border: 3px solid black;
+	border-radius: 5px;
 }
