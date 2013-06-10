@@ -1,8 +1,9 @@
 body {
-  padding-top: 45px;
+  padding-top: 35px;
   padding-left: 0px;
   padding-right: 0px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font: 14px "Merriweather Sans", Helvetica, Arial, sans-serif;
+  color: #000000;
 }
 
 a {
@@ -73,14 +74,16 @@ textarea {
 	padding: 40px 0;
 	color: #fff;
 	text-align: center;
-	text-shadow: 0 1px 3px rgba(0,0,0,.4), 0 0 30px rgba(0,0,0,.075);
-	background: #033954;
-	background: -moz-linear-gradient(45deg, #033954 0%, #36648b 100%);
+	text-shadow: 0 3px 4px rgba(0,0,0,.4), 0 0 30px rgba(0,0,0,.075);
+	
+	background: #4B088A;
+	background: -moz-linear-gradient(0deg, #4B088A 0%, #36648b 100%);
 	background: -webkit-gradient(linear, left bottom, right top, color-stop(0%,#033954), color-stop(100%,#36648b));
-	background: -webkit-linear-gradient(45deg, #033954 0%,#36648b 100%);
-	background: -o-linear-gradient(45deg, #033954 0%,#36648b 100%);
-	background: -ms-linear-gradient(45deg, #033954 0%,#36648b 100%);
-	background: linear-gradient(45deg, #033954 0%,#36648b 100%);
+	background: -webkit-linear-gradient(0deg, #4B088A 0%,#36648b 100%);
+	background: -o-linear-gradient(0deg, #4B088A 0%,#36648b 100%);
+	background: -ms-linear-gradient(0deg, #4B088A 0%,#36648b 100%);
+	background: linear-gradient(0deg, #4B088A 0%,#36648b 100%);
+
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#033954', endColorstr='#6d3353',GradientType=1 );
 	-webkit-box-shadow: inset 0 3px 7px rgba(0,0,0,.2), inset 0 -3px 7px rgba(0,0,0,.2);
 	-moz-box-shadow: inset 0 3px 7px rgba(0,0,0,.2), inset 0 -3px 7px rgba(0,0,0,.2);
@@ -95,7 +98,7 @@ textarea {
 	right: 0;
 	bottom: 0;
 	left: 0;
-	background: url(auto-form.png) repeat center center;
+	background: url(tut.png) repeat center center;
 	opacity: .2;
 }
 
@@ -115,3 +118,65 @@ textarea {
 	font-weight: 200;
 	line-height: 1.25;
 }
+
+.login-container {
+	padding: 1em;
+}
+
+.navbar-inverse1 .navbar-inner1 {
+	background-color: #8904B1;
+	background-repeat: repeat-x;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#CCFB5D', endColorstr='#CCFB5D', GradientType=0);
+	border-color: #8904B1;
+	background: -moz-linear-gradient(0deg, #4B088A 0%, #36648b 100%);
+	background: -webkit-gradient(linear, left bottom, right top, color-stop(0%,#033954), color-stop(100%,#36648b));
+	background: -webkit-linear-gradient(0deg, #4B088A 0%,#36648b 100%);
+	background: -o-linear-gradient(0deg, #4B088A 0%,#36648b 100%);
+	background: -ms-linear-gradient(0deg, #4B088A 0%,#36648b 100%);
+	background: linear-gradient0deg, #4B088A 0%,#36648b 100%);
+}
+
+.brand1 {
+	float: left;
+	display: block;
+	padding: 10px 20px 10px;
+	margin-left: -20px;
+	font-size: 20px;
+	font-weight: 200;
+	color: #ffffff;
+	text-shadow: 0 0px 0 #000000;
+	border: none;
+}
+
+.brand1:hover{
+	color: #ffffff;
+	text-decoration:none; 
+	border: none;
+}
+
+.navbar .nav1 > li > a {
+	float: none;
+	padding: 10px 15px 10px;
+	color: #ffffff;
+	text-decoration: none;
+	text-shadow: 0 1px 0 #000000;
+	outline: none
+}
+
+.nav1 .pull-right {
+	float: right;
+}
+
+navbar .nav1 li.dropdown.open > .dropdown-toggle1, .navbar .nav1 li.dropdown.active > .dropdown-toggle1, .navbar .nav1 li.dropdown.open.active > .dropdown-toggle1 {
+	background-color: rgb(255, 255, 255);
+	color: rgb(255, 255, 255);
+	outline: none
+}
+
+.navbar .nav1 > li > a:focus, .navbar .nav1 > li > a:hover {
+	background-color: transparent;
+	color: #999999;
+	text-decoration: none;
+	outline: none
+}
+

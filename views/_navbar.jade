@@ -1,12 +1,26 @@
 //- navbar
 
-div(class="navbar navbar-inverse navbar-fixed-top")
-	div(class='navbar-inner')
+div(class="navbar navbar-inverse1 navbar-fixed-top")
+	div(class='navbar-inner1')
 		div(class='container-fluid')
-			a(class="brand", href="/")
-				img(src='hal.png')
-			ul(class='nav')
+			a(class="brand1", href="/") Automobile
+			ul(class='nav1 nav')
 				li
 					a(href='/splash') Survey
 				li
 					a(href='/about') About
+			ul(class='nav1 nav pull-right')
+				if !user
+					li
+						a(href='/login') Log In
+				else
+					li.dropdown1
+						a.dropdown-toggle(href='/export', data-toggle="dropdown") Hi, #{user}
+							b.caret
+						ul.dropdown-menu
+							li
+								a(href='/export') Export Data
+							li
+								a(href='/logout') Log Out
+
+
