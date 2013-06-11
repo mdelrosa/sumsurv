@@ -106,6 +106,7 @@ app.get('/logout', function(req, res) {
 app.get('/export/csv', survey.exportcsv1);
 
 // handling survey objects
+app.post('/survey/create', survey.create);
 app.post('/survey/success', survey.save_response);
 
 http.createServer(app).listen(app.get('port'), function(){

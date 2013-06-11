@@ -3,7 +3,9 @@
  * GET users listing.
  */
 
-var baseHead = 'Stolk-vey';
+var baseHead = 'Stolk-vey'
+	, Models = require('../models/models')
+	, Survey = Models.survey;
 
 exports.list = function(req, res){
   res.send("respond with a resource");
@@ -28,10 +30,13 @@ exports.survey = function(req, res){
 };
 
 exports.create = function(req, res) {
-	res.render('create', {
-		title: baseHead + ' | Create New Survey',
-		user: req.user.username
-	})
+	Survey.find({creator: req.user}).exec(function(err, user_surveys) {
+		res.render('create', {
+			title: baseHead + ' | Create New Survey',
+			user: req.user.username,
+			surveys: user_surveys
+		});
+	});
 }
 
 exports.splash = function(req, res) {

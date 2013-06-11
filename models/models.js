@@ -4,15 +4,31 @@ var mongoose = require('mongoose')
 	, bcrypt = require('bcrypt')
 	, SALT_WORK_FACTOR = 10;
 
+// Page schema
+var pageSchema = mongoose.Schema({
+	name: { type: String, required: true, unique: false},
+	type: { type: String, required: true, unique: false},
+	questions: { type: Array, required: true}
+}),
+	Page = mongoose.model('Page', pageSchema);
+exports.page = Page;
+
+// Survey schema
+var surveySchema = mongoose.Schema({
+	name: {type: String, required: true, unique: false},
+	pages: { type: mongoose.Schema.Types.ObjectId, ref: "Page" },
+	creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User'}
+}),
+	Survey = mongoose.model('Survey', surveySchema);
+exports.survey = Survey;
+
 // Response schema
 // **NOTE: Will have to inherit result structure from Survey schema eventually. **
 var responseSchema = mongoose.Schema({
 	id: Number,
 	results: Array
-});
-
-// Export responses
-var Response = mongoose.model('Response', responseSchema);
+}),
+	Response = mongoose.model('Response', responseSchema);
 exports.response = Response;
 
 // User schema

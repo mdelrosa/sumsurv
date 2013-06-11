@@ -2,14 +2,39 @@
 // Handle acreating/editing/submitting survey objects
 
 var Models = require('../models/models')
-	, Response = Models.response;
+	, Response = Models.response
+    , Survey = Models.survey
+    , Page = Models.page;
+
+exports.create = function(req, res) {
+    console.log("User ID", req.user._id);
+    Survey.find({creator: req.user._id}).exec(function(err, survey_db) {
+        if (err) { console.log('Unable to find surveys'); return false}
+        // If survey of this name exists, then send a failure message
+        for (i=0;i<survey_db.length;i++) {
+            if (survey_db[i].name === req.body.name) {
+                res.send({success:false, message:"This survey already exists!"});
+                return false
+            }
+        }
+        // Save new survey
+        var new_survey = new Survey({name: req.body.name, creator: req.user});
+        new_survey.save(function(err) {
+            if(err) {
+                console.log('Unable to save survey');
+                res.send({success:false, message: "Unable to save your survey. Please try again!"})
+                return false
+            }
+            console.log("Successfully save new survey!");
+            res.send({success:true});
+        })
+    })
+}
 
 exports.save_response = function(req, res) {
-	console.log(req.body)
 	Response.find().exec(function(err, response_db) {
 		if(err) {console.log('Unable to find responses'); return false}
 		var newID = response_db.length;
-		console.log('newID', newID);
 		var new_response = new Response({id: newID, results: req.body.results});
 		new_response.save(function(err) {
 			if(err) {
@@ -20,8 +45,7 @@ exports.save_response = function(req, res) {
 			console.log('Successfully saved new response!');
 			res.send({success:true});
 		})	
-	})	
-	
+	})
 }
 
 //parseCSV and download to computer
