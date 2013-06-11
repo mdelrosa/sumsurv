@@ -59,3 +59,12 @@ exports.login = function(req, res) {
 	})
 	req.session.messages = null;
 }
+
+exports.import = function(req, res) {
+	if (req.user) { var user = req.user.username }
+    else { var user = null }
+	res.render("import", {
+		title: 'Stolk-vey',
+		user: user
+	});
+}

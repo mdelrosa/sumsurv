@@ -97,6 +97,13 @@ app.get('/logout', function(req, res) {
   res.redirect('/')
 })
 
+
+//import text file
+app.get('/import', user.import);
+
+//get that text file's data
+app.post('/import', survey.import);
+
 //exporting page route(s)
 app.get('/export/csv', survey.exportcsv1);
 

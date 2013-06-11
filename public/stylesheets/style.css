@@ -98,8 +98,8 @@ textarea {
 	right: 0;
 	bottom: 0;
 	left: 0;
-	background: url(tut.png) repeat center center;
-	opacity: .2;
+	background: url(startup.jpg);
+	opacity: .4;
 }
 
 .jumbotron .container {

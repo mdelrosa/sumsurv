@@ -22,6 +22,17 @@ var userSchema = mongoose.Schema({
 	password: {type: String, required: true}
 });
 
+// Email list serve schema
+var emaillistSchema = mongoose.Schema({
+	emailarray: Array
+});
+
+// Export emailist
+var Emaillist = mongoose.model('Emaillist', emaillistSchema);
+exports.emaillist = Emaillist;
+
+
+
 // Bcrypt middleware
 userSchema.pre('save', function(next) {
 	var user = this;

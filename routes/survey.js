@@ -2,7 +2,8 @@
 // Handle acreating/editing/submitting survey objects
 
 var Models = require('../models/models')
-	, Response = Models.response;
+	, Response = Models.response
+    , Emaillist = Models.emaillist;
 
 exports.save_response = function(req, res) {
 	console.log(req.body)
@@ -93,3 +94,19 @@ exports.exportcsv1 = function(req, res){
     });
 };
 
+
+exports.import = function(req, res) {
+    Emaillist.find().exec(function(err, emaillist_db) {
+        if(err) {console.log('Unable to find responses'); return false}
+        var new_emaillist = new Emaillist({emailarray: req.body.emailarray});
+        new_emaillist.save(function(err) {
+            if(err) {
+                console.log('Unable to save response');
+                res.send({success:false})
+                return false;
+            }
+            console.log('Successfully obtained emails!');
+            res.send({success:true});
+        })  
+    })  
+}
