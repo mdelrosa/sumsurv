@@ -75,7 +75,6 @@ textarea {
 	color: #fff;
 	text-align: center;
 	text-shadow: 0 3px 4px rgba(0,0,0,.4), 0 0 30px rgba(0,0,0,.075);
-	
 	background: #4B088A;
 	background: -moz-linear-gradient(0deg, #4B088A 0%, #36648b 100%);
 	background: -webkit-gradient(linear, left bottom, right top, color-stop(0%,#033954), color-stop(100%,#36648b));
@@ -98,7 +97,7 @@ textarea {
 	right: 0;
 	bottom: 0;
 	left: 0;
-	background: url(startup.jpg);
+	background: url(startup.jpg);  background-size: 100%;
 	opacity: .4;
 }
 
