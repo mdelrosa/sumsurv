@@ -90,9 +90,10 @@ app.get('/splash', user.splash);
 app.get('/survey', user.survey);
 app.get('/survey/create', ensureAuthenticated, user.create);
 app.get('/export', ensureAuthenticated, user.exportcsv);
+app.get('/mail', user.mail);
 
 // Mail routes
-app.get('/mail', ensureAuthenticated, mail.test_mail);
+app.get('/mail/send', mail.test_mail);
 
 // user routes
 app.get('/login', user.login);
