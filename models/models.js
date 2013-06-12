@@ -8,14 +8,16 @@ var mongoose = require('mongoose')
 var pageSchema = mongoose.Schema({
 	name: { type: String, required: true, unique: false},
 	type: { type: String, required: true, unique: false},
-	questions: { type: Array, required: true}
+	questions: { type: Array, required: true},
+	survey: { type: mongoose.Schema.Types.ObjectId, ref: 'Survey', required: true },
+	settings: { type: Object, required: true }
 }),
 	Page = mongoose.model('Page', pageSchema);
 exports.page = Page;
 
 // Survey schema
 var surveySchema = mongoose.Schema({
-	name: {type: String, required: true, unique: false},
+	name: { type: String, required: true, unique: false},
 	pages: { type: mongoose.Schema.Types.ObjectId, ref: "Page" },
 	creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User'}
 }),

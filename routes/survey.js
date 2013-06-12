@@ -6,8 +6,9 @@ var Models = require('../models/models')
     , Survey = Models.survey
     , Page = Models.page;
 
+// --Survey creation-- //
+// Add new survey object to database
 exports.create = function(req, res) {
-    console.log("User ID", req.user._id);
     Survey.find({creator: req.user._id}).exec(function(err, survey_db) {
         if (err) { console.log('Unable to find surveys'); return false}
         // If survey of this name exists, then send a failure message
@@ -29,6 +30,18 @@ exports.create = function(req, res) {
             res.send({success:true});
         })
     })
+}
+
+// Render page partial of current survey
+exports.current_pages = function(req, res) {
+    Survey.find({creator: req.user, name: req.body.name}).exec(function(err, current_surv) {
+        if(err) {console.log("Unable to find survey")}
+        else {
+            res.render('_currentPages', {
+                pages: current_surv.pages
+            });
+        }
+    });
 }
 
 exports.save_response = function(req, res) {

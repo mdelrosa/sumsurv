@@ -102,6 +102,9 @@ app.get('/logout', function(req, res) {
   res.redirect('/')
 })
 
+// Survey creation partials
+app.get('/pages/current', survey.current_pages);
+
 //exporting page route(s)
 app.get('/export/csv', survey.exportcsv1);
 
