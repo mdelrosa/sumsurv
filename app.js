@@ -7,6 +7,7 @@ var express = require('express')
   , routes = require('./routes')
   , user = require('./routes/user')
   , survey = require('./routes/survey')
+  , mail = require('./routes/mail')
   , http = require('http')
   , path = require('path')
   , passport = require('passport')
@@ -87,7 +88,11 @@ app.get('/users', user.list);
 app.get('/about', user.about);
 app.get('/splash', user.splash);
 app.get('/survey', user.survey);
+app.get('/survey/create', ensureAuthenticated, user.create);
 app.get('/export', ensureAuthenticated, user.exportcsv);
+
+// Mail routes
+app.get('/mail', ensureAuthenticated, mail.test_mail);
 
 // user routes
 app.get('/login', user.login);
