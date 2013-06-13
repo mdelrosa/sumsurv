@@ -2,6 +2,45 @@
 
 $(document).ready(function() {
 
+	var activateEdit = function() {
+
+		$('.edit-link').mouseenter(function() {
+			if (!$(this).hasClass('editing')) {
+				$(this).append(' Edit?');
+			}
+			$(this).mouseleave(function() {
+				if (!$(this).hasClass('editing')) {
+					$(this).html('<i class="icon icon-edit"></i>');
+				}
+			});
+		});
+
+		$('.edit-link').click(function() {
+			$('.edit-link').html('<i class="icon icon-edit"></i>');
+			$('.editing').toggleClass('editing');
+			$(this).html('<i class="icon icon-edit"></i> Editing');
+			$(this).toggleClass('editing');
+			setPagesDiv($(this).attr('name'));
+		});
+		
+	}
+
+	var setPagesDiv = function(name) {
+		$('div.current-surv h3').fadeOut("fast", function() {
+			$(this).html(name).fadeIn("fast");
+		});
+		$.get('/pages/current', {name: name}, function(data) {
+			if(data.err) {console.log("Unable to get pages"); return false}
+			else {
+				$('div.margin.pages').fadeOut("fast", function() {
+					$(this).html(data).fadeIn("fast");
+				});
+			}
+		});
+	}
+
+	activateEdit();
+
 	// initialize new-survey popover
 	$('.btn-new').popover({trigger: 'click', html: true, placement: 'right'});
 
@@ -26,15 +65,19 @@ $(document).ready(function() {
 							if (res.success === true) {
 								// Add survey editing options to page
 								$('form.name-input').slideUp();
-								$('div.current-surv h3').fadeOut("slow", function() {
-									$(this).html(survName).fadeIn("slow");
-								});
-								$.get('/pages/current', {name: survName}, function(data) {
-									if(data.err) {console.log("Unable to get pages"); return false}
+								setPagesDiv(survName);
+								$.get('/surveys/all', function(data) {
+									if (data.err) { console.log("Unable to update surveys"); return false}
 									else {
-										$('div.margin.pages').append(data);
+										$('div.survey-container').fadeOut("fast", function() {
+											$(this).html(data).fadeIn("fast", function() {
+												$('tr:last td a.edit-link').append(" Editing").toggleClass("editing");
+												activateEdit();
+											});
+										});
 									}
 								});
+								
 								$('.btn-new').popover("toggle");
 							}
 							else {

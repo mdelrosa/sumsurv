@@ -3,7 +3,7 @@
  * GET users listing.
  */
 
-var baseHead = 'Stolk-vey'
+var baseHead = 'Survo'
 	, Models = require('../models/models')
 	, Survey = Models.survey;
 
@@ -65,4 +65,22 @@ exports.login = function(req, res) {
 		message: req.session.messages
 	})
 	req.session.messages = null;
+}
+
+exports.import = function(req, res) {
+	if (req.user) { var user = req.user.username }
+    else { var user = null }
+	res.render("import", {
+		title: baseHead,
+		user: user
+	});
+}
+
+exports.mail = function(req, res) {
+	if (req.user) { var user = req.user.username }
+	else { var user = null }
+	res.render("mail", {
+		title: baseHead + " | Mail Test",
+		user: user
+	});
 }

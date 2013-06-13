@@ -1,0 +1,18 @@
+//- _surveys.jade
+//- jade partial for surveys on create.jade
+
+if (!surveys || surveys.length === 0)
+	p You have not made any surveys!
+else
+	table.table.table-striped.table-condensed
+		tr
+			th Name
+			th Deployed?
+			th Editing
+		for survey in surveys
+			tr
+				td #{survey.name}
+				td Not deployed
+				td
+					a.edit-link(name=survey.name)
+						icon.icon-edit

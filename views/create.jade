@@ -13,16 +13,13 @@ block content
 				h3 Current Survey
 				div.margin.pages
 			div.outline.margin
-				div.row-fluid
+				div.row-fluid.margin
 					h3.span6 My Surveys
-					div.span6
-					btn.btn.btn-small.btn-new.pull-right(data-toggle='popover', title data-content='<div class="name-div"><form class="form-inline name-input"><input class="survey-name" type="text" placeholder="Enter a title for your survey"></input><btn class="btn btn-small btn-name">Enter</btn></form></div>', data-original-title='Name Your Survey!') Create New
-				if (!surveys)
-					p You have not made any surveys!
-				else
-					ul
-					for survey in surveys
-						li
-							p #{survey.name}
+					div.span5
+						btn.btn.btn-small.btn-new.pull-right(data-toggle='popover', title data-content='<div class="name-div"><form class="form-inline name-input"><input class="survey-name" type="text" placeholder="Enter a title for your survey"></input><btn class="btn btn-name">Enter</btn></form></div>', data-original-title='Name Your Survey!') Create New
+				div.survey-container
+					include _surveys.jade
 		div.span8.outline.pad
-			h2 Creating...
+			h2 Pages
+			div.current-page-container
+				p Ain't got no Pages

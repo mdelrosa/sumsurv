@@ -90,9 +90,10 @@ app.get('/splash', user.splash);
 app.get('/survey', user.survey);
 app.get('/survey/create', ensureAuthenticated, user.create);
 app.get('/export', ensureAuthenticated, user.exportcsv);
+app.get('/mail', user.mail);
 
 // Mail routes
-app.get('/mail', ensureAuthenticated, mail.test_mail);
+app.get('/mail/send', mail.test_mail);
 
 // user routes
 app.get('/login', user.login);
@@ -104,6 +105,13 @@ app.get('/logout', function(req, res) {
 
 // Survey creation partials
 app.get('/pages/current', survey.current_pages);
+app.get('/surveys/all', survey.all_surveys);
+
+//import text file
+app.get('/import', user.import);
+
+//get that text file's data
+app.post('/import', survey.import);
 
 //exporting page route(s)
 app.get('/export/csv', survey.exportcsv1);
