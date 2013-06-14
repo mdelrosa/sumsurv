@@ -17,6 +17,8 @@ var express = require('express')
   , Models = require('./models/models')
   , User = Models.User;
 
+
+
 // Seed the admin
 var admin = new User({
     username: 'stolktacular',
@@ -86,8 +88,8 @@ app.configure('development', function(){
 app.get('/', routes.index);
 app.get('/users', user.list);
 app.get('/about', user.about);
-app.get('/splash', user.splash);
-app.get('/survey', user.survey);
+app.get('/splash', ensureDate, user.splash);
+app.get('/survey', ensureDate, user.survey);
 app.get('/survey/create', ensureAuthenticated, user.create);
 app.get('/export', ensureAuthenticated, user.exportcsv);
 
@@ -102,6 +104,8 @@ app.get('/logout', function(req, res) {
   res.redirect('/')
 })
 
+//redirect to rejection page
+app.get('/reject', user.reject);
 
 //import text file
 app.get('/import', user.import);
@@ -124,6 +128,15 @@ function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {return next()}
   res.redirect('/login');
 }
+
+
+//date confirmation middleware
+function ensureDate(req, res, next) {
+  var datedata = new Date();
+  if (datedata.getDay() == 4 || datedata.getDay() == 5 || datedata.getDay() == 6 || datedata.getDay() == 0) {return next()}
+  res.redirect('/reject');
+}
+
 
 // Login auth @ post /login
 app.post('/login', function(req, res, next) {

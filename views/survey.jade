@@ -4,9 +4,16 @@ block scripts
   script(type='text/javascript', src='/javascripts/take_survey.js')
 
 block content
+  -var datedata = new Date();
+  -if (datedata.getDay() == 0) {var day = 7} else {day = datedata.getDay()};
+  -var lastday = datedata.getDate()-day;
+  -var firstday = datedata.getDate()-day-6; 
+  -var month = datedata.getMonth() +1;
+  -var year = datedata.getFullYear(); 
   div.container#main-container
     br
-    h1 The Situational Motivation Scale (SIMS)
+    h1 The Situational Motivation Scale (SIMS)   
+    h4 for the week of #{month}/#{firstday}/#{year} to #{month}/#{lastday}/#{year}
     br
 
     div#survey-container

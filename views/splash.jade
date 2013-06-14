@@ -1,9 +1,19 @@
 extends layout
 
 block content
+	br
+	br
+	br
+	-var datedata = new Date();
+	-if (datedata.getDay() == 0) {var day = 7} else {day = datedata.getDay()};
+	-var lastday = datedata.getDate()-day;
+	-var firstday = datedata.getDate()-day-6;
+	-var month = datedata.getMonth() +1;
+	-var year = datedata.getFullYear();
 	div.hero.container
 		div.row-fluid
 			h1 SIMS Introduction
+			h2 for the week of #{month}/#{firstday}/#{year} to #{month}/#{lastday}/#{year}
 			p The following questionnare asks about why you are engaged in the current Materials Science course activities.
 			p There are no right or wrong answers to this questionnaire. This is not a test. Please respond to the questionnaire as accurately as possible, reflecting your own attitudes and behaviors in the course. You can skip any question and still continue with the survey, and you can quit the survey at any time by closing the web browser.
 			p Estimated time for completion of the SIMS survey is 3-5 minutes.

@@ -71,3 +71,12 @@ exports.import = function(req, res) {
 		user: user
 	});
 }
+
+exports.reject = function(req, res) {
+	if (req.user) { var user = req.user.username }
+    else { var user = null }
+	res.render("reject", {
+		title: 'Stolk-vey',
+		user: user
+	});
+}
