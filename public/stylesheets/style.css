@@ -217,6 +217,11 @@ navbar .nav1 li.dropdown.open > .dropdown-toggle1, .navbar .nav1 li.dropdown.act
 	min-width: 22.5em;
 }
 
+.name-input {
+	margin-top: auto;
+	margin-bottom: auto;
+}
+
 /* Outlines for testing */
 .outline {
 	border: 3px solid black;

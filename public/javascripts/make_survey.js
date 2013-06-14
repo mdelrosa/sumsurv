@@ -2,6 +2,7 @@
 
 $(document).ready(function() {
 
+	// activate jquery functions on edit buttons
 	var activateEdit = function() {
 
 		$('.edit-link').mouseenter(function() {
@@ -21,10 +22,10 @@ $(document).ready(function() {
 			$(this).html('<i class="icon icon-edit"></i> Editing');
 			$(this).toggleClass('editing');
 			setPagesDiv($(this).attr('name'));
-		});
-		
+		});		
 	}
 
+	// change survey div
 	var setPagesDiv = function(name) {
 		$('div.current-surv h3').fadeOut("fast", function() {
 			$(this).html(name).fadeIn("fast");
@@ -34,9 +35,22 @@ $(document).ready(function() {
 			else {
 				$('div.margin.pages').fadeOut("fast", function() {
 					$(this).html(data).fadeIn("fast");
+					pageAdd();
 				});
 			}
 		});
+	}
+
+	// initialize page adding button
+	var pageAdd = function() {
+		$('.add-page').click(function() {
+			$('.page-name').html('<div class="form-inline name-input"><input class="input-small" type="text" placeholder="Page Name"></input><button class="btn btn-pagename"><i class="icon-check"></i> Enter</button></div>').fadeIn("fast");
+			$('.page-type').html('<div class="form-inline"><select><option>Multiple Choice</option><option>Radio Scale</option><option>Text</option></select><button class="btn btn-pageinfo"><i class="icon-check"></i> Enter</button></div>')
+		})
+	}
+
+	var pageCreate = function() {
+
 	}
 
 	activateEdit();
@@ -100,6 +114,8 @@ $(document).ready(function() {
 		});
 	});
 
-	// $('.btn-') // work on page creation here
+	$('.btn-pagename').click(function() {
+		$()
+	});
 
-})
+});
