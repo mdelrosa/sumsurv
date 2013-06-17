@@ -36,17 +36,13 @@ $(document).ready(function() {
       var csv = event.target.result;
       var data = $.csv.toArray(csv);
          
-//      var html = '';
-//      for(var row in data) {
-//        html += '<tr>\r\n';
-//        for(var item in data[row]) {
-//          html += '<td>' + data[row][item] + '</td>\r\n';
-//        }
-//        html += '</tr>\r\n';
-//      }
-//      $('#contents').html(html);
-//    };
-//    reader.onerror = function(){ alert('Unable to read ' + file.fileName); };
+      var html = '';
+      var n = 0;
+      for(var row in data) {
+        html += '<tr><td>' + data[n] + '</td></tr>';
+        n += 1;
+      }
+      $('#contents').html(html);
        $.post('/import', {emailarray: data}, function(res) {
         if(res.err) {console.log("Unable to save your response."); return false}
         else {

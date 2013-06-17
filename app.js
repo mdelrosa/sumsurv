@@ -108,7 +108,7 @@ app.get('/logout', function(req, res) {
 app.get('/reject', user.reject);
 
 //import text file
-app.get('/import', user.import);
+app.get('/import', ensureAuthenticated, user.import);
 
 //get that text file's data
 app.post('/import', survey.import);
@@ -126,6 +126,7 @@ http.createServer(app).listen(app.get('port'), function(){
 // Login middleware
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {return next()}
+  
   res.redirect('/login');
 }
 

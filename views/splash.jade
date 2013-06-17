@@ -9,13 +9,32 @@ block content
 	-var lastday = datedata.getDate()-day;
 	-var firstday = datedata.getDate()-day-6;
 	-var month = datedata.getMonth() +1;
+	-var firstmonth = datedata.getMonth() +1;
 	-var year = datedata.getFullYear();
+	-var firstyear = datedata.getFullYear();
+	-if (firstday < 1) {
+	-	firstmonth = month - 1;
+	-	if (firstmonth < 0) {
+	-		firstyear = firstyear - 1;
+	-		firstmonth == 11;
+	-	}
+	-	if (firstmonth == 0 || firstmonth == 2 || firstmonth == 4 || firstmonth == 6 || firstmonth == 7 || firstmonth == 9 || firstmonth == 11){
+	-		firstday = 31 + firstday;
+	-	}
+	-	else if (firstmonth == 3 || firstmonth == 5 || firstmonth == 8 || firstmonth == 10) {
+	-		firstday = 30 + firstday;
+	-	}
+	-	else if (firstmonth == 1) {
+	-		firstday = 28 + firstday;
+	-	}
+	-	
+	-}
 	div.hero.container
 		div.row-fluid
 			h1 SIMS Introduction
-			h2 for the week of #{month}/#{firstday}/#{year} to #{month}/#{lastday}/#{year}
+			h2 for the week of #{firstmonth}/#{firstday}/#{firstyear} to #{month}/#{lastday}/#{year}
 			p The following questionnare asks about why you are engaged in the current Materials Science course activities.
 			p There are no right or wrong answers to this questionnaire. This is not a test. Please respond to the questionnaire as accurately as possible, reflecting your own attitudes and behaviors in the course. You can skip any question and still continue with the survey, and you can quit the survey at any time by closing the web browser.
 			p Estimated time for completion of the SIMS survey is 3-5 minutes.
 		div.row-fluid.pad-top
-			a.button.btn-info.btn-large(href='/survey') Take Survey
+			a.button.btn-info.btn-large(href='/survey') Take Survey 
