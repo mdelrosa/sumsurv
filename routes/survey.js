@@ -3,14 +3,66 @@
 
 var Models = require('../models/models')
 	, Response = Models.response
+    , Survey = Models.survey
+    , Page = Models.page
     , Emaillist = Models.emaillist;
 
+// --Survey creation-- //
+// Add new survey object to database
+exports.create = function(req, res) {
+    Survey.find({creator: req.user._id}).exec(function(err, survey_db) {
+        if (err) { console.log('Unable to find surveys'); return false}
+        // If survey of this name exists, then send a failure message
+        for (i=0;i<survey_db.length;i++) {
+            if (survey_db[i].name === req.body.name) {
+                res.send({success:false, message:"This survey already exists!"});
+                return false
+            }
+        }
+        // Save new survey
+        var new_survey = new Survey({name: req.body.name, creator: req.user});
+        new_survey.save(function(err) {
+            if(err) {
+                console.log('Unable to save survey');
+                res.send({success:false, message: "Unable to save your survey. Please try again!"})
+                return false
+            }
+            console.log("Successfully saved new survey!");
+            res.send({success:true});
+        })
+    })
+}
+
+// Render page partial of current survey
+exports.current_pages = function(req, res) {
+    Survey.find({creator: req.user, name: req.body.name}).exec(function(err, current_surv) {
+        if(err) {console.log("Unable to find survey")}
+        else {
+            res.render('_currentPages', {
+                current_survey: current_surv,
+                pages: current_surv.pages
+            });
+        }
+    });
+}
+
+// Render surveys partial of survey editing page
+exports.all_surveys = function(req, res) {
+    Survey.find({creator: req.user}).exec(function(err, surv_db) {
+        if(err) {console.log("Unable to find surveys"); return false}
+        else {
+            res.render('_surveys', {
+                surveys: surv_db
+            })
+        }
+    })
+}
+
+// Save an individual response to a survey
 exports.save_response = function(req, res) {
-	console.log(req.body)
 	Response.find().exec(function(err, response_db) {
 		if(err) {console.log('Unable to find responses'); return false}
 		var newID = response_db.length;
-		console.log('newID', newID);
 		var new_response = new Response({id: newID, results: req.body.results});
 		new_response.save(function(err) {
 			if(err) {
@@ -21,8 +73,7 @@ exports.save_response = function(req, res) {
 			console.log('Successfully saved new response!');
 			res.send({success:true});
 		})	
-	})	
-	
+	})
 }
 
 //This function takes away commas to prevent issues in csv

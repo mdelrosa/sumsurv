@@ -8,15 +8,20 @@ block scripts
 
 block content
 	div.row-fluid.pad-top
-		div.span3.outline
-			div.outline.margin.name-div
-				h3 Survey Title
-				div.inline-row.name-input
-					input.survey-name(type="text", placeholder="Enter a title for your survey")
-					a.btn.btn-small.btn-name Enter
+		div.span4.outline
+			div.outline.margin.current-surv
+				h3 Current Survey
+				div.margin.pages
 			div.outline.margin
-				h3 My Surveys
-				if (!surveys)
-					p You have not made any surveys!
-		div.span9.outline.pad
-			h2 Creating...
+				div.row-fluid.margin
+					h3.span6 My Surveys
+					div.span5
+						btn.btn.btn-small.btn-new.pull-right(data-toggle='popover', title data-content='<div class="name-div"><form class="form-inline name-input"><input class="survey-name" type="text" placeholder="Enter a title for your survey"></input><btn class="btn btn-name">Enter</btn></form></div>', data-original-title='Name Your Survey!') Create New
+				div.survey-container
+					include _surveys.jade
+		div.span8.outline.pad.row-fluid
+			div.span4.pages-head
+				h2 Current Page
+			div.span4.page-name
+			div.span4.page-type
+			div.current-page-container

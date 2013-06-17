@@ -47,9 +47,9 @@ a {
 	margin-left: 1em
 }
 
-
 textarea {
-	min-width: 50%
+	min-width: 80%;
+	max-width: 95%;
 }
 
 #optionsRadios1 {
@@ -216,6 +216,23 @@ navbar .nav1 li.dropdown.open > .dropdown-toggle1, .navbar .nav1 li.dropdown.act
 .footer-links li:first-child {
   padding-left: 0;
   bottom: 0;
+}
+
+.popover {
+	min-width: 22.5em;
+}
+
+.name-input {
+	margin-top: auto;
+	margin-bottom: auto;
+}
+
+table.fixed {
+	table-layout: fixed;
+}
+
+table.fixed td {
+	overflow: hidden;
 }
 
 /* Outlines for testing */

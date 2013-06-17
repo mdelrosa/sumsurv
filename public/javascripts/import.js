@@ -2,7 +2,6 @@ $(document).ready(function() {
     if(isAPIAvailable()) {
       $('#files').bind('change', handleFileSelect);
     }
-  
 
   function isAPIAvailable() {
     // Check for the various File API support.
@@ -23,9 +22,7 @@ $(document).ready(function() {
     var output = ''
         output += '<span style="font-weight:bold;">' + escape(file.name) + '</span><br />\n';
     arrayafy(file);
-   
-       
-        
+
   }
 
   //saves the file into an array
