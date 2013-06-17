@@ -27,7 +27,7 @@ exports.create = function(req, res) {
                 res.send({success:false, message: "Unable to save your survey. Please try again!"})
                 return false
             }
-            console.log("Successfully save new survey!");
+            console.log("Successfully saved new survey!");
             res.send({success:true});
         })
     })

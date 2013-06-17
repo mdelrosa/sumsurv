@@ -47,9 +47,9 @@ a {
 	margin-left: 1em
 }
 
-
 textarea {
-	min-width: 50%
+	min-width: 80%;
+	max-width: 95%;
 }
 
 #optionsRadios1 {
@@ -222,9 +222,16 @@ navbar .nav1 li.dropdown.open > .dropdown-toggle1, .navbar .nav1 li.dropdown.act
 	margin-bottom: auto;
 }
 
+table.fixed {
+	table-layout: fixed;
+}
+
+table.fixed td {
+	overflow: hidden;
+}
+
 /* Outlines for testing */
 .outline {
 	border: 3px solid black;
 	border-radius: 5px;
 }
-

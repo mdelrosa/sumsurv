@@ -5,7 +5,8 @@
 
 var baseHead = 'Survo'
 	, Models = require('../models/models')
-	, Survey = Models.survey;
+	, Survey = Models.survey
+	, Classroom = Models.classroom;
 
 exports.list = function(req, res){
   res.send("respond with a resource");
@@ -54,6 +55,19 @@ exports.exportcsv = function(req, res) {
 	res.render('exportcsv', {
 		title: baseHead + ' | Export CSV',
 		user: req.user.username
+	});
+}
+
+exports.my_classes = function(req, res) {
+	Classroom.find({owner: req.user}).exec(function(err, db_classrooms) {
+		if (err) {console.log("Could not find user's classrooms")}
+		else {
+			res.render('classes', {
+				title: baseHead + " | My Classes",
+				user: req.user.username,
+				classes: db_classrooms
+			});
+		}
 	});
 }
 

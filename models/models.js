@@ -28,10 +28,23 @@ exports.survey = Survey;
 // **NOTE: Will have to inherit result structure from Survey schema eventually. **
 var responseSchema = mongoose.Schema({
 	id: Number,
-	results: Array
+	results: Array,
+	participant: String,
+	date: String
 }),
 	Response = mongoose.model('Response', responseSchema);
 exports.response = Response;
+
+// Classroom schema
+var classroomSchema = mongoose.Schema({
+	name: { type: String, required: true},
+	owner: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
+	roster: { type: Array },
+	surveys: [{type: mongoose.Schema.Types.ObjectId, ref: 'Survey'}],
+	responses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Response" }]
+}),
+	Classroom = mongoose.model('Classroom', classroomSchema);
+exports.classroom = Classroom;
 
 // User schema
 var userSchema = mongoose.Schema({
@@ -48,8 +61,6 @@ var emaillistSchema = mongoose.Schema({
 // Export emailist
 var Emaillist = mongoose.model('Emaillist', emaillistSchema);
 exports.emaillist = Emaillist;
-
-
 
 // Bcrypt middleware
 userSchema.pre('save', function(next) {

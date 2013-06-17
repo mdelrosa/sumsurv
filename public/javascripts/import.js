@@ -2,7 +2,6 @@ $(document).ready(function() {
     if(isAPIAvailable()) {
       $('#files').bind('change', handleFileSelect);
     }
-  
 
   function isAPIAvailable() {
     // Check for the various File API support.
@@ -23,9 +22,7 @@ $(document).ready(function() {
     var output = ''
         output += '<span style="font-weight:bold;">' + escape(file.name) + '</span><br />\n';
     arrayafy(file);
-   
-       
-        
+
   }
 
   //saves the file into an array
@@ -36,17 +33,6 @@ $(document).ready(function() {
       var csv = event.target.result;
       var data = $.csv.toArray(csv);
          
-//      var html = '';
-//      for(var row in data) {
-//        html += '<tr>\r\n';
-//        for(var item in data[row]) {
-//          html += '<td>' + data[row][item] + '</td>\r\n';
-//        }
-//        html += '</tr>\r\n';
-//      }
-//      $('#contents').html(html);
-//    };
-//    reader.onerror = function(){ alert('Unable to read ' + file.fileName); };
        $.post('/import', {emailarray: data}, function(res) {
         if(res.err) {console.log("Unable to save your response."); return false}
         else {

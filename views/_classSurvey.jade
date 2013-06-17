@@ -1,0 +1,26 @@
+//- _classSurvey.jade
+//- display current class' deployed survey
+
+if (responses && responses.length > 0)
+	table.table.table-striped
+		tr
+			th Response
+			th Participant
+		for response in responses
+			tr
+				td #{response.participant}
+				td
+					button.btn.btn-small
+						i.icon-eye.icon-white
+						|  View Responses
+				td
+					button.btn.btn-small
+						i.icon-minus
+						|  Remove Particpant
+else
+	p Roster is empty!
+div.form-inline
+	input(type='textarea', placeholder='Enter comma-separated emails (i.e., "jim@jimail.com, steve@youwoo.net"')
+	button.btn
+		i.icon-plus
+		|  Add Participants

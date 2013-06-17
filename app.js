@@ -6,6 +6,7 @@
 var express = require('express')
   , routes = require('./routes')
   , user = require('./routes/user')
+  , classroom = require('./routes/classroom')
   , survey = require('./routes/survey')
   , mail = require('./routes/mail')
   , http = require('http')
@@ -21,7 +22,9 @@ var express = require('express')
 var admin = new User({
     username: 'stolktacular',
     email: "Whoop@gmail.com",
-    password: "jsizzle"});
+    password: "jsizzle",
+    classes: []
+  });
 admin.save(function(err) {
   if(err) {
     console.log(err);
@@ -91,6 +94,7 @@ app.get('/survey', user.survey);
 app.get('/survey/create', ensureAuthenticated, user.create);
 app.get('/export', ensureAuthenticated, user.exportcsv);
 app.get('/mail', user.mail);
+app.get('/classes', ensureAuthenticated, user.my_classes);
 
 // Mail routes
 app.get('/mail/send', mail.test_mail);
@@ -107,6 +111,11 @@ app.get('/logout', function(req, res) {
 app.get('/pages/current', survey.current_pages);
 app.get('/surveys/all', survey.all_surveys);
 
+// Class creation partials
+app.get('/class/all', classroom.all);
+app.get('/class/roster', classroom.roster);
+app.get('/class/survey', classroom.survey);
+
 //import text file
 app.get('/import', user.import);
 
@@ -119,6 +128,9 @@ app.get('/export/csv', survey.exportcsv1);
 // handling survey objects
 app.post('/survey/create', survey.create);
 app.post('/survey/success', survey.save_response);
+
+// handling classroom objects
+app.post('/class/create', classroom.new_class);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));

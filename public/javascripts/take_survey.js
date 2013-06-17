@@ -6,12 +6,21 @@ $(document).ready(function() {
 	$('#myTab li a').click(function (e) {
 	  e.preventDefault();
 	  $(this).tab('show');
+	  if ($(this).parent().hasClass('incomplete')) {
+	  	$(this).parent().toggleClass('incomplete');
+	  }
 	});
 
 	// Activate internal tab buttons
 	$('.tab-control a').click(function (e) {
 		e.preventDefault();
 		$(this).tab('show');
+		// Clicking on internal tab buttons also switches active tab button
+		var href = $(this).attr('href');
+		if (href) {
+			$('#myTab li.active').toggleClass('active');
+			$('#myTab li a[href='+href+']').parent().toggleClass('active');
+		}
 	});
 
 	// Handle survey submission
@@ -171,7 +180,7 @@ $(document).ready(function() {
 
 		// Comments tab
 		if ($comments.val().length === 0) {
-			results.push(undefined);
+			results.push("Admin None");
 		}
 		else {
 			results.push($comments.val());
