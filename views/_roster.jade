@@ -16,6 +16,8 @@ if (roster && roster.length > 0)
 else
 	p Roster is empty!
 div.form-inline
-	button.btn.roster-add(data-toggle='popover', title="", data-content='<div class="roster-add"><form class="form-inline roster-input"><textarea class="popover-textarea" type="textarea" placeholder="i.e. tim.bibberson@blargh.com, jim.jefferson@woohoo.com"></textarea><br><btn class="btn btn-text-roster">Enter</btn><btn class="btn btn-csv-roster pull-right">Load CSV</btn></form></div>', data-original-title='Add Participants')
+	button.btn.roster-add(data-toggle='popover', title="", data-content='<div class="roster-add"><form class="form-inline roster-input"><textarea class="popover-textarea" type="textarea" placeholder="i.e. tim.bibberson@blargh.com, jim.jefferson@woohoo.com"></textarea><br><btn class="btn btn-text-roster">Enter</btn></form></div>', data-original-title='Add Participants')
 		i.icon-plus
 		|  Add Participants
+
+		//- <input id="files" class="pull-right" type="file" name="files[]"></input>
