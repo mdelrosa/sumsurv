@@ -12,7 +12,10 @@ html
 		link(href='http://fonts.googleapis.com/css?family=Merriweather+Sans:400,700,800', rel='stylesheet', type='text/css')
 		block scripts
 	body
-		include _navbar.jade
-		div.container-fluid
-			block content
-		include _footer.jade
+		#wrap
+			#main
+				include _navbar.jade
+				div.container-fluid
+					block content
+		#footer
+			include _footer.jade
