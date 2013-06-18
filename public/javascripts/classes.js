@@ -62,6 +62,9 @@ $(document).ready(function() {
 											"</button><strong>Oops! </strong>"+
 											"You didn't enter anything!</div>");
 				}
+				else {
+					$.post('/class/roster/update', {csvRoster})
+				}
 			});
 		});
 	}
