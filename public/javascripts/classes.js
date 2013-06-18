@@ -13,6 +13,7 @@ $(document).ready(function() {
 					$(this).html(data).fadeIn("fast");
 					// initialize new-survey popover
 					$('button.roster-add').popover({trigger: 'click', html: true, placement: 'bottom'});
+					activateRosterEdit();
 				})
 				activateImport();
 			}
@@ -47,6 +48,22 @@ $(document).ready(function() {
 			$(this).html('<i class="icon icon-edit"></i> Editing');
 			$(this).toggleClass('editing');
 			setClassDiv($(this).attr('name'));
+		});
+	}
+
+	// activate roster jquery
+	var activateRosterEdit = function() {
+		$('.roster-add').click(function() {
+			$('.btn-text-roster').click(function() {
+				$('.alert').remove();
+				var csvRoster = $('textarea').val();
+				if (csvRoster.length === 0) {
+					$('div.roster-add').append("<div class='alert margin'>"+
+											"<button type='button' class='close' data-dismiss='alert'>&times;"+
+											"</button><strong>Oops! </strong>"+
+											"You didn't enter anything!</div>");
+				}
+			});
 		});
 	}
 
@@ -97,7 +114,6 @@ $(document).ready(function() {
 										"<button type='button' class='close' data-dismiss='alert'>&times;"+
 										"</button><strong>Oops! </strong>"+
 										"You need to enter a name!</div>");
-
 			}
 		});
 	});
