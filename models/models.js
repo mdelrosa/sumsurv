@@ -39,7 +39,7 @@ exports.response = Response;
 var classroomSchema = mongoose.Schema({
 	name: { type: String, required: true},
 	owner: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
-	roster: { type: Array },
+	roster: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 	surveys: [{type: mongoose.Schema.Types.ObjectId, ref: 'Survey'}],
 	responses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Response" }]
 }),

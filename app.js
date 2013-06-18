@@ -148,14 +148,12 @@ function ensureAuthenticated(req, res, next) {
   res.redirect('/login');
 }
 
-
 //date confirmation middleware
 function ensureDate(req, res, next) {
   var datedata = new Date();
   if (datedata.getDay() == 4 || datedata.getDay() == 5 || datedata.getDay() == 6 || datedata.getDay() == 0) {return next()}
   res.redirect('/reject');
 }
-
 
 // Login auth @ post /login
 app.post('/login', function(req, res, next) {
@@ -164,7 +162,7 @@ app.post('/login', function(req, res, next) {
     if (err) { return next(err) }
     if (!user) {
       console.log('login failed')
-      req.session.messages =  [info.message];
+      req.session.messages = [info.message];
       return res.redirect('/login')
     }
     req.logIn(user, function(err) {
@@ -175,3 +173,44 @@ app.post('/login', function(req, res, next) {
     });
   })(req, res, next);
 });
+
+// Handle new user creation
+app.post('/user/create', function(req, res, next) {
+  var r = req.body
+  if (r.username.length === 0|| r.email.length === 0 || r.password.length === 0 || r.passwordCheck.length === 0) {
+    req.session.userMessage = "Missing credentials!";
+    return res.redirect('/login');
+  }
+  else if (r.password !== r.passwordCheck) {
+    req.session.userMessage = "Passwords did not match!";
+    return res.redirect('/login');
+  }
+  User.find({email: r.email}).exec(function(err, user_db) {
+    if (user_db.length > 0) {
+      req.session.userMessage = "Email already registered!";
+      return res.redirect('/login');
+    }
+    for (i=0;i<user_db.length;i++) {
+      if (user_db[i].username === r.username) {
+        req.session.userMessage = "Username already in use!";
+        return res.redirect('/login');
+      }
+    }
+    var newUser = new User({
+      username: r.username,
+      email: r.email,
+      password: r.password
+    });
+    newUser.save(function(err) {
+      if(err) {
+        console.log("Error: ", err)
+        req.session.userMessage = "Unable to save your credentials. Please try again!"
+        return res.redirect('/login');
+      }
+      else {
+        req.session.userMessage = "Successfully saved your credentials!"
+        res.render('/login');
+      }
+    });
+  });
+})

@@ -76,9 +76,11 @@ exports.my_classes = function(req, res) {
 exports.login = function(req, res) {
 	res.render("login", {
 		title: baseHead + ' | Log In',
-		message: req.session.messages
+		message: req.session.messages,
+		createMessage: req.session.userMessage
 	})
 	req.session.messages = null;
+	req.session.userMessage = null;
 }
 
 exports.import = function(req, res) {
@@ -103,7 +105,7 @@ exports.reject = function(req, res) {
 	if (req.user) { var user = req.user.username }
     else { var user = null }
 	res.render("reject", {
-		title: 'Stolk-vey',
+		title: baseHead + " | Survey Unavailable",
 		user: user
 	});
 }
