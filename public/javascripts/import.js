@@ -31,22 +31,22 @@ $(document).ready(function() {
     reader.readAsText(file);
     reader.onload = function(event){
       var csv = event.target.result;
-      var data = $.csv;
-      $('textarea').html(html);   
-//      var html = '';
-//      var n = 0;
-//      for(var row in data) {
-//        html += + data[n] + ;
-//        n += 1;
-//      }
-//      $('#contents').html(html);
+      var data = $.csv.toArray(csv);
+         
+      var html = '';
+      var n = 0;
+      for(var row in data) {
+        html += '<tr><td>' + data[n] + '</td></tr>';
+        n += 1;
+      }
+      $('#contents').html(html);
        $.post('/import', {emailarray: data}, function(res) {
-//        if(res.err) {console.log("Unable to save your response."); return false}
-//       else {
-//          // display success alert
-//          $('#main-container').append("<div class='alert alert-success'>"+
-//                        "<button type='button' class='close' data-dismiss='alert'>&times;"+
-//                        "</button><strong>Your file has been uploaded </strong></div>");
+        if(res.err) {console.log("Unable to save your response."); return false}
+        else {
+          // display success alert
+          $('#main-container').append("<div class='alert alert-success'>"+
+                        "<button type='button' class='close' data-dismiss='alert'>&times;"+
+                        "</button><strong>Your file has been uploaded </strong></div>");
         }
        })
     }
