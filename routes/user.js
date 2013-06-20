@@ -62,7 +62,7 @@ exports.my_classes = function(req, res) {
 	Classroom.find({owner: req.user}).exec(function(err, db_classrooms) {
 		if (err) {console.log("Could not find user's classrooms")}
 		else {
-			res.render('classes', {
+			res.render('classes2', {
 				title: baseHead + " | My Classes",
 				user: req.user.username,
 				classes: db_classrooms

@@ -144,7 +144,7 @@ http.createServer(app).listen(app.get('port'), function(){
 // Login middleware
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {return next()}
-  
+  req.session.nextpath = req.route.path;
   res.redirect('/login');
 }
 
@@ -169,7 +169,14 @@ app.post('/login', function(req, res, next) {
       console.log('successful login')
       if (err) { return next(err); }
       req.session.user = user;
-      return res.redirect('/');
+      console.log(req.session.nextpath);
+      if (req.session.nextpath) {
+        res.redirect(req.session.nextpath);
+        req.session.nextpath = false;
+      }
+      else {
+        res.redirect('/');
+      }
     });
   })(req, res, next);
 });

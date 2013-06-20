@@ -48,6 +48,7 @@ exports.test_mail = function(req, res) {
 				};				
 			};
 
+
 			var mailOptions = {
 			    from: "Tim Bibbersun<authumlab@gmail.com>", // sender address
 			    to: emaillist_db[emaillist_db.length-1].emailarray.toString(), // list of receivers
@@ -70,18 +71,16 @@ exports.test_mail = function(req, res) {
 			    		'<p style="color: #999999">This will fill up space about home potoo yes please why that tut tut singaling yeh?</center></p></footer></center></div></div>'
 			    		,//html body
 			}
-
-			// send mail with defined transport object
+				// send mail with defined transport object
 			smtpTransport.sendMail(mailOptions, function(error, response){
 			    if(error){
 			        console.log(error);
 			    }else{
 			        console.log("Message sent: " + response.message);
 			    }
-
-			    // if you don't want to use this transport object anymore, uncomment following line
+				    // if you don't want to use this transport object anymore, uncomment following line
 			    smtpTransport.close(); // shut down the connection pool, no more messages
-			});
+			});	
 		   };
 	  });	
 }

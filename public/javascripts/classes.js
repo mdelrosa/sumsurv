@@ -15,7 +15,6 @@ $(document).ready(function() {
 					$('button.roster-add').popover({trigger: 'click', html: true, placement: 'bottom'});
 					activateRosterEdit();
 				})
-				activateImport();
 			}
 		});
 		$.get('/class/survey', { name: name }, function(data) {
@@ -54,6 +53,7 @@ $(document).ready(function() {
 	// activate roster jquery
 	var activateRosterEdit = function() {
 		$('.roster-add').click(function() {
+			activateImport();
 			$('.btn-text-roster').click(function() {
 				$('.alert').remove();
 				var csvRoster = $('textarea').val();
@@ -154,6 +154,8 @@ $(document).ready(function() {
 	      reader.onload = function(event){
 	        var csv = event.target.result;
 	        var data = $.csv;
+	        var data1 = $.csv.toArray(csv);
+	        console.log("data " + data);
 	        $('textarea').html(data);   
 	  //      var html = '';
 	  //      var n = 0;
@@ -162,7 +164,7 @@ $(document).ready(function() {
 	  //        n += 1;
 	  //      }
 	  //      $('#contents').html(html);
-	         $.post('/import', {emailarray: data}, function(res) {
+	         $.post('/import', {emailarray: data1}, function(res) {
 	  //        if(res.err) {console.log("Unable to save your response."); return false}
 	  //       else {
 	  //          // display success alert
