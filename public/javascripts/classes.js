@@ -14,13 +14,15 @@ $(document).ready(function() {
 					// initialize new-survey popover
 					$('button.roster-add').popover({trigger: 'click', html: true, placement: 'bottom'});
 					$('.btn-remove').click(function() {
-						var participant = $(this).parent().prev().text();
+						var participant = $(this).parent().prev().text()
+							, parentRow = $(this).parent().parent();
 						console.log("participant: ", participant);
 						$.post('/class/roster/remove', { participant: participant, className: name}, function(res) {
 							if(res.err) {console.log("Unable to remove participant"); return false}
 							else {
 								if(res.success) {
-									setClassDiv(name);
+									console.log("Success");
+									parentRow.fadeOut('fast');
 								}
 							}
 						});
@@ -37,7 +39,6 @@ $(document).ready(function() {
 				})
 			}
 		});
-
 	}
 
 	// activate jquery functions on edit buttons

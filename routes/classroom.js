@@ -77,7 +77,7 @@ exports.roster = function(req, res) {
 }
 
 // Remove specified participant
-exports.remove_participant = function(req, res) {
+exports.remove = function(req, res) {
 	Classroom.update({ name: req.body.className }, { $pull: { roster: req.body.participant } }, function(err, newDb) {
 		if(err || newDb === null) {console.log("Error in remove participant: ", err)}
 		else {
