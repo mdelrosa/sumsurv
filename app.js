@@ -92,7 +92,7 @@ app.get('/', routes.index);
 app.get('/users', user.list);
 app.get('/about', user.about);
 app.get('/splash', ensureDate, user.splash);
-app.get('/survey', ensureDate, user.survey);
+app.get('/survey', ensureAuthenticated, ensureDate, user.survey);
 app.get('/survey/create', ensureAuthenticated, user.create);
 app.get('/export', ensureAuthenticated, user.exportcsv);
 app.get('/mail', user.mail);
@@ -134,10 +134,14 @@ app.get('/export/csv', survey.exportcsv1);
 app.post('/survey/create', survey.create);
 app.post('/survey/success', survey.save_response);
 
-// handling classroom objects
+// -- handling classroom objects
+// roster
 app.post('/class/create', classroom.new_class);
 app.post('/class/roster/update', classroom.roster_update);
 app.post('/class/roster/remove', classroom.remove);
+// survey
+app.post('/class/survey/update', classroom.survey_update)
+
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));

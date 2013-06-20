@@ -97,3 +97,14 @@ exports.survey = function(req, res) {
 		}
 	})
 }
+
+// Update class survey
+exports.survey_update = function(req, res) {
+	console.log("body", req.body);
+	Classroom.find({name:req.query.className, owner: req.user}).exec(function(err, found_class) {
+		if(err) { console.log("Survey update error: ", err); return false}
+		else {
+			res.send({success: true});
+		}
+	})
+}
