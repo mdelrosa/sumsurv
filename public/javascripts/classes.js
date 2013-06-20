@@ -6,18 +6,30 @@ $(document).ready(function() {
 	// change roster/survey div
 	var setClassDiv = function(name) {
 		// Render current class' roster/survey
-		$.get('/class/roster', { name: name }, function(data) {
+		$.get('/class/roster', { className: name }, function(data) {
 			if(data.err) { console.log("Unable to fetch roster.") }
 			else {
 				$(".roster").fadeOut("fast", function() {
 					$(this).html(data).fadeIn("fast");
 					// initialize new-survey popover
 					$('button.roster-add').popover({trigger: 'click', html: true, placement: 'bottom'});
+					$('.btn-remove').click(function() {
+						var participant = $(this).parent().prev().text();
+						console.log("participant: ", participant);
+						$.post('/class/roster/remove', { participant: participant, className: name}, function(res) {
+							if(res.err) {console.log("Unable to remove participant"); return false}
+							else {
+								if(res.success) {
+									setClassDiv(name);
+								}
+							}
+						});
+					});
 					activateRosterEdit();
 				})
 			}
 		});
-		$.get('/class/survey', { name: name }, function(data) {
+		$.get('/class/survey', { className: name }, function(data) {
 			if(data.err) { console.log("Unable to fetch survey.") }
 			else {
 				$(".survey").fadeOut("fast", function() {
@@ -25,6 +37,7 @@ $(document).ready(function() {
 				})
 			}
 		});
+
 	}
 
 	// activate jquery functions on edit buttons
@@ -46,6 +59,7 @@ $(document).ready(function() {
 			$('.editing').toggleClass('editing');
 			$(this).html('<i class="icon icon-edit"></i> Editing');
 			$(this).toggleClass('editing');
+			$(this).parent().prev().toggleClass('editing');
 			setClassDiv($(this).attr('name'));
 		});
 	}
@@ -63,8 +77,64 @@ $(document).ready(function() {
 											"</button><strong>Oops! </strong>"+
 											"You didn't enter anything!</div>");
 				}
+				else {
+					var rosterAdd = csvRoster.split(", ");
+					var className = $('td.editing').html();
+					console.log("classname", className);
+					$.post('/class/roster/update', {rAdd: rosterAdd, name: className}, function(res) {
+						if(res.err) { console.log("Error posting roster"); return false}
+						else {
+							if(res.success) {
+								console.log("Success!");
+								// Add get that renders roster
+								setClassDiv($("a.editing").attr("name"));
+								$('.roster-add').popover("toggle");
+							}
+						}
+					})
+				}
 			});
 		});
+	}
+
+	// Activate jquery for importing roster
+	var activateImport = function() {
+		if(isAPIAvailable()) {
+	      $('#files').bind('change', handleFileSelect);
+	    }
+
+	    function isAPIAvailable() {
+	      // Check for the various File API support.
+	      if (window.File && window.FileReader && window.FileList && window.Blob) {
+	        // File APIs supported.
+	        return true;
+	      } else {
+	        document.writeln("Looks like this isn't supported in your version of the browser.");
+	        return false;
+	      }
+	    }
+
+	    function handleFileSelect(evt) {
+	      var files = evt.target.files; // FileList object
+	      var file = files[0];
+
+	    // read the file metadata
+	      var output = ''
+	          output += '<span style="font-weight:bold;">' + escape(file.name) + '</span><br />\n';
+	      arrayafy(file);
+
+	    } 
+
+	    //saves the file into an array
+	    function arrayafy(file) {
+	      var reader = new FileReader();
+	      reader.readAsText(file);
+	      reader.onload = function(event){
+	        var csv = event.target.result;
+	        $('textarea').html(csv);   
+	      }
+
+	    }
 	}
 
 	activateEdit();
@@ -91,6 +161,7 @@ $(document).ready(function() {
 									$(".class-container").fadeOut("fast", function() {
 										$(this).html(data).fadeIn("fast", function() {
 											$('tr:last td a.edit-link').append(" Editing").toggleClass("editing");
+											$('tr:last td:first').toggleClass("editing");
 											activateEdit();
 										})
 									})
@@ -177,5 +248,6 @@ $(document).ready(function() {
 
 	    }
 	}  
+
 
 });
