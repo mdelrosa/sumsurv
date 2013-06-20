@@ -137,6 +137,7 @@ app.post('/survey/success', survey.save_response);
 // handling classroom objects
 app.post('/class/create', classroom.new_class);
 app.post('/class/roster/update', classroom.roster_update);
+app.post('/class/roster/remove', classroom.remove);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
