@@ -24,9 +24,8 @@ exports.test_mail = function(req, res) {
 			var date = datedata.getDate(); 
 			var year = datedata.getFullYear();
 			var day = datedata.getDay() + 1;
-			if (datedata.getDay() == 0) {var day = 7} else {day = datedata.getDay()};
-			var lastday = date-day;
-			var firstday = date-day-6;
+			var lastday = date-day+7-day;
+			var firstday = date-day;
 			var firstmonth = datedata.getMonth()+1;
 			var firstyear = datedata.getFullYear();
 			var first = firstmonth.toString()+ "/" +firstday.toString()+ "/" +firstyear.toString();

@@ -5,9 +5,9 @@ block content
 	br
 	br
 	-var datedata = new Date();
-	-if (datedata.getDay() == 0) {var day = 7} else {day = datedata.getDay()};
-	-var lastday = datedata.getDate()-day;
-	-var firstday = datedata.getDate()-day-6;
+	-var day = datedata.getDay();
+	-var lastday = datedata.getDate()+7-day;
+	-var firstday = datedata.getDate()-day;
 	-var month = datedata.getMonth() +1;
 	-var firstmonth = datedata.getMonth() +1;
 	-var year = datedata.getFullYear();

@@ -32,8 +32,6 @@ $(document).ready(function() {
     reader.onload = function(event){
       var csv = event.target.result;
       var data = $.csv.toArray(csv);
-      console.log("data ", data);
-      console.log("csv ", csv);
       var html = '';
       var n = 0;
       for(var row in data) {
