@@ -1,12 +1,13 @@
 // mail.js
 // Handle sending emails
 var Models = require('../models/models')
-    , Emaillist = Models.emaillist;
+    , Emaillist = Models.emaillist
+    , Classroom = Models.classroom;
 
 var nodemailer = require("nodemailer");
 
 exports.test_mail = function(req, res) {
-	  Emaillist.find({}).exec(function(err, emaillist_db) {
+	  Classroom.find({name: req.query.name}).exec(function(err, classroom_db) {
 		   if(err) {console.log('Unable to find responses'); return false}
 		   else{
 			var smtpTransport = nodemailer.createTransport("SMTP", {
@@ -23,8 +24,8 @@ exports.test_mail = function(req, res) {
 			var month = datedata.getMonth()+1; 
 			var date = datedata.getDate(); 
 			var year = datedata.getFullYear();
-			var day = datedata.getDay() + 1;
-			var lastday = date-day+7-day;
+			var day = datedata.getDay();
+			var lastday = date+7-day;
 			var firstday = date-day;
 			var firstmonth = datedata.getMonth()+1;
 			var firstyear = datedata.getFullYear();
@@ -46,11 +47,9 @@ exports.test_mail = function(req, res) {
 					firstday = 28 + firstday;
 				};				
 			};
-
-
 			var mailOptions = {
 			    from: "Tim Bibbersun<authumlab@gmail.com>", // sender address
-			    to: emaillist_db[emaillist_db.length-1].emailarray.toString(), // list of receivers
+			    to: classroom_db[0].roster.join(","), // list of receivers
 			    subject: "SIMS weekly survey", // Subject line
 			    text: "Hello world", // plaintext body
 			    html:        
@@ -76,9 +75,11 @@ exports.test_mail = function(req, res) {
 			        console.log(error);
 			    }else{
 			        console.log("Message sent: " + response.message);
+			        smtpTransport.close();
+			        res.send("success");
 			    }
 				    // if you don't want to use this transport object anymore, uncomment following line
-			    smtpTransport.close(); // shut down the connection pool, no more messages
+			        // shut down the connection pool, no more messages
 			});	
 		   };
 	  });	
