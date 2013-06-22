@@ -16,9 +16,8 @@ var express = require('express')
   , mongoose = require('mongoose')
   , MongoStore = require('connect-mongo')(express)
   , Models = require('./models/models')
-  , User = Models.User;
-
-
+  , User = Models.User
+  , Survey = Models.survey;
 
 // Seed the admin
 var admin = new User({
@@ -27,13 +26,35 @@ var admin = new User({
     password: "jsizzle",
     classes: []
   });
-admin.save(function(err) {
+admin.save(function(err, stolk) {
   if(err) {
     console.log(err);
-  } else {
-    console.log("admin: " + user.username + " saved");
+  } 
+  else {
+    // Seed the SIMS survey
+    var SIMS = new Survey({
+      name: "SIMS",
+      pages: [],
+      creator: stolk._id
+    });
+    SIMS.save(function(err) {
+      if(err) {console.log("SIMS Save Error: ", err); return false}
+      else {
+        console.log("Succesffuly saved SIMS")
+        Survey.find({name:"SIMS"}).populate("creator").exec(function(err, found) {
+          if(err) {console.log("SIMS Error: ", err); return false}
+          else {
+            console.log("Found: ", found[0])
+            console.log("SIMS is owned by: ", found[0].creator);
+          }
+        })
+      }
+    })
   }
 });
+
+
+
 
 // Passport session setup.
 passport.serializeUser(function(user, done) {
@@ -97,6 +118,8 @@ app.get('/survey/create', ensureAuthenticated, user.create);
 app.get('/export', ensureAuthenticated, user.exportcsv);
 app.get('/mail', user.mail);
 app.get('/classes', ensureAuthenticated, user.my_classes);
+app.get('/part', ensureAuthenticated, user.part);
+app.get('/:user/:class/take', ensureAuthenticated, user.take);
 
 // Mail routes
 app.get('/mail/send', mail.test_mail);
@@ -173,10 +196,10 @@ app.post('/login', function(req, res, next) {
       return res.redirect('/login')
     }
     req.logIn(user, function(err) {
-      console.log('successful login')
-      if (err) { return next(err); }
+      if (err) { return next(err) }
+      console.log("successful login");
       req.session.user = user;
-      console.log(req.session.nextpath);
+      console.log("nextpath: ", req.session.nextpath);
       if (req.session.nextpath) {
         res.redirect(req.session.nextpath);
         req.session.nextpath = false;
@@ -223,7 +246,7 @@ app.post('/user/create', function(req, res, next) {
       }
       else {
         req.session.userMessage = "Successfully saved your credentials!"
-        res.render('/login');
+        res.render('login');
       }
     });
   });

@@ -40,7 +40,13 @@ $(document).ready(function() {
 							if(res.err) { console.log("Unable to update class survey: ", res.err); return false}
 							else {
 								if(res.success) {
-									console.log("Successfully updated class survey!");
+									// console.log("Successfully updated class survey!");
+									// $.get('class/survey', { className: name }, function(data2) {
+									// 	if(data2.err) {console.log("Unable to fetch survey")}
+									// 	else {
+									// 		$(".survey.fadeOut")
+									// 	}
+									// })
 								}
 							}
 						})

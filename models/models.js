@@ -18,7 +18,7 @@ exports.page = Page;
 // Survey schema
 var surveySchema = mongoose.Schema({
 	name: { type: String, required: true, unique: false},
-	pages: { type: mongoose.Schema.Types.ObjectId, ref: "Page" },
+	pages: [{ type: mongoose.Schema.Types.ObjectId, ref: "Page" }],
 	creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User'}
 }),
 	Survey = mongoose.model('Survey', surveySchema);
@@ -40,7 +40,7 @@ var classroomSchema = mongoose.Schema({
 	name: { type: String, required: true},
 	owner: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
 	roster: [String],
-	surveys: [{type: mongoose.Schema.Types.ObjectId, ref: 'Survey'}],
+	survey: {type: mongoose.Schema.Types.ObjectId, ref: 'Survey'},
 	responses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Response" }]
 }),
 	Classroom = mongoose.model('Classroom', classroomSchema);

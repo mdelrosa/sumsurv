@@ -12,3 +12,9 @@ div.form-inline
 			for surv in survs
 				option #{surv.name}
 	button.btn.btn-surv-select Select
+div.responses
+	h4 Responses:
+	if responses
+		p There are #{responses.length} responses to the survey.
+	else
+		p No responses so far!

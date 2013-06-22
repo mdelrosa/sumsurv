@@ -6,7 +6,8 @@
 var baseHead = 'Survo'
 	, Models = require('../models/models')
 	, Survey = Models.survey
-	, Classroom = Models.classroom;
+	, Classroom = Models.classroom
+	, User = Models.User;
 
 exports.list = function(req, res){
   res.send("respond with a resource");
@@ -69,6 +70,47 @@ exports.my_classes = function(req, res) {
 			});
 		}
 	});
+}
+
+exports.part = function(req, res) {
+	Classroom.where("roster").in([req.user.email]).exec(function(err, found_class) {
+		if(err) {console.log("Participating static error: ", err); return false}
+		else {
+			console.log("found_class: ", found_class);
+			res.render('participating', {
+				title: baseHead + " | Participating",
+				user: req.user.username,
+				classes: found_class
+			});
+		}
+	})
+}
+
+exports.take = function(req, res) {
+	User.find({username: req.params.user}).exec(function(err0, found_user) {
+		console.log("found_user: ", found_user)
+		if(err0) { console.log("Take user error: ", err0) }
+		else {
+			Classroom.find({name: req.params.class, owner: found_user[0]._id}).exec(function(err, found_class) {
+				if(err) { console.log("Take class error: ", err); return false}
+				else {
+					console.log("found_class: ", found_class)
+					Survey.find({_id: found_class[0].survey}).exec(function(err2, found_surv) {
+						if(err2) {console.log("Take survey error: ", err2); return false}
+						else {
+							if (found_surv[0].name === "SIMS") {
+								res.render("survey", {
+									user: req.user.username,
+									title: req.params.user + "'s " + req.params.class + " | SIMS",
+									className: req.params.className
+								})
+							}
+						}
+					})
+				}
+			})			
+		}
+	})
 }
 
 // Handle auth

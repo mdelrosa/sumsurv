@@ -1,0 +1,23 @@
+//- participating.jade
+//- show classes user is participating in
+
+extends layout
+
+block scripts
+	script(type='text/javascript', src='/javascripts/participating.js')
+
+block content
+	div.fluid-row.pad
+		if (classes)
+			for room in classes
+				div.span3.outline
+					h3 #{room.name}
+					img.about-img(src="http://24.media.tumblr.com/366b2c3d6507c85a2049b040b291ef3f/tumblr_mluafwApSk1qgjj2bo1_400.png")
+					a(href)
+		div.span3.outline
+			h3 Find more classes!
+			img.about-img(src="http://24.media.tumblr.com/366b2c3d6507c85a2049b040b291ef3f/tumblr_mluafwApSk1qgjj2bo1_400.png")
+			p Check out other classes and give some feedback!
+
+	- var html = "<script>var width = $('img.about-img').width(); $('img.about-img').css({'height':width+'px'})</script>"
+	| !{html}
