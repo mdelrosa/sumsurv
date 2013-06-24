@@ -29,6 +29,10 @@ a {
 	padding: 1em;
 }
 
+.pad-small {
+	padding: .25em;
+}
+
 .margin {
 	margin: 0.5em;
 }

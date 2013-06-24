@@ -53,9 +53,6 @@ admin.save(function(err, stolk) {
   }
 });
 
-
-
-
 // Passport session setup.
 passport.serializeUser(function(user, done) {
   done(null, user.id);
@@ -120,6 +117,7 @@ app.get('/mail', user.mail);
 app.get('/classes', ensureAuthenticated, user.my_classes);
 app.get('/part', ensureAuthenticated, user.part);
 app.get('/:user/:class/take', ensureAuthenticated, user.take);
+app.get('/error/not_in_roster', ensureAuthenticated, user.err);
 
 // Mail routes
 app.get('/mail/send', mail.test_mail);
@@ -174,7 +172,20 @@ http.createServer(app).listen(app.get('port'), function(){
 function ensureAuthenticated(req, res, next) {
   console.log(req.route);
   if (req.isAuthenticated()) {return next()}
-  req.session.nextpath = req.route.path;
+  // If not unique route
+  if (!req.params) {
+    req.session.nextpath = req.route.path;  
+    req.session.nextparams = false;
+  }
+  else {
+    console.log("route: ", req.session.route);
+    req.session.nextpath = req.route.path;
+    req.session.nextparams = new Object();
+    for(var key in req.route.params) {
+      req.session.nextparams[key] = req.route.params[key];
+      console.log("nextparams", req.session.nextparams);
+    }
+  }
   res.redirect('/login');
 }
 
@@ -199,10 +210,17 @@ app.post('/login', function(req, res, next) {
       if (err) { return next(err) }
       console.log("successful login");
       req.session.user = user;
-      console.log("nextpath: ", req.session.nextpath);
       if (req.session.nextpath) {
-        res.redirect(req.session.nextpath);
-        req.session.nextpath = false;
+        if (!req.session.nextparams) {
+          res.redirect(req.session.nextpath);
+          req.session.nextpath = false;
+        }
+        else {
+          console.log("nextparams", req.session.nextparams);
+          res.redirect(req.session.nextpath.formParamURL(req.session.nextparams))
+          req.session.nextpath = false;
+          req.session.nextparams = false;
+        }
       }
       else {
         res.redirect('/');
@@ -210,6 +228,37 @@ app.post('/login', function(req, res, next) {
     });
   })(req, res, next);
 });
+
+// Form a param url after ensureAuthenticated middleware
+String.prototype.formParamURL = function(params) {
+  console.log("params internal", params)
+  var result = ""
+      , getParamKey = false
+      , paramNames = []
+      , nextParam = "";
+  for (i=0;i<this.length;i++) {
+    if(!getParamKey) {
+      if(this[i] === ":") {
+        getParamKey = true;
+      }
+      else {
+        result = result + this[i]
+      }
+    }
+    else {
+      if (this[i] !== "/") {
+        nextParam += this[i];
+      }
+      else {
+        getParamKey = false;
+        console.log("nextParam",nextParam);
+        result = result + params[nextParam]+"/";
+        nextParam = "";
+      }
+    }
+  }
+  return result;
+}
 
 // Handle new user creation
 app.post('/user/create', function(req, res, next) {
@@ -251,3 +300,4 @@ app.post('/user/create', function(req, res, next) {
     });
   });
 })
+

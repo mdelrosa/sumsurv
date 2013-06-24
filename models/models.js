@@ -27,9 +27,9 @@ exports.survey = Survey;
 // Response schema
 // **NOTE: Will have to inherit result structure from Survey schema eventually. **
 var responseSchema = mongoose.Schema({
-	id: Number,
 	results: Array,
-	participant: String,
+	participant: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
+	classroom: { type: mongoose.Schema.Types.ObjectId, ref: "Classroom"},
 	date: String
 }),
 	Response = mongoose.model('Response', responseSchema);

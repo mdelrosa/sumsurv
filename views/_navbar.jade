@@ -16,7 +16,7 @@ div(class="navbar navbar-inverse1 navbar-fixed-top")
 						a(href='/login') Log In
 				else
 					li.dropdown1
-						a.dropdown-toggle(href='/export', data-toggle="dropdown") Hi, #{user}
+						a.dropdown-toggle#username(href='/export', data-toggle="dropdown", name=user) Hi, #{user}
 							b.caret
 						ul.dropdown-menu
 							li

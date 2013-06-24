@@ -73,7 +73,7 @@ exports.my_classes = function(req, res) {
 }
 
 exports.part = function(req, res) {
-	Classroom.where("roster").in([req.user.email]).exec(function(err, found_class) {
+	Classroom.where("roster").in([req.user.email]).populate('owner').exec(function(err, found_class) {
 		if(err) {console.log("Participating static error: ", err); return false}
 		else {
 			console.log("found_class: ", found_class);
@@ -91,25 +91,37 @@ exports.take = function(req, res) {
 		console.log("found_user: ", found_user)
 		if(err0) { console.log("Take user error: ", err0) }
 		else {
-			Classroom.find({name: req.params.class, owner: found_user[0]._id}).exec(function(err, found_class) {
+			Classroom.find({name: req.params.class, owner: found_user[0]._id}).populate('owner').exec(function(err, found_class) {
 				if(err) { console.log("Take class error: ", err); return false}
 				else {
+					if (found_class[0].roster.indexOf(req.user.email) === -1) {
+						res.redirect('/error/not_in_roster');
+						return false
+					}
 					console.log("found_class: ", found_class)
 					Survey.find({_id: found_class[0].survey}).exec(function(err2, found_surv) {
 						if(err2) {console.log("Take survey error: ", err2); return false}
 						else {
 							if (found_surv[0].name === "SIMS") {
-								res.render("survey", {
+								res.render("sims", {
 									user: req.user.username,
-									title: req.params.user + "'s " + req.params.class + " | SIMS",
-									className: req.params.className
-								})
+									title: baseHead + " | " + req.params.user + "'s " + req.params.class,
+									className: req.params.class,
+									owner: found_class[0].owner.username
+								});
 							}
 						}
 					})
 				}
 			})			
 		}
+	})
+}
+
+exports.err = function(req, res) {
+	res.render('not_roster', {
+		user: req.user.username,
+		title: baseHead + " | " + "Not In Roster"
 	})
 }
 
