@@ -26,6 +26,7 @@ $(document).ready(function() {
 						});
 					});
 					activateRosterEdit();
+					sendemail();
 				})
 			}
 		});
@@ -108,10 +109,42 @@ $(document).ready(function() {
 							}
 						}
 					})
+					
 				}
 			});
 		});
 	}
+
+	//sends email to the list
+	var sendemail = function(){
+		$('.send-email').click(function() {
+			$('.container1').append("<div class='progress progress-striped active'>"+
+  								 "<div class='bar' style='width: 100%;''></div>" +
+								 "</div>");
+			var className = $('td.editing').html();
+			console.log("outside");
+			$.get('/mail/send', { name: className }, function(data) {
+				console.log("it works?");
+				if(data.err) { 
+					console.log("Unable to send survey to mailer.");
+					$('.progress-striped').remove(); 
+					$('.container1').append("<div class='alert alert-error'>"+
+											"<button type='button' class='close' data-dismiss='alert'>&times;"+
+											"</button><strong>Fail to send </strong>"+
+											"Something is wrong.</div>");
+				}
+				else {
+					console.log("it works!");
+					$('.progress-striped').remove();
+					$('.container1').append("<div class='alert alert-success'>"+
+											"<button type='button' class='close' data-dismiss='alert'>&times;"+
+											"</button><strong>Email sent! </strong>"+
+											"The survey has been sent.</div>");
+				}
+			});
+		});
+	}
+
 
 	// Activate jquery for importing roster
 	var activateImport = function() {
