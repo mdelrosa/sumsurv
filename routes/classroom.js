@@ -19,7 +19,7 @@ exports.new_class = function(req, res) {
 				name: req.body.name,
 				owner: req.user,
 				roster: [],
-				surveys: [],
+				surveys: null,
 				responses: []
 			});
 			newClassroom.save(function(err) {
@@ -81,7 +81,7 @@ exports.remove = function(req, res) {
 	Classroom.update({ name: req.body.className }, { $pull: { roster: req.body.participant } }, function(err, newDb) {
 		if(err || newDb === null) {console.log("Error in remove participant: ", err)}
 		else {
-			res.send({success: true})
+			res.send({success: true});
 		}			
 	})
 }
@@ -90,10 +90,37 @@ exports.remove = function(req, res) {
 exports.survey = function(req, res) {
 	Classroom.find({name: req.query.className, owner: req.user}).exec(function(err, found_class) {
 		if(err) { console.log("Survey error: ", err); return false}
+		Survey.find({id: found_class.survey}).exec(function(err2, found_survey) {
+			if(err) { console.log("Survey error: ", err2); return false}
+			else {
+				console.log("found_survey",found_survey[0])
+				res.render("_classSurvey", {
+					survey: found_survey[0],
+					responses: found_class.responses
+				});
+			}
+		})
+	})
+}
+
+// --NOTE: Populate isn't working quite properly here
+// Update class survey
+exports.survey_update = function(req, res) {
+	console.log(req.body);
+	Survey.findOne({name: req.body.survey, creator: req.user}).exec(function(err, found_survey) {
+		if(err) {console.log("Classroom survey search error: ", err); return false}
 		else {
-			res.render("_classSurvey", {
-				responses: found_class.responses
+			Classroom.update({name: req.body.className, owner: req.user}, { survey: found_survey._id }).exec(function(err2) {
+				if(err2) { console.log("Classroom survey update error: ", err2); return false}
+				else {
+					Classroom.find({name: req.body.className, owner: req.user}).populate("survey").exec(function(err3, found_class) {
+						if(err3) {console.log("Classroom survey populate error: ", err3); return false}
+						else {
+							res.send({success: true});
+						}
+					})
+				}
 			})
 		}
-	})
+	});
 }

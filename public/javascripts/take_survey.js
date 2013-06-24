@@ -75,8 +75,12 @@ $(document).ready(function() {
 		} 
 
 		else {
+			var info = new Object()
+				, user = $('a#username').attr('name');
+			info["owner"] = $('span#owner').attr('name');
+			info["className"] = $('span#className').attr('name');
 			// survey was completed, post survey
-			$.post('/survey/success', {results: results}, function(res) {
+			$.post('/survey/success', {results: results, info: info, username: user}, function(res) {
 				if(res.err) {console.log("Unable to save your response."); return false}
 				else {
 

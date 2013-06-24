@@ -16,12 +16,10 @@ $(document).ready(function() {
 					$('.btn-remove').click(function() {
 						var participant = $(this).parent().prev().text()
 							, parentRow = $(this).parent().parent();
-						console.log("participant: ", participant);
 						$.post('/class/roster/remove', { participant: participant, className: name}, function(res) {
 							if(res.err) {console.log("Unable to remove participant"); return false}
 							else {
 								if(res.success) {
-									console.log("Success");
 									parentRow.fadeOut('fast');
 								}
 							}
@@ -37,6 +35,23 @@ $(document).ready(function() {
 			else {
 				$(".survey").fadeOut("fast", function() {
 					$(this).html(data).fadeIn("fast");
+					$('.btn-surv-select').click(function() {
+						var selectedSurv = $('select option:selected').html();
+						$.post('/class/survey/update', { className: name, survey: selectedSurv}, function(res) {
+							if(res.err) { console.log("Unable to update class survey: ", res.err); return false}
+							else {
+								if(res.success) {
+									// console.log("Successfully updated class survey!");
+									// $.get('class/survey', { className: name }, function(data2) {
+									// 	if(data2.err) {console.log("Unable to fetch survey")}
+									// 	else {
+									// 		$(".survey.fadeOut")
+									// 	}
+									// })
+								}
+							}
+						})
+					})
 				})
 			}
 		});

@@ -1,0 +1,24 @@
+//- participating.jade
+//- show classes user is participating in
+
+extends layout
+
+block scripts
+	script(type='text/javascript', src='/javascripts/participating.js')
+
+block content
+	div.fluid-row.pad
+		if (classes.length)
+			for room in classes
+				div.span3.outline.text-center
+					h3 #{room.name}
+					img.about-img(src="http://24.media.tumblr.com/366b2c3d6507c85a2049b040b291ef3f/tumblr_mluafwApSk1qgjj2bo1_400.png")
+					a.btn.btn-info.margin(href='/'+room.owner.username+'/'+room.name+'/take') Take Survey
+		else
+			div.span3.outline.text-center
+				h3 Sorry!
+				img.about-img(src="http://24.media.tumblr.com/366b2c3d6507c85a2049b040b291ef3f/tumblr_mluafwApSk1qgjj2bo1_400.png")
+				p.margin You are not on any class rosters!
+
+	- var html = "<script>var width = $('img.about-img').width(); $('img.about-img').css({'height':width+'px'})</script>"
+	| !{html}

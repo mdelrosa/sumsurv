@@ -16,9 +16,8 @@ var express = require('express')
   , mongoose = require('mongoose')
   , MongoStore = require('connect-mongo')(express)
   , Models = require('./models/models')
-  , User = Models.User;
-
-
+  , User = Models.User
+  , Survey = Models.survey;
 
 // Seed the admin
 var admin = new User({
@@ -27,11 +26,30 @@ var admin = new User({
     password: "jsizzle",
     classes: []
   });
-admin.save(function(err) {
+admin.save(function(err, stolk) {
   if(err) {
     console.log(err);
-  } else {
-    console.log("admin: " + user.username + " saved");
+  } 
+  else {
+    // Seed the SIMS survey
+    var SIMS = new Survey({
+      name: "SIMS",
+      pages: [],
+      creator: stolk._id
+    });
+    SIMS.save(function(err) {
+      if(err) {console.log("SIMS Save Error: ", err); return false}
+      else {
+        console.log("Succesffuly saved SIMS")
+        Survey.find({name:"SIMS"}).populate("creator").exec(function(err, found) {
+          if(err) {console.log("SIMS Error: ", err); return false}
+          else {
+            console.log("Found: ", found[0])
+            console.log("SIMS is owned by: ", found[0].creator);
+          }
+        })
+      }
+    })
   }
 });
 
@@ -92,11 +110,14 @@ app.get('/', routes.index);
 app.get('/users', user.list);
 app.get('/about', user.about);
 app.get('/splash', ensureDate, user.splash);
-app.get('/survey', ensureDate, user.survey);
+app.get('/survey', ensureAuthenticated, ensureDate, user.survey);
 app.get('/survey/create', ensureAuthenticated, user.create);
 app.get('/export', ensureAuthenticated, user.exportcsv);
 app.get('/mail', user.mail);
 app.get('/classes', ensureAuthenticated, user.my_classes);
+app.get('/part', ensureAuthenticated, user.part);
+app.get('/:user/:class/take', ensureAuthenticated, user.take);
+app.get('/error/not_in_roster', ensureAuthenticated, user.err);
 
 // Mail routes
 app.get('/mail/send', mail.test_mail);
@@ -134,10 +155,14 @@ app.get('/export/csv', survey.exportcsv1);
 app.post('/survey/create', survey.create);
 app.post('/survey/success', survey.save_response);
 
-// handling classroom objects
+// -- handling classroom objects
+// roster
 app.post('/class/create', classroom.new_class);
 app.post('/class/roster/update', classroom.roster_update);
 app.post('/class/roster/remove', classroom.remove);
+// survey
+app.post('/class/survey/update', classroom.survey_update)
+
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
@@ -147,7 +172,20 @@ http.createServer(app).listen(app.get('port'), function(){
 function ensureAuthenticated(req, res, next) {
   console.log(req.route);
   if (req.isAuthenticated()) {return next()}
-  req.session.nextpath = req.route.path;
+  // If not unique route
+  if (!req.params) {
+    req.session.nextpath = req.route.path;  
+    req.session.nextparams = false;
+  }
+  else {
+    console.log("route: ", req.session.route);
+    req.session.nextpath = req.route.path;
+    req.session.nextparams = new Object();
+    for(var key in req.route.params) {
+      req.session.nextparams[key] = req.route.params[key];
+      console.log("nextparams", req.session.nextparams);
+    }
+  }
   res.redirect('/login');
 }
 
@@ -169,13 +207,20 @@ app.post('/login', function(req, res, next) {
       return res.redirect('/login')
     }
     req.logIn(user, function(err) {
-      console.log('successful login')
-      if (err) { return next(err); }
+      if (err) { return next(err) }
+      console.log("successful login");
       req.session.user = user;
-      console.log(req.session.nextpath);
       if (req.session.nextpath) {
-        res.redirect(req.session.nextpath);
-        req.session.nextpath = false;
+        if (!req.session.nextparams) {
+          res.redirect(req.session.nextpath);
+          req.session.nextpath = false;
+        }
+        else {
+          console.log("nextparams", req.session.nextparams);
+          res.redirect(req.session.nextpath.formParamURL(req.session.nextparams))
+          req.session.nextpath = false;
+          req.session.nextparams = false;
+        }
       }
       else {
         res.redirect('/');
@@ -183,6 +228,37 @@ app.post('/login', function(req, res, next) {
     });
   })(req, res, next);
 });
+
+// Form a param url after ensureAuthenticated middleware
+String.prototype.formParamURL = function(params) {
+  console.log("params internal", params)
+  var result = ""
+      , getParamKey = false
+      , paramNames = []
+      , nextParam = "";
+  for (i=0;i<this.length;i++) {
+    if(!getParamKey) {
+      if(this[i] === ":") {
+        getParamKey = true;
+      }
+      else {
+        result = result + this[i]
+      }
+    }
+    else {
+      if (this[i] !== "/") {
+        nextParam += this[i];
+      }
+      else {
+        getParamKey = false;
+        console.log("nextParam",nextParam);
+        result = result + params[nextParam]+"/";
+        nextParam = "";
+      }
+    }
+  }
+  return result;
+}
 
 // Handle new user creation
 app.post('/user/create', function(req, res, next) {
@@ -219,8 +295,9 @@ app.post('/user/create', function(req, res, next) {
       }
       else {
         req.session.userMessage = "Successfully saved your credentials!"
-        res.render('/login');
+        res.render('login');
       }
     });
   });
 })
+
