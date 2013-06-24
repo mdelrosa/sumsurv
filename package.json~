@@ -14,7 +14,6 @@
     "passport": ">= 0.0.0",
     "passport-local": ">= 0.0.0",
     "bcrypt": ">= 0.0.0",
-    "nodemailer": ">= 0.0.0",
-    "cron": ">= 0.0.0"
+    "nodemailer": ">= 0.0.0"
   }
 }
