@@ -102,10 +102,20 @@ exports.take = function(req, res) {
 					Survey.find({_id: found_class[0].survey}).exec(function(err2, found_surv) {
 						if(err2) {console.log("Take survey error: ", err2); return false}
 						else {
-							if (found_surv[0].name === "SIMS") {
-								res.render("sims", {
+							try {
+								if (found_surv[0].name === "SIMS") {
+									res.render("sims", {
+										user: req.user.username,
+										title: baseHead + " | " + req.params.user + "'s " + req.params.class,
+										className: req.params.class,
+										owner: found_class[0].owner.username
+									});
+								}
+							}
+							catch(err) {
+								res.render("no_survey", {
 									user: req.user.username,
-									title: baseHead + " | " + req.params.user + "'s " + req.params.class,
+									title: baseHead + " | No Survey Found",
 									className: req.params.class,
 									owner: found_class[0].owner.username
 								});
