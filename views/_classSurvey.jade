@@ -1,0 +1,20 @@
+//- _classSurvey.jade
+//- display current class' deployed survey
+
+if (survey)
+	h4 #{survey.name}
+else
+	h4 No survey selected!
+div.form-inline
+	select
+		option SIMS
+		if (survs)
+			for surv in survs
+				option #{surv.name}
+	button.btn.btn-surv-select Select
+div.responses
+	h4 Responses:
+	if responses
+		p There are #{responses.length} responses to the survey.
+	else
+		p No responses so far!

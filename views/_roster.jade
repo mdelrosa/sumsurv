@@ -1,0 +1,27 @@
+//- roster.jade
+//- show roster div
+
+if (roster && roster.length > 0)
+	table.table.table-striped
+		tr
+			th Student
+			th Edit
+		for student in roster
+			tr
+				td #{student}
+				td
+					button.btn.btn-small.btn-remove
+						i.icon-minus
+						|  Remove
+else
+	p Roster is empty!
+div.form-inline
+	button.btn.roster-add(data-toggle='popover', title="", data-content='<div class="roster-add"><form class="form-inline roster-input"><textarea class="popover-textarea" type="textarea" placeholder="i.e. tim.bibberson@blargh.com, jim.jefferson@woohoo.com"></textarea><br><btn class="btn btn-text-roster">Enter</btn><input style="bold" type="file" name="files[]" multiple="multiple" id="files"></input></form></div>', data-original-title='Add Participants')
+		i.icon-plus
+		|  Add Participants
+	br
+	br		
+	div.container1
+		button.btn.btn.btn-new.send-email
+			i.icon-envelope	
+			|   Send Survey

@@ -4,7 +4,10 @@ body {
   padding-right: 0px;
   font: 14px "Merriweather Sans", Helvetica, Arial, sans-serif;
   color: #000000;
+  height: 100%;
+  min-height: 100%;
 }
+
 
 a {
   color: #00B7FF;
@@ -24,6 +27,10 @@ a {
 
 .pad {
 	padding: 1em;
+}
+
+.pad-small {
+	padding: .25em;
 }
 
 .margin {
@@ -47,9 +54,9 @@ a {
 	margin-left: 1em
 }
 
-
 textarea {
-	min-width: 50%
+	min-width: 80%;
+	max-width: 95%;
 }
 
 #optionsRadios1 {
@@ -122,10 +129,6 @@ textarea {
 	line-height: 1.25;
 }
 
-.login-container {
-	padding: 1em;
-}
-
 .navbar-inverse1 .navbar-inner1 {
 	background-color: #8904B1;
 	background-repeat: repeat-x;
@@ -189,28 +192,49 @@ navbar .nav1 li.dropdown.open > .dropdown-toggle1, .navbar .nav1 li.dropdown.act
 .footer {
   text-align: center;
   padding: 30px 0;
-  margin-top: 70px;
+  margin-top: 50px;
   border-top: 1px solid #e5e5e5;
   background-color: #f5f5f5;
   margin-left: -20px;
   margin-right: -20px;
   padding-left: 20px;
   padding-right: 20px;
+  bottom: 0;
 }
 .footer p {
   margin-bottom: 0;
   color: #777;
+  bottom: 0;
 }
 .footer-links {
   margin: 10px 0;
   display: inline;
+  bottom: 0;
 }
 .footer-links li {
   display: inline;
   padding: 0 2px;
+  bottom: 0;
 }
 .footer-links li:first-child {
   padding-left: 0;
+  bottom: 0;
+}
+
+#footer{
+	position: relative;
+	margin-top: -50px;
+	height: 50px;
+	clear: both;
+}
+
+#wrap {
+	min-height: 100%;
+}
+
+#main {
+	overflow: auto;
+	padding-bottom: 50px;
 }
 
 .popover {
@@ -222,9 +246,21 @@ navbar .nav1 li.dropdown.open > .dropdown-toggle1, .navbar .nav1 li.dropdown.act
 	margin-bottom: auto;
 }
 
+table.fixed {
+	table-layout: fixed;
+}
+
+table.fixed td {
+	overflow: hidden;
+}
+
 /* Outlines for testing */
 .outline {
 	border: 3px solid black;
 	border-radius: 5px;
 }
 
+input[type="file"] {
+	height: 40px;
+	line-height: 0px;
+}
