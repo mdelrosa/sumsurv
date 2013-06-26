@@ -1,3 +1,6 @@
+//- sims.jade
+//- hardcoded sims survey
+
 extends layout
 
 block scripts
@@ -12,8 +15,17 @@ block content
   -var year = datedata.getFullYear(); 
   div.container#main-container
     br
-    h1 The Situational Motivation Scale (SIMS)   
-    h4 for the week of #{month}/#{firstday}/#{year} to #{month}/#{lastday}/#{year}
+    div.row-fluid
+      div.span8
+        h1 The Situational Motivation Scale (SIMS)   
+        h4 for the week of #{month}/#{firstday}/#{year} to #{month}/#{lastday}/#{year}
+      div.span4
+        span.label.label-info.pad-small.margin#className(name=className)
+          i.icon-th-large.icon-white
+          |  #{className}
+        span.label.label-info.pad-small.margin#owner(name=owner)
+          i.icon-user.icon-white
+          |  #{owner}
     br
 
     div#survey-container
@@ -493,5 +505,5 @@ block content
             div.pull-left.tab-control
               a.btn.btn-info(href="#questions") Previous
             div.pull-right.tab-control
-              a.btn.btn-info.btn-large(id = 'submitform', value = 'Submit', name = 'submitform') Submit 
+              a.btn.btn-info.btn-large(id = 'submitform', value = 'Submit', name = 'submitform') Submit
           div.pull-right#alertDiv

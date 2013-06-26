@@ -7,6 +7,6 @@ $(document).ready(function{
 					//downloads csv file
 					var myWindow = window.open(res.csvstring);
 					myWindow.focus();	
-				});
-	}
+				}
+	});
 });

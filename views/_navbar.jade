@@ -3,7 +3,8 @@
 div(class="navbar navbar-inverse1 navbar-fixed-top")
 	div(class='navbar-inner1')
 		div(class='container-fluid')
-			a(class="brand1", href="/") Survo
+			a(class="brand1", href="/") 
+				| Survo
 			ul(class='nav1 nav')
 					li
 						a(href='/splash') Survey
@@ -15,15 +16,15 @@ div(class="navbar navbar-inverse1 navbar-fixed-top")
 						a(href='/login') Log In
 				else
 					li.dropdown1
-						a.dropdown-toggle(href='/export', data-toggle="dropdown") Hi, #{user}
+						a.dropdown-toggle#username(href='/export', data-toggle="dropdown", name=user) Hi, #{user}
 							b.caret
 						ul.dropdown-menu
 							li
-								a(href='/survey/create') Create Survey
+								a(href='/survey/create') My Surveys
 							li
-								a(href='/export') Export Data
+								a(href='/classes') My Classes
 							li
-								a(href='/import') Import Emails	
+								a(href='/part') Participating	
 							li
 								a(href='/logout') Log Out
 							

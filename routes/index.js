@@ -3,7 +3,7 @@
  * GET home page.
  */
 
-var baseHead = "Stolk-vey";
+var baseHead = "Survo";
 
 exports.index = function(req, res){
   if (req.user) { var user = req.user.username }

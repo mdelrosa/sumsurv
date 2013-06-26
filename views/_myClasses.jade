@@ -1,0 +1,16 @@
+//- _myClasses.jade
+//- partial for displaying user's classes
+
+if (!classes || classes.length === 0)
+	p You do not have any classes!
+else
+	table.table.table-striped.table-condensed.fixed
+		tr
+			th Name
+			th View
+		for room in classes
+			tr
+				td #{room.name}
+				td
+					a.edit-link(name=room.name)
+						icon.icon-edit

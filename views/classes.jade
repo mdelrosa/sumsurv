@@ -1,0 +1,43 @@
+//- classes.jade
+//- display my current classes/allow for roster updating/data exporting
+
+extends layout
+
+block scripts
+	script(type='text/javascript', src='/javascripts/classes.js')
+
+block content
+	div.row-fluid.pad-top
+		div.span4.outline.pad
+			h2 My Classes
+			div.class-container
+				include _myClasses.jade
+			btn.btn.btn-new(data-toggle='popover', title data-content='<div class="name-div"><form class="form-inline name-input"><input class="class-name" type="text" placeholder="Enter a name for your class"></input><btn class="btn btn-name">Enter</btn></form></div>', data-original-title='Class Name')
+				icon.icon-plus
+				|  New Class
+		div.span8.outline.pad
+			div.class-header
+				h2 Current Class
+			div.row-fluid
+				div.span6.outline.roster
+					div.roster-header
+						h4.text-center Roster
+					p.muted Please select a class
+					if (roster && roster.length > 0)
+						table.table.table-striped
+							tr
+								th Student
+								th Edit
+							for student in roster
+								tr
+									td #{student}
+									td
+										button.btn.btn-small
+											i.icon-minus
+											|  Remove
+					else
+				div.span6.outline.survey
+					div.survey-header
+						h4.text-center Survey
+					p.muted Please select a class
+			
