@@ -149,7 +149,7 @@ app.get('/import', ensureAuthenticated, user.import);
 app.post('/import', survey.import);
 
 //exporting page route(s)
-app.get('/export/csv', survey.exportcsv1);
+app.get('/class/export', survey.export);
 
 // handling survey objects
 app.post('/survey/create', survey.create);

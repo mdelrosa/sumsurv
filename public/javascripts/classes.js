@@ -3,6 +3,20 @@
 
 $(document).ready(function() {
 
+	// Export class data
+	var activateExport = function(className) {
+		console.log("Export active");
+		$('.btn-export').click(function() {
+			console.log("className: ", className)
+			$.get('/class/export', { className: className }, function(data) {
+				if(data.err) { console.log("Class export error: ", data.err); return false }
+				else {
+					console.log("Export success");
+				}
+			})
+		})
+	}
+
 	// change roster/survey div
 	var setClassDiv = function(name) {
 		// Render current class' roster/survey
@@ -41,17 +55,12 @@ $(document).ready(function() {
 							if(res.err) { console.log("Unable to update class survey: ", res.err); return false}
 							else {
 								if(res.success) {
-									// console.log("Successfully updated class survey!");
-									// $.get('class/survey', { className: name }, function(data2) {
-									// 	if(data2.err) {console.log("Unable to fetch survey")}
-									// 	else {
-									// 		$(".survey.fadeOut")
-									// 	}
-									// })
+									// Success stuff
 								}
 							}
 						});
 					});
+					activateExport(name);
 					$('.response-square').tooltip({html: true, placement: 'top', trigger: 'hover'});
 				})
 			}
