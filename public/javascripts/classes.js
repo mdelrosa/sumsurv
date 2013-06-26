@@ -3,23 +3,6 @@
 
 $(document).ready(function() {
 
-	// Export class data
-	var activateExport = function(className) {
-		console.log("Export active");
-		$('.btn-export').click(function() {
-			console.log("className: ", className)
-			$.get('/class/export', { className: className }, function(data) {
-				if(data.err) { console.log("Class export error: ", data.err); return false }
-				else {
-					console.log("Export success");
-					console.log("data: ", data);
-					var myWindow = window.open(data.csvstring);
-					myWindow.focus();	
-				}
-			})
-		})
-	}
-
 	// change roster/survey div
 	var setClassDiv = function(name) {
 		// Render current class' roster/survey
@@ -63,7 +46,6 @@ $(document).ready(function() {
 							}
 						});
 					});
-					activateExport(name);
 					$('.response-square').tooltip({html: true, placement: 'top', trigger: 'hover'});
 				})
 			}

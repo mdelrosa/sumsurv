@@ -93,9 +93,11 @@ exports.survey = function(req, res) {
 		else {
 			Response.where('_id').in(found_class[0].responses).populate('participant').exec(function(err2, found_responses) {
 				if(err2) { console.log("Survey responses error: ", err2); return false}
+				var className = encodeURIComponent(req.query.className);
 				res.render("_classSurvey", {
 					survey: found_class[0].survey,
-					responses: found_responses
+					responses: found_responses,
+					className: className
 				});
 			});
 		}

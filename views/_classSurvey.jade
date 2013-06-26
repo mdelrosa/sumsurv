@@ -14,7 +14,7 @@ div.form-inline.pad
 			for surv in survs
 				option #{surv.name}
 	button.btn.btn-surv-select Select
-	button.btn.btn-export.pull-right Export Data
+	a.btn.btn-export.pull-right(href="/class/export?className="+className) Export Data
 
 div.responses
 	h4 Responses:
