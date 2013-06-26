@@ -12,6 +12,9 @@ $(document).ready(function() {
 				if(data.err) { console.log("Class export error: ", data.err); return false }
 				else {
 					console.log("Export success");
+					console.log("data: ", data);
+					var myWindow = window.open(data.csvstring);
+					myWindow.focus();	
 				}
 			})
 		})

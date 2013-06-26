@@ -9,6 +9,7 @@ var Models = require('../models/models')
     , Classroom = Models.classroom
     , User = Models.User;
 
+
 // --Survey creation-- //
 // Add new survey object to database
 exports.create = function(req, res) {
@@ -111,21 +112,27 @@ function decommafy(str) {
 
 }
 
-exports.export = function(req, res){
-    Classroom.find({owner: req.user.username, name: req.body.name}).exec(function(err, found_class) {
-        if(err) {console.log("Error in classroom export: ", err); return false}
+exports.export = function(req, res) {
+    console.log('req.query: ', req.query)
+    Classroom.find({owner: req.user.id, name: req.query.className}).exec(function(err, found_class) {
+        if(err) {console.log("Error in classroom export:", err); return false}
         else {
             Response.find({classroom: found_class[0].id},function(err2, response_db){
-                if(err2) { console.log("Error in response export: ", err2); return false}
+            	if(err2) {console.log("Error in response export: ", err2); return false}
                 else {
-                	var csvstr = [' , Id, Gender, Year, Status, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Comment, '];    	
-                	for(i=1; i < response_db.length+1; i++) {
+                    var csvstr = [' , Id, Gender, Year, Status, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Comment, Answer Date, '];    	
+                	var answerdate = "";
+                    for(i=1; i < response_db.length+1; i++) {
+                        //These two lines decommafy the written responses
                 		response_db[i-1].results[2] = decommafy(response_db[i-1].results[2]);
                 		response_db[i-1].results[19] = decommafy(response_db[i-1].results[19]);
-            			csvstr[i] = " ," + response_db[i-1].id + "," + response_db[i-1].results.join(",") + ", ";
+                        //takes the date the survey was taken and converts it to a x/x/xxxx format in string.
+                        answerdate = response_db[i-1].date.month.toString() + "/" + response_db[i-1].date.date.toString() + "/" + response_db[i-1].date.year.toString();
+                        //This just turns the array into a string with comma separated values.
+            			csvstr[i] = " ," + response_db[i-1].id + "," + response_db[i-1].results.join(",") +","+ answerdate +  ", ";
             		}
                     res.header('Content-type', 'text/csv');
-                    res.send(csvstr);
+                    res.send({csvstring: csvstr});
                 }
             });
         }

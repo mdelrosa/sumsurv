@@ -102,8 +102,6 @@ exports.take = function(req, res) {
 					Survey.find({_id: found_class[0].survey}).exec(function(err2, found_surv) {
 						if(err2) {console.log("Take survey error: ", err2); return false}
 						else {
-							console.log("className: ", req.params.class);
-							console.log("owner: ", found_class[0].owner.username)
 							try {
 								if (found_surv[0].name === "SIMS") {
 									res.render("sims", {
