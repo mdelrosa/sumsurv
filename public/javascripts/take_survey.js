@@ -81,6 +81,7 @@ $(document).ready(function() {
 			info["owner"] = $('span#owner').attr('name');
 			info["className"] = $('span#className').attr('name');
 			// survey was completed, post survey
+			console.log(info);
 			$.post('/survey/success', {results: results, date: date, info: info}, function(res) {
 				if(res.err) {console.log("Unable to save your response."); return false}
 				else {
