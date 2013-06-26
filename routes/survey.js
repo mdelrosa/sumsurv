@@ -113,7 +113,7 @@ function decommafy(str) {
 }
 
 exports.export = function(req, res) {
-    console.log("REQ.QUERRRYYYYYY ", req.query);
+    console.log('req.query: ', req.query)
     Classroom.find({owner: req.user.id, name: req.query.className}).exec(function(err, found_class) {
         if(err) {console.log("Error in classroom export:", err); return false}
         else {
@@ -127,12 +127,12 @@ exports.export = function(req, res) {
                 		response_db[i-1].results[2] = decommafy(response_db[i-1].results[2]);
                 		response_db[i-1].results[19] = decommafy(response_db[i-1].results[19]);
                         //takes the date the survey was taken and converts it to a x/x/xxxx format in string.
-                        answerdate = response_db[i-1].date.month.toString() + "/" + response_db[i-1].date.day.toString() + "/" + response_db[i-1].date.year.toString();
+                        answerdate = response_db[i-1].date.month.toString() + "/" + response_db[i-1].date.date.toString() + "/" + response_db[i-1].date.year.toString();
                         //This just turns the array into a string with comma separated values.
-            			csvstr[i] = " ," + response_db[i-1].id + "," + response_db[i-1].results.join(",") + answerdate + ", ";
+            			csvstr[i] = " ," + response_db[i-1].id + "," + response_db[i-1].results.join(",") +","+ answerdate +  ", ";
             		}
                     res.header('Content-type', 'text/csv');
-                    res.send(csvstr);
+                    res.send({csvstring: csvstr});
                 }
             });
         }
