@@ -75,12 +75,13 @@ $(document).ready(function() {
 		} 
 
 		else {
-			var info = new Object()
-				, user = $('a#username').attr('name');
+			var dateObj = new Date()
+				, date = { year: dateObj.getFullYear(), month: dateObj.getMonth(), day: dateObj.getDay(), date: dateObj.getDate() }
+				, info = new Object();
 			info["owner"] = $('span#owner').attr('name');
 			info["className"] = $('span#className').attr('name');
 			// survey was completed, post survey
-			$.post('/survey/success', {results: results, info: info, username: user}, function(res) {
+			$.post('/survey/success', {results: results, date: date, info: info}, function(res) {
 				if(res.err) {console.log("Unable to save your response."); return false}
 				else {
 

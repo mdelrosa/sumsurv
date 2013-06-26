@@ -9,6 +9,7 @@ var Models = require('../models/models')
     , Classroom = Models.classroom;
     , User = Models.user;
 
+
 // --Survey creation-- //
 // Add new survey object to database
 exports.create = function(req, res) {
@@ -62,16 +63,31 @@ exports.all_surveys = function(req, res) {
 
 // Save an individual response to a survey
 exports.save_response = function(req, res) {
-    User.findOne({name: req.body.username})
-	var new_response = new Response({results: req.body.results, partipant: req.body.info});
-	new_response.save(function(err) {
-		if(err) {
-			console.log('Unable to save response');
-		 	res.send({success:false})
-		 	return false;
-		}
-		console.log('Successfully saved new response!');
-		res.send({success:true});
+    console.log("req.body", req.body);
+    User.find({username: req.body.info.owner}).exec(function(err, found_user) {
+        if(err) {console.log("Error in save_response user search: ", err); return false}
+        Classroom.find({name: req.body.info.className, owner: found_user[0].id}).exec(function(err2, found_class) {
+        	if(err2) {console.log("Error in save_response classroom search: ", err2); return false}
+            var new_response = new Response({
+                results: req.body.results,
+                participant: req.user.id,
+                classroom: found_class[0].id,
+                date: req.body.date
+            });
+        	new_response.save(function(err, saved_response) {
+        		if(err) {
+        			console.log('Unable to save response');
+        		 	res.send({success:false})
+        		 	return false;
+        		}
+        		console.log('Successfully saved new response!');
+                Classroom.update({name: req.body.info.className, owner: found_user[0]}  , { $addToSet: { responses: saved_response.id }}).exec(function(err3, updated_class) {
+                    if(err3) { console.log("Err in classroom update: ", err3); return false }
+                    console.log("Successfully updated classroom!");
+                    res.send({success:true})
+                });
+            });
+        });
     });
 }
 

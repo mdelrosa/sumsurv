@@ -186,6 +186,10 @@ navbar .nav1 li.dropdown.open > .dropdown-toggle1, .navbar .nav1 li.dropdown.act
 	outline: none
 }
 
+.response-square {
+	background-color: #4d1b7b;
+	margin: 0.2em;
+}
 
 /*footer stuff*/
 

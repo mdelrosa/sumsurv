@@ -30,7 +30,7 @@ var responseSchema = mongoose.Schema({
 	results: Array,
 	participant: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
 	classroom: { type: mongoose.Schema.Types.ObjectId, ref: "Classroom"},
-	date: String
+	date: Object
 }),
 	Response = mongoose.model('Response', responseSchema);
 exports.response = Response;

@@ -50,8 +50,9 @@ $(document).ready(function() {
 									// })
 								}
 							}
-						})
-					})
+						});
+					});
+					$('.response-square').tooltip({html: true, placement: 'top', trigger: 'hover'});
 				})
 			}
 		});

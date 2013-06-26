@@ -88,37 +88,29 @@ exports.remove = function(req, res) {
 
 // Render survey partial
 exports.survey = function(req, res) {
-	Classroom.find({name: req.query.className, owner: req.user}).exec(function(err, found_class) {
+	Classroom.find({name: req.query.className, owner: req.user.id}).populate('survey').exec(function(err, found_class) {
 		if(err) { console.log("Survey error: ", err); return false}
-		Survey.find({id: found_class.survey}).exec(function(err2, found_survey) {
-			if(err) { console.log("Survey error: ", err2); return false}
-			else {
-				console.log("found_survey",found_survey[0])
+		else {
+			Response.where('_id').in(found_class[0].responses).populate('participant').exec(function(err2, found_responses) {
+				if(err2) { console.log("Survey responses error: ", err2); return false}
 				res.render("_classSurvey", {
-					survey: found_survey[0],
-					responses: found_class.responses
+					survey: found_class[0].survey,
+					responses: found_responses
 				});
-			}
-		})
-	})
+			});
+		}
+	});
 }
 
-// --NOTE: Populate isn't working quite properly here
 // Update class survey
 exports.survey_update = function(req, res) {
-	console.log(req.body);
 	Survey.findOne({name: req.body.survey, creator: req.user}).exec(function(err, found_survey) {
 		if(err) {console.log("Classroom survey search error: ", err); return false}
 		else {
 			Classroom.update({name: req.body.className, owner: req.user}, { survey: found_survey._id }).exec(function(err2) {
 				if(err2) { console.log("Classroom survey update error: ", err2); return false}
 				else {
-					Classroom.find({name: req.body.className, owner: req.user}).populate("survey").exec(function(err3, found_class) {
-						if(err3) {console.log("Classroom survey populate error: ", err3); return false}
-						else {
-							res.send({success: true});
-						}
-					})
+					res.send({success:true})
 				}
 			})
 		}
