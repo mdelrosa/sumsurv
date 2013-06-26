@@ -6,6 +6,8 @@ var Models = require('../models/models')
     , Survey = Models.survey
     , Page = Models.page
     , Emaillist = Models.emaillist;
+    , Classroom = Models.classroom;
+    , User = Models.user;
 
 // --Survey creation-- //
 // Add new survey object to database
