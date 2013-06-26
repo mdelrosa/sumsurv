@@ -8,12 +8,12 @@ $(document).ready(function() {
 		console.log("Export active");
 		$('.btn-export').click(function() {
 			console.log("className: ", className)
-			$.get('/class/export', { className: className }, function(data) {
-				if(data.err) { console.log("Class export error: ", data.err); return false }
+			$.get('/class/export', { className: className }, function(res) {
+				if(res.err) { console.log("Class export error: ", res.err); return false }
 				else {
 					console.log("Export success");
-					console.log("data: ", data);
-					var myWindow = window.open(data.csvstring);
+					console.log("res: ", res);
+					var myWindow = window.open(res.csvstring);
 					myWindow.focus();	
 				}
 			})

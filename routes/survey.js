@@ -132,7 +132,7 @@ exports.export = function(req, res) {
             			csvstr[i] = " ," + response_db[i-1].id + "," + response_db[i-1].results.join(",") +","+ answerdate +  ", ";
             		}
                     res.header('Content-type', 'text/csv');
-                    res.send({csvstring: csvstr});
+                    res.send(csvstr);
                 }
             });
         }
