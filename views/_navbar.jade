@@ -7,14 +7,12 @@ div(class="navbar navbar-inverse1 navbar-fixed-top")
 				| Survo
 			ul(class='nav1 nav')
 					li
-						a(href='/splash') Survey
-					li
 						a(href='/about') About
 			ul(class='nav1 nav pull-right')
 				if !user
 					li
 						a(href='/login') Log In
-				else
+				else if user == "stolktacular"
 					li.dropdown1
 						a.dropdown-toggle#username(href='/export', data-toggle="dropdown", name=user) Hi, #{user}
 							b.caret
@@ -27,6 +25,14 @@ div(class="navbar navbar-inverse1 navbar-fixed-top")
 								a(href='/part') Participating	
 							li
 								a(href='/logout') Log Out
-							
+				else 
+					li.dropdown1
+						a.dropdown-toggle#username(href='/export', data-toggle="dropdown", name=user) Hi, #{user}
+							b.caret
+						ul.dropdown-menu
+							li
+								a(href='/part') Participating	
+							li
+								a(href='/logout') Log Out			
 
 
