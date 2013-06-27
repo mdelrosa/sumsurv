@@ -77,12 +77,13 @@ $(document).ready(function() {
 		else {
 			var dateObj = new Date()
 				, date = { year: dateObj.getFullYear(), month: dateObj.getMonth()+1, day: dateObj.getDay()+1, date: dateObj.getDate() }
+				, time = { hour: dateObj.getHours(), minutes: dateObj.getMinutes(), seconds: dateObj.getSeconds()}
 				, info = new Object();
 			info["owner"] = $('span#owner').attr('name');
 			info["className"] = $('span#className').attr('name');
 			// survey was completed, post survey
 			console.log(info);
-			$.post('/survey/success', {results: results, date: date, info: info}, function(res) {
+			$.post('/survey/success', {results: results, date: date, info: info, time: time}, function(res) {
 				if(res.err) {console.log("Unable to save your response."); return false}
 				else {
 

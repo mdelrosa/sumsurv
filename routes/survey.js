@@ -72,7 +72,8 @@ exports.save_response = function(req, res) {
                 results: req.body.results,
                 participant: req.user.id,
                 classroom: found_class[0].id,
-                date: req.body.date
+                date: req.body.date,
+                time: req.body.time
             });
         	new_response.save(function(err, saved_response) {
         		if(err) {
@@ -113,23 +114,24 @@ function decommafy(str) {
 }
 
 exports.export = function(req, res) {
-    console.log('req.query: ', req.query)
     Classroom.find({owner: req.user.id, name: req.query.className}).exec(function(err, found_class) {
         if(err) {console.log("Error in classroom export:", err); return false}
         else {
             Response.find({classroom: found_class[0].id}).populate('participant').exec(function(err2, response_db) {
             	if(err2) {console.log("Error in response export: ", err2); return false}
                 else {
-                    var csvstr = [' , Id, Gender, Year, Status, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Comment, Answer Date, '];    	
+                    var csvstr = [' , Id, Gender, Year, Status, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Comment, Answer Date, Time'];    	
                 	var answerdate = "";
+                    var answertime = ";"
                     for(i=1; i < response_db.length+1; i++) {
                         //These two lines decommafy the written responses
                 		response_db[i-1].results[2] = decommafy(response_db[i-1].results[2]);
                 		response_db[i-1].results[19] = decommafy(response_db[i-1].results[19]);
                         //takes the date the survey was taken and converts it to a x/x/xxxx format in string.
                         answerdate = response_db[i-1].date.month.toString() + "/" + response_db[i-1].date.date.toString() + "/" + response_db[i-1].date.year.toString();
+                        answertime = response_db[i-1].time.hour.toString() + ":" + response_db[i-1].time.minutes.toString() + ":" + response_db[i-1].time.seconds.toString();
                         //This just turns the array into a string with comma separated values.
-            			csvstr[i] = " ," + response_db[i-1].participant.email + "," + response_db[i-1].results.join(",") +","+ answerdate +  ", ";
+            			csvstr[i] = " ," + response_db[i-1].participant.email + "," + response_db[i-1].results.join(",") +","+ answerdate +  "," + answertime + ", ";
             		}
                     res.header('Content-type', 'text/csv');
                     res.send(csvstr);

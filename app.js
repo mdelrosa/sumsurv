@@ -116,7 +116,7 @@ app.get('/export', ensureAuthenticated, user.exportcsv);
 app.get('/mail', user.mail);
 app.get('/classes', ensureAuthenticated, user.my_classes);
 app.get('/part', ensureAuthenticated, user.part);
-app.get('/:user/:class/take', ensureAuthenticated, user.take);
+app.get('/:user/:class/take', ensureAuthenticated, ensureDate, user.take);
 app.get('/error/not_in_roster', ensureAuthenticated, user.err);
 
 // Mail routes
@@ -192,7 +192,7 @@ function ensureAuthenticated(req, res, next) {
 //date confirmation middleware
 function ensureDate(req, res, next) {
   var datedata = new Date();
-  if (datedata.getDay() == 3 || datedata.getDay() == 5 || datedata.getDay() == 6 || datedata.getDay() == 0) {return next()}
+  if (datedata.getDay() == 4 || datedata.getDay() == 5 || datedata.getDay() == 6 || datedata.getDay() == 0) {return next()}
   res.redirect('/reject');
 }
 
