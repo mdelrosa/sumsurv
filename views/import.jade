@@ -1,0 +1,15 @@
+extends layout
+
+block scripts
+    script(src="http://jquery-csv.googlecode.com/git/src/jquery.csv.js")
+    script(type='text/javascript', src='/javascripts/import.js')
+
+block content
+  br 
+  br 
+  #inputs.clearfix
+    #main-container
+      h3 Import your Email List
+      input#files(style='bold', type='file', name='files[]', multiple='multiple')
+      table.table.table-condensed#contents(style='width: 30%; height: 100px;')
+

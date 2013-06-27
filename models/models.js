@@ -4,16 +4,47 @@ var mongoose = require('mongoose')
 	, bcrypt = require('bcrypt')
 	, SALT_WORK_FACTOR = 10;
 
+// Page schema
+var pageSchema = mongoose.Schema({
+	name: { type: String, required: true, unique: false},
+	type: { type: String, required: true, unique: false},
+	questions: { type: Array, required: true},
+	survey: { type: mongoose.Schema.Types.ObjectId, ref: 'Survey', required: true },
+	settings: { type: Object, required: true }
+}),
+	Page = mongoose.model('Page', pageSchema);
+exports.page = Page;
+
+// Survey schema
+var surveySchema = mongoose.Schema({
+	name: { type: String, required: true, unique: false},
+	pages: [{ type: mongoose.Schema.Types.ObjectId, ref: "Page" }],
+	creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User'}
+}),
+	Survey = mongoose.model('Survey', surveySchema);
+exports.survey = Survey;
+
 // Response schema
 // **NOTE: Will have to inherit result structure from Survey schema eventually. **
 var responseSchema = mongoose.Schema({
-	id: Number,
-	results: Array
-});
-
-// Export responses
-var Response = mongoose.model('Response', responseSchema);
+	results: Array,
+	participant: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
+	classroom: { type: mongoose.Schema.Types.ObjectId, ref: "Classroom"},
+	date: Object
+}),
+	Response = mongoose.model('Response', responseSchema);
 exports.response = Response;
+
+// Classroom schema
+var classroomSchema = mongoose.Schema({
+	name: { type: String, required: true},
+	owner: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
+	roster: [String],
+	survey: {type: mongoose.Schema.Types.ObjectId, ref: 'Survey'},
+	responses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Response" }]
+}),
+	Classroom = mongoose.model('Classroom', classroomSchema);
+exports.classroom = Classroom;
 
 // User schema
 var userSchema = mongoose.Schema({
@@ -21,6 +52,15 @@ var userSchema = mongoose.Schema({
 	email: { type: String, required: true, unique: true},
 	password: {type: String, required: true}
 });
+
+// Email list serve schema
+var emaillistSchema = mongoose.Schema({
+	emailarray: Array
+});
+
+// Export emailist
+var Emaillist = mongoose.model('Emaillist', emaillistSchema);
+exports.emaillist = Emaillist;
 
 // Bcrypt middleware
 userSchema.pre('save', function(next) {

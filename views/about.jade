@@ -1,6 +1,7 @@
 extends layout
 
 block content
+
 	div.container
 
 		div.page-header
@@ -14,9 +15,9 @@ block content
 					p Snappy dresser, movie enthusiast, and hater of morning.
 			li.span3
 				div.thumbnail
-					img.about-img(data-src='holder.js/300x200', alt='', src='http://cdn.backyardchickens.com/4/40/409912b8_huge-beard-man.jpeg')
+					img.about-img(data-src='holder.js/300x200', alt='', src='http://fc01.deviantart.net/fs71/f/2013/138/a/9/mr__potoo_is_not_amused_by_secret_pony-d65oite.png')
 					| <h4> Alex Dillon <small>aka DJ Smooth Plotz</small></h4>
-					p Coffee connoussier, bearded warrior, and master of charts.
+					p Coffee connoisseur, bearded warrior, and master of charts.
 			li.span3
 				div.thumbnail
 					img.about-img(data-src='holder.js/300x200', alt='', src='https://fbcdn-sphotos-h-a.akamaihd.net/hphotos-ak-ash3/733835_10200776964168725_1349741006_n.jpg')
@@ -30,4 +31,3 @@ block content
 
 		- var html = "<script>var width = $('img.about-img').width(); $('img.about-img').css({'height':width+'px'})</script>"
 		| !{html}
-

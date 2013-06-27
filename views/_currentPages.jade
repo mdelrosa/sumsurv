@@ -1,0 +1,10 @@
+//- _currentPages.jade
+//- List current existing pages of survey
+
+if (pages)
+	for page in pages
+		a(name=page.name) #{page.name} + " - " + #{page.type}
+else
+	p No pages in survey!
+a.add-page.btn Add Page 
+	i.icon-plus

@@ -6,12 +6,21 @@ $(document).ready(function() {
 	$('#myTab li a').click(function (e) {
 	  e.preventDefault();
 	  $(this).tab('show');
+	  if ($(this).parent().hasClass('incomplete')) {
+	  	$(this).parent().toggleClass('incomplete');
+	  }
 	});
 
 	// Activate internal tab buttons
 	$('.tab-control a').click(function (e) {
 		e.preventDefault();
 		$(this).tab('show');
+		// Clicking on internal tab buttons also switches active tab button
+		var href = $(this).attr('href');
+		if (href) {
+			$('#myTab li.active').toggleClass('active');
+			$('#myTab li a[href='+href+']').parent().toggleClass('active');
+		}
 	});
 
 	// Handle survey submission
@@ -66,8 +75,14 @@ $(document).ready(function() {
 		} 
 
 		else {
+			var dateObj = new Date()
+				, date = { year: dateObj.getFullYear(), month: dateObj.getMonth()+1, day: dateObj.getDay()+1, date: dateObj.getDate() }
+				, info = new Object();
+			info["owner"] = $('span#owner').attr('name');
+			info["className"] = $('span#className').attr('name');
 			// survey was completed, post survey
-			$.post('/survey/success', {results: results}, function(res) {
+			console.log(info);
+			$.post('/survey/success', {results: results, date: date, info: info}, function(res) {
 				if(res.err) {console.log("Unable to save your response."); return false}
 				else {
 
@@ -163,7 +178,7 @@ $(document).ready(function() {
 			//find checked button in response
 			for (j=0;j<answers.length;j++) {
 				if (answers[j].checked) {
-					res = j;
+					res = j+1;
 				}
 			}
 			results.push(res);
@@ -171,7 +186,7 @@ $(document).ready(function() {
 
 		// Comments tab
 		if ($comments.val().length === 0) {
-			results.push(undefined);
+			results.push("Admin None");
 		}
 		else {
 			results.push($comments.val());

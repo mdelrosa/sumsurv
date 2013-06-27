@@ -3,7 +3,7 @@
 extends layout
 
 block content
-	.login-container.hero
+	.pad
 		.row-fluid
 			.span6
 				form.form-horizontal.form-login(action="/login", method="post")
@@ -22,3 +22,28 @@ block content
 								input.btn.btn-large(type="submit", value="Submit") Submit
 				if message
 					div.alert #{message}
+			.span6
+				form.form-horizontal.form-login(action="/user/create", method="post")
+					fieldset
+						legend Create an Account
+						.control-group
+							label.control-label Email Address
+							.controls
+								input(type="text", placeholder="Enter your email", name="email")
+						.control-group
+							label.control-label Username
+							.controls
+								input(type="text", placeholder="Create a username", name="username")
+						.control-group
+							label.control-label Password
+							.controls
+								input(type="password", placeholder="Select a password", name="password")
+						.control-group
+							label.control-label Confirm Password
+							.controls
+								input(type="password", placeholder="Re-enter password", name="passwordCheck")
+						.control-group
+							.controls
+								input.btn.btn-large(type="submit", value="Submit") Submit
+				if createMessage
+					div.alert #{createMessage}

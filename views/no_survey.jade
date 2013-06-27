@@ -1,0 +1,11 @@
+//- no_survey.jade
+//- render error page for no survey in class
+
+extends layout
+
+block content
+	div.hero.container.pad
+		div.row-fluid.text-center.hero-unit.margin
+			h1 Oh snap.
+			h3 It seems that #{className} does not have an assigned survey! You should bother #{owner} about this.
+			img(src='http://i.huffpost.com/gen/1143173/thumbs/o-POTOO-FUNNY-BIRD-570.jpg?6')

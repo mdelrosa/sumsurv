@@ -1,0 +1,26 @@
+//- _classSurvey.jade
+//- display current class' deployed survey
+
+div.survey-header
+	h4.text-center Survey
+if (survey)
+	h4 #{survey.name}
+else
+	h4 No survey selected!
+div.form-inline.pad
+	select
+		option SIMS
+		if (survs)
+			for surv in survs
+				option #{surv.name}
+	button.btn.btn-surv-select Select
+	a.btn.btn-export.pull-right(href="/class/export?className="+className) Export Data
+
+div.responses
+	h4 Responses:
+	if (responses.length)
+		div.row-fluid
+		for response in responses
+			a.span1.response-square(data-toggle='tooltip', data-original-title=response.participant.email, name=response.id)
+	else
+		p No responses so far!

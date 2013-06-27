@@ -1,0 +1,27 @@
+//- create.jade
+//- Survey creation page
+
+extends layout
+
+block scripts
+	script(type='text/javascript', src='/javascripts/make_survey.js')
+
+block content
+	div.row-fluid.pad-top
+		div.span4.outline
+			div.outline.margin.current-surv
+				h3 Current Survey
+				div.margin.pages
+			div.outline.margin
+				div.row-fluid.margin
+					h3.span6 My Surveys
+					div.span5
+						btn.btn.btn-small.btn-new.pull-right(data-toggle='popover', title data-content='<div class="name-div"><form class="form-inline name-input"><input class="survey-name" type="text" placeholder="Enter a title for your survey"></input><btn class="btn btn-name">Enter</btn></form></div>', data-original-title='Name Your Survey!') Create New
+				div.survey-container
+					include _surveys.jade
+		div.span8.outline.pad.row-fluid
+			div.span4.pages-head
+				h2 Current Page
+			div.span4.page-name
+			div.span4.page-type
+			div.current-page-container
