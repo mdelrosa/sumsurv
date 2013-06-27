@@ -138,6 +138,7 @@ exports.err = function(req, res) {
 // Handle auth
 
 exports.login = function(req, res) {
+	console.log("userMessage: ", req.session.userMessage)
 	res.render("login", {
 		title: baseHead + ' | Log In',
 		message: req.session.messages,

@@ -45,7 +45,7 @@ exports.test_mail = function(req, res) {
 					firstday = 28 + firstday;
 				};				
 			};
-			var urllink = "survo.herokuapps.com/" + encodeURIComponent(classroom_db[0].owner.username).toString() + "/" + encodeURIComponent(classroom_db[0].name).toString() + "/take"
+			var urllink = "survo.herokuapp.com/" + encodeURIComponent(classroom_db[0].owner.username).toString() + "/" + encodeURIComponent(classroom_db[0].name).toString() + "/take"
 			console.log("urllinkr ", urllink);
 			var mailOptions = {
 			    from: "Autonomous Humans Lab<authumlab@gmail.com>", // sender address
@@ -71,8 +71,8 @@ exports.test_mail = function(req, res) {
 			    		'<p>Happy surveying,</p>' +
 			    		'<p>Autonomous Humans Lab</p>' +
 			    		'<p>P.S. This is a no-reply email, so don’t reply to this! To contact us, email mason.delrosario@students.olin.edu or Doyung.lee@students.olin.edu. Thanks!</p>' +
-			    		'<div style="background-color: #dcdcdc"><center><footer><p style="color: #999999">Mason del Rosario Doyung Lee Alex Dillon Jon Stolk</p>' +
-			    		'<p style="color: #999999">Footer.</center></p></footer></center></div></div>'
+			    		'<div style="background-color: #dcdcdc"><center><footer><p style="color: #999999">Mason del Rosario | Doyung Lee | Alex Dillon | Jon Stolk</p>' +
+			    		'<p style="color: #999999">Autonomous Humans Lab.</center></p></footer></center></div></div>'
 			    		,//html body
 			}
 				// send mail with defined transport object

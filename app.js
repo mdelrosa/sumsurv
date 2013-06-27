@@ -289,13 +289,14 @@ app.post('/user/create', function(req, res, next) {
     });
     newUser.save(function(err) {
       if(err) {
-        console.log("Error: ", err)
-        req.session.userMessage = "Unable to save your credentials. Please try again!"
+        console.log("Error: ", err);
+        req.session.userMessage = "Unable to save your credentials. Please try again!";
         return res.redirect('/login');
       }
       else {
-        req.session.userMessage = "Successfully saved your credentials!"
-        res.render('login');
+        console.log("success");
+        req.session.userMessage = "Successfully saved your credentials!";
+        return res.redirect('/login');
       }
     });
   });
