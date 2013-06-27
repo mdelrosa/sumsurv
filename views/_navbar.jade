@@ -1,26 +1,32 @@
 //- navbar
 
-div(class="navbar navbar-inverse navbar-fixed-top")
-	div(class='navbar-inner')
+div(class="navbar navbar-inverse1 navbar-fixed-top")
+	div(class='navbar-inner1')
 		div(class='container-fluid')
-			a(class="brand", href="/") Stolk-vey
-				//img(src='auto-form.png')
-			ul(class='nav')
-				li
-					a(href='/splash') Survey
-				li
-					a(href='/about') About
-			ul.nav.pull-right
+			a(class="brand1", href="/") 
+				| Survo
+			ul(class='nav1 nav')
+					li
+						a(href='/splash') Survey
+					li
+						a(href='/about') About
+			ul(class='nav1 nav pull-right')
 				if !user
 					li
 						a(href='/login') Log In
 				else
-					li.dropdown
-						a.dropdown-toggle(href='/export', data-toggle="dropdown") Hi, #{user}
+					li.dropdown1
+						a.dropdown-toggle#username(href='/export', data-toggle="dropdown", name=user) Hi, #{user}
 							b.caret
 						ul.dropdown-menu
 							li
-								a(href='/export') Export Data
+								a(href='/survey/create') My Surveys
+							li
+								a(href='/classes') My Classes
+							li
+								a(href='/part') Participating	
 							li
 								a(href='/logout') Log Out
+							
+
 

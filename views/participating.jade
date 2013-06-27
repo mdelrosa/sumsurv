@@ -1,0 +1,24 @@
+//- participating.jade
+//- show classes user is participating in
+
+extends layout
+
+block scripts
+	script(type='text/javascript', src='/javascripts/participating.js')
+
+block content
+	div.fluid-row.pad
+		if (classes.length)
+			for room in classes
+				div.span3.outline.text-center
+					h3 #{room.name}
+					img.about-img(src="paperbig.png")
+					a.btn.btn-info.margin(href='/'+room.owner.username+'/'+room.name+'/take') Take Survey
+		else
+			div.span3.outline.text-center
+				h3 Sorry!
+				img.about-img(src="error.png", title="'Now you're just a potoo I used to know'" )
+				p.margin You are not on any class rosters!
+
+	- var html = "<script>var width = $('img.about-img').width(); $('img.about-img').css({'height':width+'px'})</script>"
+	| !{html}
