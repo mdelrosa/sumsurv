@@ -46,10 +46,9 @@ exports.test_mail = function(req, res) {
 				};				
 			};
 			var urllink = "survo.herokuapp.com/" + encodeURIComponent(classroom_db[0].owner.username).toString() + "/" + encodeURIComponent(classroom_db[0].name).toString() + "/take"
-			console.log("urllinkr ", urllink);
 			var mailOptions = {
 			    from: "Autonomous Humans Lab<authumlab@gmail.com>", // sender address
-			    to: classroom_db[0].roster.join(","), // list of receivers
+			    bcc: classroom_db[0].roster.join(","), // list of receivers
 			    subject: "Welcome to SIMS.", // Subject line
 			    text: "Hello world", // plaintext body
 			    html:        

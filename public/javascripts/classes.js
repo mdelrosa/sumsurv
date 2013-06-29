@@ -3,6 +3,16 @@
 
 $(document).ready(function() {
 
+	// handle popover dismissal
+	var popoverDismiss = function() {
+		$('body').click('on', function(e) {		$('.popper').each(function() {
+				if(!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+					$(this).popover('hide');
+				}
+			})
+		})
+	}
+
 	// change roster/survey div
 	var setClassDiv = function(name) {
 		// Render current class' roster/survey
@@ -12,7 +22,7 @@ $(document).ready(function() {
 				$(".roster").fadeOut("fast", function() {
 					$(this).html(data).fadeIn("fast");
 					// initialize new-survey popover
-					$('button.roster-add').popover({trigger: 'click', html: true, placement: 'bottom'});
+					$('button.roster-add').popover({trigger: 'click', html: true, placement: 'bottom', callback: popoverDismiss()});
 					$('.btn-remove').click(function() {
 						var participant = $(this).parent().prev().text()
 							, parentRow = $(this).parent().parent();
@@ -184,7 +194,8 @@ $(document).ready(function() {
 	activateEdit();
 
 	// initialize new-class popover
-	$('.btn-new').popover({trigger: 'click', html: true, placement: 'right'});
+	$('.btn-new').popover({trigger: 'click', html: true, placement: 'right', callback: popoverDismiss()});
+
 
 	// name new class
 	$('.btn-new').click(function() {
@@ -269,9 +280,10 @@ $(document).ready(function() {
 	      reader.onload = function(event){
 	        var csv = event.target.result;
 	        var data = $.csv;
-	        var data1 = $.csv.toArray(csv);
-	        console.log("data " + data);
-	        $('textarea').html(data);   
+	        // var data1 = $.csv.toArray(csv);
+	        console.log("data: ", data);
+	        console.log("csv: ", csv);
+	        $('textarea').html(csv);   
 	  //      var html = '';
 	  //      var n = 0;
 	  //      for(var row in data) {
@@ -279,7 +291,7 @@ $(document).ready(function() {
 	  //        n += 1;
 	  //      }
 	  //      $('#contents').html(html);
-	         $.post('/import', {emailarray: data1}, function(res) {
+	         // $.post('/import', {emailarray: data}, function(res) {
 	  //        if(res.err) {console.log("Unable to save your response."); return false}
 	  //       else {
 	  //          // display success alert
@@ -287,7 +299,7 @@ $(document).ready(function() {
 	  //                        "<button type='button' class='close' data-dismiss='alert'>&times;"+
 	  //                        "</button><strong>Your file has been uploaded </strong></div>");
 	  //       }
-	         })
+	         // })
 	      }
 
 	    }

@@ -118,6 +118,7 @@ app.get('/classes', ensureAuthenticated, user.my_classes);
 app.get('/part', ensureAuthenticated, user.part);
 app.get('/:user/:class/take', ensureAuthenticated, ensureDate, user.take);
 app.get('/error/not_in_roster', ensureAuthenticated, user.err);
+app.get('/error', user.error);
 
 // Mail routes
 app.get('/mail/send', mail.test_mail);
@@ -170,7 +171,6 @@ http.createServer(app).listen(app.get('port'), function(){
 
 // Login middleware
 function ensureAuthenticated(req, res, next) {
-  console.log(req.route);
   if (req.isAuthenticated()) {return next()}
   // If not unique route
   if (!req.params) {
@@ -178,12 +178,10 @@ function ensureAuthenticated(req, res, next) {
     req.session.nextparams = false;
   }
   else {
-    console.log("route: ", req.session.route);
     req.session.nextpath = req.route.path;
     req.session.nextparams = new Object();
     for(var key in req.route.params) {
       req.session.nextparams[key] = req.route.params[key];
-      console.log("nextparams", req.session.nextparams);
     }
   }
   res.redirect('/login');
@@ -199,7 +197,6 @@ function ensureDate(req, res, next) {
 // Login auth @ post /login
 app.post('/login', function(req, res, next) {
   passport.authenticate('local', function(err, user, info) {
-    console.log('user', user)
     if (err) { return next(err) }
     if (!user) {
       console.log('login failed')
@@ -216,7 +213,6 @@ app.post('/login', function(req, res, next) {
           req.session.nextpath = false;
         }
         else {
-          console.log("nextparams", req.session.nextparams);
           res.redirect(req.session.nextpath.formParamURL(req.session.nextparams))
           req.session.nextpath = false;
           req.session.nextparams = false;
@@ -231,7 +227,6 @@ app.post('/login', function(req, res, next) {
 
 // Form a param url after ensureAuthenticated middleware
 String.prototype.formParamURL = function(params) {
-  console.log("params internal", params)
   var result = ""
       , getParamKey = false
       , paramNames = []
@@ -251,7 +246,6 @@ String.prototype.formParamURL = function(params) {
       }
       else {
         getParamKey = false;
-        console.log("nextParam",nextParam);
         result = result + params[nextParam]+"/";
         nextParam = "";
       }
@@ -284,7 +278,7 @@ app.post('/user/create', function(req, res, next) {
     }
     var newUser = new User({
       username: r.username,
-      email: r.email,
+      email: r.email.toLowerCase(),
       password: r.password
     });
     newUser.save(function(err) {
