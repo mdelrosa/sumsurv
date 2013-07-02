@@ -157,12 +157,16 @@ app.post('/survey/create', survey.create);
 app.post('/survey/success', survey.save_response);
 
 // -- handling classroom objects
+// deletion
+app.post('/class/delete', classroom.delete)
 // roster
 app.post('/class/create', classroom.new_class);
 app.post('/class/roster/update', classroom.roster_update);
 app.post('/class/roster/remove', classroom.remove);
 // survey
-app.post('/class/survey/update', classroom.survey_update)
+app.post('/class/survey/update', classroom.survey_update);
+// interval
+app.post('/class/interval', classroom.interval);
 
 
 http.createServer(app).listen(app.get('port'), function(){

@@ -20,7 +20,8 @@ exports.new_class = function(req, res) {
 				owner: req.user,
 				roster: [],
 				surveys: null,
-				responses: []
+				responses: [],
+				interval: { start: 4, end: 7 }
 			});
 			newClassroom.save(function(err) {
 	            if(err) {
@@ -35,6 +36,16 @@ exports.new_class = function(req, res) {
 			});	
 		}
 	});
+}
+
+// Class deletion
+exports.delete = function(req, res) {
+	Classroom.find({owner: req.user, name: req.body.name}).remove().exec(function(err) {
+		if(err) {console.log("Delete error: ", err); return false}
+		else {
+			res.send({success: true});
+		}
+	})
 }
 
 // Render all classes partial
@@ -96,11 +107,34 @@ exports.survey = function(req, res) {
 				res.render("_classSurvey", {
 					survey: found_class[0].survey,
 					responses: found_responses,
-					className: className
+					className: className,
+					interval: found_class[0].interval
 				});
 			});
 		}
 	});
+}
+
+exports.interval = function(req, res) {
+	console.log("req.body", req.body);
+	if (req.body.start) {
+		console.log("got start");
+		Classroom.update({name: req.body.className, owner: req.user.id}, {$set: {'interval.start': req.body.start}}, {upsert: true}).exec(function(err) {
+			if(err) { console.log("Interval error: ", err); return false }
+			else {
+				res.send({success: true});
+			}
+		});
+	}
+	else if (req.body.end) {
+		console.log("got end");
+			Classroom.update({name: req.body.className, owner: req.user.id}, {$set: {'interval.end': req.body.end}}, {upsert: true}).exec(function(err) {
+			if(err) { console.log("Interval error: ", err); return false }
+			else {
+				res.send({success: true});
+			}
+		});	
+	}
 }
 
 // Update class survey

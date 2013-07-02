@@ -2,7 +2,7 @@
 //- display current class' deployed survey
 
 div.survey-header
-	h4.text-center Survey
+	h3.text-center Survey
 if (survey)
 	h4 #{survey.name}
 else
@@ -19,8 +19,29 @@ div.form-inline.pad
 div.responses
 	h4 Responses:
 	if (responses.length)
-		div.row-fluid
-		for response in responses
-			a.span1.response-square(data-toggle='tooltip', data-original-title=response.participant.email, name=response.id)
+		div.row-fluid.pad
+			for response in responses
+				div.span1.response-square(data-toggle='tooltip', data-original-title=response.participant.email, name=response.id)
 	else
 		p No responses so far!
+
+div.interval
+	h4 Interval:
+	div.pad.row-fluid
+		- var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+		if interval
+			div.span4
+				if (interval.start && interval.start > 0)
+					a.btn.change-start.popper(data-toggle='popover', title data-content='<div class="pad row-fluid text-center"><div class="offset2 span1 day-square" name=1> M</div><div class="span1 day-square" name=2> T</div><div class="span1 day-square" name=3> W</div><div class="span1 day-square" name=4> Th</div><div class="span1 day-square" name=5> F</div><div class="span1 day-square" name=6> Sa</div><div class="span1 day-square" name=7> Su</div></div>', data-original-title='Pick a Start Day') Start #{days[interval.start-1]}
+				else
+					a.btn.change-start.popper(data-toggle='popover', title data-content='<div class="pad row-fluid text-center"><div class="offset2 span1 day-square" name=1> M</div><div class="span1 day-square" name=2> T</div><div class="span1 day-square" name=3> W</div><div class="span1 day-square" name=4> Th</div><div class="span1 day-square" name=5> F</div><div class="span1 day-square" name=6> Sa</div><div class="span1 day-square" name=7> Su</div></div>', data-original-title='Pick a Start Day') Select Start
+			div.offset2.span4
+				if (interval.end && interval.end > 0)
+					a.btn.change-end.popper.pull-right(data-toggle='popover', title data-content='<div class="pad row-fluid text-center"><div class="offset2 span1 day-square" name=1> M</div><div class="span1 day-square" name=2> T</div><div class="span1 day-square" name=3> W</div><div class="span1 day-square" name=4> Th</div><div class="span1 day-square" name=5> F</div><div class="span1 day-square" name=6> Sa</div><div class="span1 day-square" name=7> Su</div></div>', data-original-title='Pick an End Day') End #{days[interval.end-1]}
+				else
+					a.btn.change-end.popper.pull-right(data-toggle='popover', title data-content='<div class="pad row-fluid text-center"><div class="offset2 span1 day-square" name=1> M</div><div class="span1 day-square" name=2> T</div><div class="span1 day-square" name=3> W</div><div class="span1 day-square" name=4> Th</div><div class="span1 day-square" name=5> F</div><div class="span1 day-square" name=6> Sa</div><div class="span1 day-square" name=7> Su</div></div>', data-original-title='Pick an End Day') Select End
+		else
+			div.span4
+				a.btn.change-start.popper(data-toggle='popover', title data-content='<div class="pad row-fluid text-center"><div class="offset2 span1 day-square" name=1> M</div><div class="span1 day-square" name=2> T</div><div class="span1 day-square" name=3> W</div><div class="span1 day-square" name=4> Th</div><div class="span1 day-square" name=5> F</div><div class="span1 day-square" name=6> Sa</div><div class="span1 day-square" name=7> Su</div></div>', data-original-title='Pick a Start Day') Select Start
+			div.offset2.span4
+				a.btn.change-end.popper.pull-right(data-toggle='popover', title data-content='<div class="pad row-fluid text-center"><div class="offset2 span1 day-square" name=1> M</div><div class="span1 day-square" name=2> T</div><div class="span1 day-square" name=3> W</div><div class="span1 day-square" name=4> Th</div><div class="span1 day-square" name=5> F</div><div class="span1 day-square" name=6> Sa</div><div class="span1 day-square" name=7> Su</div></div>', data-original-title='Pick an End Day') Select End

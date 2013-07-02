@@ -42,7 +42,8 @@ var classroomSchema = mongoose.Schema({
 	owner: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
 	roster: [String],
 	survey: {type: mongoose.Schema.Types.ObjectId, ref: 'Survey'},
-	responses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Response" }]
+	responses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Response" }],
+	interval: { type: Object, required: true}
 }),
 	Classroom = mongoose.model('Classroom', classroomSchema);
 exports.classroom = Classroom;

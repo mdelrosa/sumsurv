@@ -3,9 +3,91 @@
 
 $(document).ready(function() {
 
+	var setDeleteClass = function(name) {
+		$('#class-delete').click(function() {
+			$.post('/class/delete', {name: name}, function(res) {
+				if(res.err) { console.log("Class delete error: ", res.err); return false }
+				else if (res.success) {
+					$('.roster').slideUp(function() {
+						$(this).html('<h3 class="text-center"> Roster</h3>').slideDown('fast');
+					});
+					$('.survey').slideUp(function() {
+						$(this).html('<h3 class="text-center"> Survey</h3>').slideDown('fast');
+					});
+					$('#class-header').fadeOut('fast', function() {
+						$('#class-header').html("<h2 class='span6'> Current Class</h2>"+
+												"<div class='offset1 span4 alert alert-success margin'>"+
+												"<button type='button' class='close' data-dismiss='alert'>&times;"+
+												"</button><strong> " + name + " </strong>"+
+												"was deleted!</div>").fadeIn('fast');
+
+					});
+				}
+				else {
+					$('#class-current').append("<div class='alert alert-success margin'>"+
+											"<button type='button' class='close' data-dismiss='alert'>&times;"+
+											"</button><strong> " + name + " </strong>"+
+											"could not be deleted!</div>");
+
+				}
+			})
+		});
+	}
+
+	var setDaySquare = function(name, editing) {
+		var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+			, editingDay = null;
+		$('.day-square').click(function() {
+			console.log('day-square here')
+			editingDay = $(this).attr('name');
+			if (editing === "start") {
+				$.post('/class/interval', { start: editingDay, className: name }, function(res) {
+					if(res.err) { console.log("Class interval error: ", res.err); return false}
+					else if (res.success) {
+						$('.change-start').html('Start '+ days[editingDay-1]);
+						return false
+					} 
+					else {
+						console.log("Unable to save new start date");
+						return false
+					}
+				});
+			}
+			else if (editing === "end") {
+				$.post('/class/interval', { end: editingDay, className: name }, function(res) {
+					if(res.err) { console.log("Class interval error: ", res.err); return false}
+					else if (res.success) {
+						$('.change-end').html('End '+ days[editingDay-1]);
+						return false
+					} 
+					else {
+						console.log("Unable to save new end date");
+						return false
+					}
+				});
+			}
+			$('a').popover('hide');
+		});
+	}
+
+	// Change start/end days
+	var setDate = function(name) {
+		$('a').popover({trigger: 'click', html: true, placement: 'top', callback: popoverDismiss()});
+		var editing = null
+			, editingDay = null;
+		$('.change-start').click(function() {
+			editing = "start";
+			setDaySquare(name, editing);
+		});
+		$('.change-end').click(function() {
+			editing = "end";
+			setDaySquare(name, editing);
+		})
+	}
+
 	// handle popover dismissal
 	var popoverDismiss = function() {
-		$('body').click('on', function(e) {		$('.popper').each(function() {
+		$('body').click('on', function(e) { $('.popper').each(function() {
 				if(!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
 					$(this).popover('hide');
 				}
@@ -16,6 +98,10 @@ $(document).ready(function() {
 	// change roster/survey div
 	var setClassDiv = function(name) {
 		// Render current class' roster/survey
+		$('#class-header').fadeOut('fast', function() {
+			$(this).html('<h2 class="span6"> ' + name + '</h2><div class="offset4 span2"><btn class="btn btn-danger" id="class-delete"> Delete Class</btn></div>').fadeIn('fast');
+			setDeleteClass(name)
+		});
 		$.get('/class/roster', { className: name }, function(data) {
 			if(data.err) { console.log("Unable to fetch roster.") }
 			else {
@@ -57,6 +143,7 @@ $(document).ready(function() {
 						});
 					});
 					$('.response-square').tooltip({html: true, placement: 'top', trigger: 'hover'});
+					setDate(name);
 				})
 			}
 		});
@@ -284,22 +371,6 @@ $(document).ready(function() {
 	        console.log("data: ", data);
 	        console.log("csv: ", csv);
 	        $('textarea').html(csv);   
-	  //      var html = '';
-	  //      var n = 0;
-	  //      for(var row in data) {
-	  //        html += + data[n] + ;
-	  //        n += 1;
-	  //      }
-	  //      $('#contents').html(html);
-	         // $.post('/import', {emailarray: data}, function(res) {
-	  //        if(res.err) {console.log("Unable to save your response."); return false}
-	  //       else {
-	  //          // display success alert
-	  //          $('#main-container').append("<div class='alert alert-success'>"+
-	  //                        "<button type='button' class='close' data-dismiss='alert'>&times;"+
-	  //                        "</button><strong>Your file has been uploaded </strong></div>");
-	  //       }
-	         // })
 	      }
 
 	    }

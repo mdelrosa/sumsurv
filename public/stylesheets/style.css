@@ -193,6 +193,14 @@ navbar .nav1 li.dropdown.open > .dropdown-toggle1, .navbar .nav1 li.dropdown.act
 	margin: 0.2em;
 }
 
+.day-square {
+	background-color: #5200ff;
+	padding: auto;
+	color: white;
+	text-align: center;
+	border-radius: 3px
+}
+
 /*footer stuff*/
 
 .footer {
