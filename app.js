@@ -116,7 +116,7 @@ app.get('/export', ensureAuthenticated, user.exportcsv);
 app.get('/mail', user.mail);
 app.get('/classes', ensureAuthenticated, user.my_classes);
 app.get('/part', ensureAuthenticated, user.part);
-app.get('/:user/:class/take', ensureAuthenticated, ensureDate, user.take);
+app.get('/:user/:class/take', ensureAuthenticated, user.take);
 app.get('/error/not_in_roster', ensureAuthenticated, user.err);
 app.get('/error', user.error);
 

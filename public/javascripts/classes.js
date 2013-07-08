@@ -22,6 +22,16 @@ $(document).ready(function() {
 												"was deleted!</div>").fadeIn('fast');
 
 					});
+					$.get('/class/all', function(data) {
+						if(data.err) { console.log("Unable to load all classes.") }
+						else {
+							$(".class-container").fadeOut("fast", function() {
+								$(this).html(data).fadeIn("fast", function() {
+									activateEdit();
+								})
+							})
+						}
+					});
 				}
 				else {
 					$('#class-current').append("<div class='alert alert-success margin'>"+
