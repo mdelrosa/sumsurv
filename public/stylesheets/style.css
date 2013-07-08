@@ -255,6 +255,14 @@ navbar .nav1 li.dropdown.open > .dropdown-toggle1, .navbar .nav1 li.dropdown.act
 	min-width: 22.5em;
 }
 
+#select-day {
+	max-width: 10em;
+}
+
+#select-hour {
+	max-width: 2em;
+}
+
 .name-input {
 	margin-top: auto;
 	margin-bottom: auto;
