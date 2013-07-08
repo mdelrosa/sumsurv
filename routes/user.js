@@ -173,3 +173,12 @@ exports.reject = function(req, res) {
 		user: user
 	});
 }
+
+exports.aboutsurvo = function(req, res) {
+	if (req.user) { var user = req.user.username }
+    else { var user = null }
+	res.render("aboutsurvo", {
+		title: baseHead + " | About Survo",
+		user: user
+	});
+}

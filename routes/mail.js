@@ -88,7 +88,7 @@ exports.test_mail = function(req, res) {
 			        // shut down the connection pool, no more messages
 			});	
 			// setup e-mail data with unicode symbols
-			new cronJob('0 0 6 * * 4', function() {
+			new cronJob('00 00 15 * * 1-5', function() {
 				surveymail();
 			}, null, true, "America/New_York");
 

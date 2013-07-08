@@ -270,3 +270,72 @@ input[type="file"] {
 	height: 40px;
 	line-height: 0px;
 }
+
+/*parallax up in this*/
+#home { 
+  background: url(purplemountains.png) 50% 0 repeat fixed; background-repeat:no-repeat; background-attachment:fixed; min-height: 1000px; 
+  height: 1400px; 
+  margin: 0 auto; 
+  width: 100%; 
+  max-width: 1920px; 
+  position: relative; 
+}
+
+
+ 
+
+#home article { 
+  height: 458px; 
+  position: absolute; 
+  text-align: center; 
+  top: 150px; 
+  width: 100%; 
+  text-shadow: 0 3px 4px rgba(0,0,0,.4), 0 0 30px rgba(0,0,0,.075);
+  color: #fff;
+}
+
+#home h1 {
+	font-size: 120px;
+	line-height: 1;
+	letter-spacing: -2px;
+}
+
+#home p {
+	font-size: 40px;
+	font-weight: 200;
+	line-height: 1.25;
+}
+
+ 
+
+#about { 
+  background: url(background2.png) 50% 0 repeat fixed; background-repeat:no-repeat; background-attachment:fixed; min-height: 1000px; 
+  height: 1000px; 
+  margin: 0 auto; 
+  width: 100%; 
+  max-width: 1920px; 
+  position: relative; 
+  color: #fff;
+}
+
+#about h1 {
+	font-size: 80px;
+	line-height: 1;
+	letter-spacing: -2px;
+}
+
+#about p {
+	font-size: 24px;
+	font-weight: 200;
+	line-height: 1.25;
+	text-align: left;
+}
+ 
+
+#about article { 
+  height: 458px; 
+  position: absolute; 
+  text-align: center; 
+  top: 150px; 
+  width: 100%; 
+}

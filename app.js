@@ -118,6 +118,8 @@ app.get('/classes', ensureAuthenticated, user.my_classes);
 app.get('/part', ensureAuthenticated, user.part);
 app.get('/:user/:class/take', ensureAuthenticated, user.take);
 app.get('/error/not_in_roster', ensureAuthenticated, user.err);
+app.get('/aboutsurvo', user.aboutsurvo);
+
 
 // Mail routes
 app.get('/mail/send', mail.test_mail);
@@ -141,6 +143,7 @@ app.get('/surveys/all', survey.all_surveys);
 app.get('/class/all', classroom.all);
 app.get('/class/roster', classroom.roster);
 app.get('/class/survey', classroom.survey);
+
 
 //import text file
 app.get('/import', ensureAuthenticated, user.import);
