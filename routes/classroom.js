@@ -51,7 +51,6 @@ exports.all = function(req, res) {
 
 // 
 exports.roster_update = function(req, res) {
-	console.log("rAdd: ", req.body.rAdd)
 	var rAdd = req.body.rAdd;
 	if (rAdd.length) {
 		Classroom.update({owner: req.user, name: req.body.name}, {$addToSet: {roster: {$each: rAdd}}}).populate('roster').exec(function(err) {

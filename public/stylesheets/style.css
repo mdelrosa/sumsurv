@@ -256,6 +256,12 @@ table.fixed {
 	table-layout: fixed;
 }
 
+#table-roster {
+	max-height: 50em !important;
+	margin: 0px;
+	overflow: auto;
+}
+
 table.fixed td {
 	overflow: hidden;
 }

@@ -2,6 +2,16 @@
 
 $(document).ready(function() {
 
+	// handle popover dismissal
+	var popoverDismiss = function() {
+		$('body').click('on', function(e) {		$('.popper').each(function() {
+				if(!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+					$(this).popover('hide');
+				}
+			})
+		})
+	}
+
 	// activate jquery functions on edit buttons
 	var activateEdit = function() {
 
@@ -56,7 +66,7 @@ $(document).ready(function() {
 	activateEdit();
 
 	// initialize new-survey popover
-	$('.btn-new').popover({trigger: 'click', html: true, placement: 'right'});
+	$('.btn-new').popover({trigger: 'click', html: true, placement: 'right', callback: popoverDismiss()});
 
 	$('.btn-new').click(function(){
 
