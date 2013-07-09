@@ -94,7 +94,7 @@ exports.take = function(req, res) {
 			Classroom.find({name: req.params.class, owner: found_user[0]._id}).populate('owner').exec(function(err, found_class) {
 				if(err) { console.log("Take class error: ", err); return false}
 				else {
-					if (found_class[0].roster.indexOf(req.user.email) === -1) {
+					if (found_class[0].roster.indexOf(req.user.email.toLowerCase()) === -1) {
 						res.redirect('/error/not_in_roster');
 						return false
 					}

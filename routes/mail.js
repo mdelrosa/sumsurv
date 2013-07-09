@@ -73,7 +73,7 @@ exports.test_mail = function(req, res) {
 			    		'<p>P.S. This is a no-reply email, so don’t reply to this! To contact us, email mason.delrosario@students.olin.edu or Doyung.lee@students.olin.edu. Thanks!</p>' +
 			    		'<div style="background-color: #dcdcdc"><center><footer><p style="color: #999999">Mason del Rosario Doyung Lee Alex Dillon Jon Stolk</p>' +
 			    		'<p style="color: #999999">Footer.</center></p></footer></center></div></div>'
-			    		,//html body
+			    		//html body
 			}
 				// send mail with defined transport object
 			smtpTransport.sendMail(mailOptions, function(error, response){
@@ -88,14 +88,15 @@ exports.test_mail = function(req, res) {
 			        // shut down the connection pool, no more messages
 			});	
 			// setup e-mail data with unicode symbols
-			new cronJob('00 00 15 * * 1-5', function() {
+			new cronJob('00 00 * * * *', function() {
+			//first * is which second, next is minute, next is the hour, ? ? and then day of the week.	
 				surveymail();
 			}, null, true, "America/New_York");
 
 		   };
 	  
 	   var surveymail = function() {
-	   		var datedata= new Date(); 
+			var datedata= new Date(); 
 			var month = datedata.getMonth()+1; 
 			var date = datedata.getDate(); 
 			var year = datedata.getFullYear();

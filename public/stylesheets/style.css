@@ -339,3 +339,35 @@ input[type="file"] {
   top: 150px; 
   width: 100%; 
 }
+
+#next { 
+  background: url(lavander.jpg) 50% 0 repeat fixed; background-repeat:no-repeat; background-attachment:fixed; min-height: 1000px; 
+  height: 1000px; 
+  margin: 0 auto; 
+  width: 100%; 
+  max-width: 1920px; 
+  position: relative; 
+  color: #fff;
+}
+
+#next h1 {
+	font-size: 80px;
+	line-height: 1;
+	letter-spacing: -2px;
+}
+
+#next p {
+	font-size: 24px;
+	font-weight: 200;
+	line-height: 1.25;
+	text-align: left;
+}
+ 
+
+#next article { 
+  height: 458px; 
+  position: absolute; 
+  text-align: center; 
+  top: 150px; 
+  width: 100%; 
+}
