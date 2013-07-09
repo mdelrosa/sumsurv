@@ -47,14 +47,13 @@ $(document).ready(function() {
 	var setDaySquare = function(name, editing) {
 		var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 			, editingDay = null;
-		$('.day-square').click(function() {
-			console.log('day-square here')
-			editingDay = $(this).attr('name');
+		$('.btn-interval').click(function() {
+			var interval = {day: $('#select-day :selected').val(), hour: $('.hour-select :selected').val(), minute: $('.minute-select :selected').val(), time: $('.ampm-select :selected').val()};
 			if (editing === "start") {
-				$.post('/class/interval', { start: editingDay, className: name }, function(res) {
+				$.post('/class/interval', { start: interval, className: name }, function(res) {
 					if(res.err) { console.log("Class interval error: ", res.err); return false}
 					else if (res.success) {
-						$('.change-start').html('Start '+ days[editingDay-1]);
+						$('.change-start').html(days[interval.day-1] + " @ " + interval.hour + ":" +interval.minute + " " + interval.time);
 						return false
 					} 
 					else {
@@ -64,10 +63,10 @@ $(document).ready(function() {
 				});
 			}
 			else if (editing === "end") {
-				$.post('/class/interval', { end: editingDay, className: name }, function(res) {
+				$.post('/class/interval', { end: interval, className: name }, function(res) {
 					if(res.err) { console.log("Class interval error: ", res.err); return false}
 					else if (res.success) {
-						$('.change-end').html('End '+ days[editingDay-1]);
+						$('.change-end').html(days[interval.day-1] + " @ " + interval.hour + ":" +interval.minute + " " + interval.time);
 						return false
 					} 
 					else {

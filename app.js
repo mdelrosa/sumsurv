@@ -269,7 +269,7 @@ app.post('/user/create', function(req, res, next) {
     req.session.userMessage = "Passwords did not match!";
     return res.redirect('/login');
   }
-  User.find({email: r.email}).exec(function(err, user_db) {
+  User.find({email: r.email.toLowerCase()}).exec(function(err, user_db) {
     if (user_db.length > 0) {
       req.session.userMessage = "Email already registered!";
       return res.redirect('/login');

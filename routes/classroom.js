@@ -62,7 +62,11 @@ exports.all = function(req, res) {
 
 // 
 exports.roster_update = function(req, res) {
-	var rAdd = req.body.rAdd;
+	var rAddRaw = req.body.rAdd
+		, rAdd = [];
+	for (i=0;i<rAddRaw.length;i++) {
+		rAdd[i] = rAddRaw[i].toLowerCase();
+	}
 	if (rAdd.length) {
 		Classroom.update({owner: req.user, name: req.body.name}, {$addToSet: {roster: {$each: rAdd}}}).populate('roster').exec(function(err) {
 			if(err) { console.log("Error in update: ", err); return false}
@@ -104,6 +108,7 @@ exports.survey = function(req, res) {
 			Response.where('_id').in(found_class[0].responses).populate('participant').exec(function(err2, found_responses) {
 				if(err2) { console.log("Survey responses error: ", err2); return false}
 				var className = encodeURIComponent(req.query.className);
+				console.log(found_class[0].interval);
 				res.render("_classSurvey", {
 					survey: found_class[0].survey,
 					responses: found_responses,
