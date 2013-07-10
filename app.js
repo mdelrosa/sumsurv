@@ -137,6 +137,7 @@ app.get('/reject', user.reject);
 // Survey creation partials
 app.get('/pages/current', survey.current_pages);
 app.get('/surveys/all', survey.all_surveys);
+app.get('/survey/deployed', survey.deployed);
 
 // Class creation partials
 app.get('/class/all', classroom.all);

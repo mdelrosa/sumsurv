@@ -54,8 +54,42 @@ exports.all_surveys = function(req, res) {
     Survey.find({creator: req.user}).exec(function(err, surv_db) {
         if(err) {console.log("Unable to find surveys"); return false}
         else {
-            res.render('_surveys', {
-                surveys: surv_db
+            var survIDS = [];
+            for (i=0;i<surv_db.length;i++) {
+                survIDS[i] = surv_db[i].id;
+            }
+            Classroom.find({survey: {$in: survIDS}}).exec(function(err, classroom_db) {
+                if(err) {console.log("All surveys classroom error: ", err); return false}
+                else {
+                    console.log("classes: ", classroom_db);
+                    // finds number of occurrences of object with value
+                    var countArr = [];
+                    for (i=0;i<survIDS.length;i++) {
+                        countArr[i] = 0;
+                        for (j=0;j<classroom_db.length;j++) {
+                            if (classroom_db[j].id === survIDS[i]) {
+                                countArr[i] = countArr[i] + 1;
+                            }
+                        }
+                    }
+                    res.render('_surveys', {
+                        surveys: surv_db,
+                        countArr: countArr
+                    })
+                }
+            })
+        }
+    })
+}
+
+// Render partial displaying classes which use this survey
+exports.deployed = function(req, res) {
+    Classroom.find({survey: req.query.survey}).populate('owner').exec(function(err, classroom_db) {
+        if(err) { console.log("Deployed classroom error: ", err); return false}
+        else { 
+            res.render('_deployed', {
+                classes: classroom_db,
+                survey: req.query.survName
             })
         }
     })

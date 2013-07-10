@@ -42,10 +42,35 @@ exports.survey = function(req, res){
 
 exports.create = function(req, res) {
 	Survey.find({creator: req.user}).exec(function(err, user_surveys) {
-		res.render('create', {
-			title: baseHead + ' | Create New Survey',
-			user: req.user.username,
-			surveys: user_surveys
+        var survIDS = [];
+        for (i=0;i<user_surveys.length;i++) {
+            survIDS[i] = user_surveys[i].id;
+        }
+        Classroom.find({survey: {$in: survIDS}}).populate('survey').exec(function(err, classroom_db) {
+            if(err) {console.log("All surveys classroom error: ", err); return false}
+            else {
+                console.log("classes: ", classroom_db);
+                // finds number of occurrences of object with value
+                var countArr = [];
+                for (i=0;i<survIDS.length;i++) {
+                    countArr[i] = 0;
+                    for (j=0;j<classroom_db.length;j++) {
+                    	console.log("1: ", classroom_db[j].survey.id, "type: ", typeof classroom_db[j].survey);
+                    	console.log("2: ", survIDS[i], "type: ", typeof survIDS[i]);
+                    	console.log(classroom_db[j].survey.id === survIDS[i]);
+                        if (classroom_db[j].survey.id === survIDS[i]) {
+                            countArr[i] = countArr[i] + 1;
+                        }
+                    }
+                }
+                console.log("countArr: ", countArr);
+				res.render('create', {
+					title: baseHead + ' | Create New Survey',
+					user: req.user.username,
+					surveys: user_surveys,
+					countArr: countArr
+				});
+			}
 		});
 	});
 }

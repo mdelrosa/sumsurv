@@ -12,6 +12,25 @@ $(document).ready(function() {
 		})
 	}
 
+	var activateOverview = function() {
+
+		$('.overview-link').click(function() {
+
+			var survID = $(this).attr('name')
+				, survName = $(this).parent().prev().html();
+			console.log('survName:', survName);
+			$.get('/survey/deployed', { survName: survName, survey: survID }, function(data) {
+				if(data.err) { console.log("Survey classes error: ", data.err); return false}
+				else {
+					$('.create-container').fadeOut('fast', function() {
+						$(this).html(data).fadeIn('fast');
+					});
+				}	
+			})
+		})
+
+	}
+
 	// activate jquery functions on edit buttons
 	var activateEdit = function() {
 
@@ -64,6 +83,7 @@ $(document).ready(function() {
 	}
 
 	activateEdit();
+	activateOverview();
 
 	// initialize new-survey popover
 	$('.btn-new').popover({trigger: 'click', html: true, placement: 'right', callback: popoverDismiss()});
