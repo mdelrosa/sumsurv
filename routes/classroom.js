@@ -78,13 +78,31 @@ exports.roster_update = function(req, res) {
 	}
 }
 
+// Add one user to roster based on userID; from request
+exports.roster_add = function(req, res) {
+	User.find({ _id: req.body.userID }).exec(function(err, found_user) {
+		console.log(found_user[0]);
+		Classroom.update({ name: req.body.className, owner: req.user.id }, { $addToSet: { roster: found_user[0].email}, $pull: { requests: { type: "add", userID: req.body.userID}}}, function(err, num) {
+			if(err) { console.log("Roster add classroom update error:", err); return false}
+			else if(num===0) {console.log("Nothing updated"); return false}
+			else {
+				res.send({
+					success:true,
+					email: found_user[0].email
+				});
+			}
+		})
+	})
+}
+
 // Render roster partial
 exports.roster = function(req, res) {
 	Classroom.find({name: req.query.className, owner: req.user}).exec(function(err, found_class) {
 		if(err) { console.log("Roster error: ", err); return false}
 		else {
 			res.render("_roster", {
-				roster: found_class[0].roster
+				roster: found_class[0].roster,
+				requests: found_class[0].requests
 			})
 		}
 	})
@@ -100,6 +118,30 @@ exports.remove = function(req, res) {
 	})
 }
 
+// Get a class's requests
+exports.view_requests = function(req, res) {
+	Classroom.find({owner: req.user.id, name: req.query.name}).exec(function(err, class_db) {
+		if(err) { console.log("view_requests classroom error:", err); return false}
+		else {
+			res.render('_requests', {
+				requests: class_db[0].requests
+			});
+		}
+	})
+}
+
+// Save a new request to be added to the class roster
+exports.part_add = function(req, res) {
+	var addUserReq = { username: req.user.username, userID: req.user.id, type: "add" };
+	Classroom.update({ _id: req.body.classID }, { $push: { 'requests': addUserReq }}, function(err, newDb) {
+		if(err || newDb === null) { console.log("Participant add error:", err); return false }
+		else {
+			console.log("newDb:", newDb);
+			res.send({success: true});
+		}
+	})
+}
+
 // Render survey partial
 exports.survey = function(req, res) {
 	Classroom.find({name: req.query.className, owner: req.user.id}).populate('survey').exec(function(err, found_class) {
@@ -108,7 +150,6 @@ exports.survey = function(req, res) {
 			Response.where('_id').in(found_class[0].responses).populate('participant').exec(function(err2, found_responses) {
 				if(err2) { console.log("Survey responses error: ", err2); return false}
 				var className = encodeURIComponent(req.query.className);
-				console.log(found_class[0].interval);
 				res.render("_classSurvey", {
 					survey: found_class[0].survey,
 					responses: found_responses,
@@ -120,6 +161,7 @@ exports.survey = function(req, res) {
 	});
 }
 
+// Handle updating interval of classroom
 exports.interval = function(req, res) {
 	console.log("req.body", req.body);
 	if (req.body.start) {

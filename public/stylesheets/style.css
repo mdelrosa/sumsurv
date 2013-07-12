@@ -280,6 +280,22 @@ navbar .nav1 li.dropdown.open > .dropdown-toggle1, .navbar .nav1 li.dropdown.act
 	margin-bottom: auto;
 }
 
+.roster {
+	width: 95%;
+	padding-left: auto !important;
+	padding-right: auto !important;
+}
+
+#roster-group {
+	width: 95%;
+	margin: 0 auto;
+}
+
+#roster-group button {
+	width: 33%;
+	font-size: small;
+}
+
 table.fixed {
 	table-layout: fixed;
 }

@@ -14,7 +14,6 @@ div.form-inline.pad
 			for surv in survs
 				option #{surv.name}
 	button.btn.btn-surv-select Select
-	a.btn.btn-export.pull-right(href="/class/export?className="+className) Export Data
 
 div.responses
 	h4 Responses:
@@ -23,7 +22,7 @@ div.responses
 			for response in responses
 				div.span1.response-square(data-toggle='tooltip', data-original-title=response.participant.email, name=response.id)
 	else
-		p No responses so far!
+		p.pad No responses so far!
 
 div.interval
 	h4 Interval:

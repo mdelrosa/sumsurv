@@ -143,6 +143,7 @@ app.get('/survey/deployed', survey.deployed);
 app.get('/class/all', classroom.all);
 app.get('/class/roster', classroom.roster);
 app.get('/class/survey', classroom.survey);
+app.get('/class/requests', classroom.view_requests);
 
 //import text file
 app.get('/import', ensureAuthenticated, user.import);
@@ -164,11 +165,13 @@ app.post('/class/delete', classroom.delete)
 app.post('/class/create', classroom.new_class);
 app.post('/class/roster/update', classroom.roster_update);
 app.post('/class/roster/remove', classroom.remove);
+app.post('/class/roster/add', classroom.roster_add);
 // survey
 app.post('/class/survey/update', classroom.survey_update);
 // interval
 app.post('/class/interval', classroom.interval);
-
+// participant requests
+app.post('/class/request/add', classroom.part_add);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));

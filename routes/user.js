@@ -123,10 +123,11 @@ exports.take = function(req, res) {
 	User.find({username: req.params.user}).exec(function(err0, found_user) {
 		if(err0) { console.log("Take user error: ", err0) }
 		else {
-			Classroom.find({name: req.params.class, owner: found_user[0]._id}).populate('owner').exec(function(err, found_class) {
+			Classroom.find({name: req.params.class, owner: found_user[0].id}).populate('owner').exec(function(err, found_class) {
 				if(err) { console.log("Take class error: ", err); return false}
 				else {
 					if (found_class[0].roster.indexOf(req.user.email) === -1) {
+						req.session.classID = found_class[0].id;
 						res.redirect('/error/not_in_roster');
 						return false
 					}
@@ -162,8 +163,10 @@ exports.take = function(req, res) {
 exports.err = function(req, res) {
 	res.render('not_roster', {
 		user: req.user.username,
-		title: baseHead + " | " + "Not In Roster"
-	})
+		title: baseHead + " | " + "Not In Roster",
+		classID: req.session.classID
+	});
+	req.session.classID = null;
 }
 
 // Handle auth

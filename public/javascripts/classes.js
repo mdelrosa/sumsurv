@@ -3,6 +3,58 @@
 
 $(document).ready(function() {
 
+	// Handle request popover
+	var activateRequest = function(name) {
+		$('button.requests').popover({trigger: 'click', html: true, placement: 'bottom', callback: popoverDismiss()});
+		$('button.requests').click(function() {
+			$('div.requests').html('<div class="progress progress-striped active">'+
+			   '<div class="bar" style="width: 100%;"></div>'+
+			   '</div>')
+			$.get('/class/requests', { name: name }, function(data) {
+				if(data.err) { console.log("Error in class requests:", data.err) }
+				else {
+					$('div.requests').html(data);
+					$('.add-action').click(function() {
+						var classID = $(this).parent().prev().children('p').attr('name')
+							, $clicked = $(this);
+						if ($clicked.attr('name') === "accept") {
+							$.post('/class/roster/add', { userID: classID, className: name }, function(res) {
+								if(res.err) {console.log("Class roster add error:", res.err); return false}
+								else {
+									if (res.success) {
+										// create a deffered object
+										var $dfd = $.Deferred()
+											, remover = function(n) {
+												n.remove("tr");
+											}
+											, roster = function(n) {
+												$('table#table-roster').append('<tr><td>'+res.email+'</td><td><button class="btn btn-small btn-remove"><i class="icon-minus"></i> Remove</button></td></tr>');
+												var reqNum = $('.table-requests tbody').children().length;
+												if(reqNum === 0) {
+													$('button.requests').popover('hide');
+													$('button.requests').html('<i class="icon-globe"></i>  No Requests').toggleClass('btn-inverse');
+												}
+												else {
+													word = (reqNum) ? " Request" : " Requests";
+													$('button.requests').html('<i class="icon-globe icon-inverse"></i>  '+reqNum.toString()+word);
+												}
+											};
+										$dfd.done(remover).done(roster);
+										// ensure that tablecheck is performed after element is removed
+										$clicked.parents("tr").fadeOut('fast', function() {
+											$dfd.resolve(this);
+										})
+									}
+								}
+							});
+						}
+					});
+				}
+			});
+		});
+	}
+
+	// Activate class deletion button and render appropriate html
 	var setDeleteClass = function(name) {
 		$('#class-delete').click(function() {
 			$.post('/class/delete', {name: name}, function(res) {
@@ -28,7 +80,7 @@ $(document).ready(function() {
 							$(".class-container").fadeOut("fast", function() {
 								$(this).html(data).fadeIn("fast", function() {
 									activateEdit();
-								})
+								});
 							})
 						}
 					});
@@ -108,7 +160,7 @@ $(document).ready(function() {
 	var setClassDiv = function(name) {
 		// Render current class' roster/survey
 		$('#class-header').fadeOut('fast', function() {
-			$(this).html('<h2 class="span6"> ' + name + '</h2><div class="offset4 span2"><btn class="btn btn-danger" id="class-delete"> Delete Class</btn></div>').fadeIn('fast');
+			$(this).html('<h2 class="span6"> ' + name + '</h2><div class="span6 btn-group pull-right"><a class="btn btn-info" href="/class/export?className='+name+'">Export Data </a><a class="btn btn-danger" id="class-delete"> Delete Class</a></div>').fadeIn('fast');
 			setDeleteClass(name)
 		});
 		$.get('/class/roster', { className: name }, function(data) {
@@ -131,6 +183,7 @@ $(document).ready(function() {
 						});
 					});
 					activateRosterEdit();
+					activateRequest(name);
 					sendemail();
 				})
 			}

@@ -43,7 +43,8 @@ var classroomSchema = mongoose.Schema({
 	roster: [String],
 	survey: {type: mongoose.Schema.Types.ObjectId, ref: 'Survey'},
 	responses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Response" }],
-	interval: { type: Object, required: true}
+	interval: { type: Object, required: true},
+	requests: { type: Array }
 }),
 	Classroom = mongoose.model('Classroom', classroomSchema);
 exports.classroom = Classroom;
