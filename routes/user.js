@@ -113,10 +113,34 @@ exports.part = function(req, res) {
 			res.render('participating', {
 				title: baseHead + " | Participating",
 				user: req.user.username,
-				classes: found_class
+				classes: found_class,
+				info: req.user.info
 			});
 		}
 	})
+}
+
+exports.info_update = function(req, res) {
+	var type = req.body.type
+		, val = req.body.value;
+		if (type === "gender") {
+				User.update({_id: req.user.id}, {$set: {'info.gender': val}}, {upsert:true}).exec(function(err, num) {
+				if(err) {console.log('User info update error:', err); return false}
+				else if (!num) {console.log("Nothing updated!"); res.send({success: false}); return false}
+				else {
+					res.send({success: true});
+				}
+			});
+		}
+		else if (type === "year") {
+			User.update({_id: req.user.id}, {$set: {'info.year': val}}, {upsert:true}).exec(function(err, num) {
+				if(err) {console.log('User info update error:', err); return false}
+				else if (!num) {console.log("Nothing updated!"); res.send({success: false}); return false}
+				else {
+					res.send({success: true});
+				}
+			})
+		}
 }
 
 exports.take = function(req, res) {

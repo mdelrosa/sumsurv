@@ -49,6 +49,10 @@ a {
 	width: 100%;
 }
 
+#class-img {
+	width: 10em;
+}
+
 .inline {
 	display: inline;
 	margin-left: 1em

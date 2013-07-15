@@ -154,6 +154,9 @@ app.post('/import', survey.import);
 //exporting page route(s)
 app.get('/class/export', survey.export);
 
+// handling user object info
+app.post('/user/info/update', user.info_update);
+
 // handling survey objects
 app.post('/survey/create', survey.create);
 app.post('/survey/success', survey.save_response);

@@ -22,7 +22,7 @@ div.btn-group.text-center.pad#roster-group
 		i.icon-envelope	
 		|   Send Survey
 if (roster && roster.length > 0)
-	div#table-roster
+	div.pad-top#table-roster
 		table.table.table-striped#table-roster
 			tr
 				th Student
@@ -35,4 +35,4 @@ if (roster && roster.length > 0)
 							i.icon-minus
 							|  Remove
 else
-	p Roster is empty!
+	p.pad Roster is empty!
