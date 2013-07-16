@@ -116,8 +116,11 @@ app.get('/export', ensureAuthenticated, user.exportcsv);
 app.get('/mail', user.mail);
 app.get('/classes', ensureAuthenticated, user.my_classes);
 app.get('/part', ensureAuthenticated, user.part);
-app.get('/:user/:class/take', ensureAuthenticated, ensureDate, user.take);
+app.get('/:user/:class/take', ensureAuthenticated, user.take);
 app.get('/error/not_in_roster', ensureAuthenticated, user.err);
+app.get('/testpage1', user.testpage1);
+app.get('/testpage2', user.testpage2);
+app.get('/testpage3', user.testpage3);
 
 app.get('/aboutsurvo', user.aboutsurvo);
 

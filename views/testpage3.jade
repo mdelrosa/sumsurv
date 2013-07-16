@@ -1,0 +1,114 @@
+extends layout
+
+block scripts
+    script(src="http://jquery-csv.googlecode.com/git/src/jquery.csv.js")
+    link(rel='stylesheet', href='http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css')
+    script(src='http://code.jquery.com/jquery-1.9.1.js')
+    script(src='http://code.jquery.com/ui/1.10.3/jquery-ui.js')
+    script(type='text/javascript', src='/javascripts/testpage2.js')
+    link(rel='stylesheet', href='http://code.jquery.com/ui/1.8.20/themes/base/jquery-ui.css', type='text/css', media='all')  
+block content  
+    br
+    br
+    div.container.outline    
+       img#drag1(style='margin-left: auto; margin-right: auto; display: block', src='logo2.png', draggable='true', ondragstart='drag(event)', width='100px', height='69')
+
+    #columns
+        .span2
+            .column
+                header 1
+        .span2        
+            .column
+                header 2
+        .span2    
+            .column
+                header 3
+        .span2    
+            .column
+                header 4
+        .span2    
+            .column
+                header 5
+        .span2    
+            .column
+                header 6
+        .span1    
+            .column
+                header 7
+    script
+    
+        function handleDragOver(e) {
+          if (e.preventDefault) {
+            e.preventDefault(); // Necessary. Allows us to drop.
+          }
+
+          e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+
+          return false;
+        }
+
+        function handleDragEnter(e) {
+          // this / e.target is the current hover target.
+          this.classList.add('over');
+        }
+
+        function handleDragLeave(e) {
+          this.classList.remove('over');  // this / e.target is previous target element.
+        }
+
+        function handleDrop(e) {
+          // this/e.target is current target element.
+
+          if (e.stopPropagation) {
+            e.stopPropagation(); // Stops some browsers from redirecting.
+          }
+
+          // Don't do anything if dropping the same column we're dragging.
+          if (dragSrcEl != this) {
+            // Set the source column's HTML to the HTML of the column we dropped on.
+            dragSrcEl.innerHTML = this.innerHTML;
+            this.innerHTML = e.dataTransfer.getData('text/html');
+          }
+
+          return false;
+        }
+
+        function handleDragEnd(e) {
+          // this/e.target is the source node.
+
+          [].forEach.call(cols, function (col) {
+            col.classList.remove('over');
+          });
+        }
+
+        var cols = document.querySelectorAll('#columns .column');
+        [].forEach.call(cols, function(col) {
+          col.addEventListener('dragstart', handleDragStart, false);
+          col.addEventListener('dragenter', handleDragEnter, false)
+          col.addEventListener('dragover', handleDragOver, false);
+          col.addEventListener('dragleave', handleDragLeave, false);
+          col.addEventListener('drop', handleDrop, false);
+          col.addEventListener('dragend', handleDragEnd, false);
+        });
+        
+        var dragSrcEl = null;
+
+        function handleDragStart(e) {
+          // Target (this) element is the source node.
+          this.style.opacity = '0.4';
+
+          dragSrcEl = this;
+
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/html', this.innerHTML);
+        }
+        
+        function handleDrop(e) {
+          e.stopPropagation(); // Stops some browsers from redirecting.
+          e.preventDefault();
+
+          var files = e.dataTransfer.files;
+          for (var i = 0, f; f = files[i]; i++) {
+            // Read the File objects in this FileList.
+          }
+        }

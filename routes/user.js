@@ -188,3 +188,31 @@ exports.aboutsurvo = function(req, res) {
 		user: user
 	});
 }
+
+exports.testpage1 = function(req, res) {
+	if (req.user) { var user = req.user.username }
+    else { var user = null }
+	res.render("testpage1", {
+		title: baseHead + " | Test Page 1",
+		user: user
+	});
+}
+
+exports.testpage3 = function(req, res) {
+	if (req.user) { var user = req.user.username }
+    else { var user = null }
+	res.render("testpage3", {
+		title: baseHead + " | Test Page 3",
+		user: user
+	});
+}
+
+
+exports.testpage2 = function(req, res) {
+	if (req.user) { var user = req.user.username }
+    else { var user = null }
+	res.render("testpage2", {
+		title: baseHead + " | Test Page 2",
+		user: user
+	});
+}

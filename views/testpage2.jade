@@ -1,0 +1,78 @@
+extends layout
+
+block scripts
+    script(src="http://jquery-csv.googlecode.com/git/src/jquery.csv.js")
+    link(rel='stylesheet', href='http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css')
+    script(src='http://code.jquery.com/jquery-1.9.1.js')
+    script(src='http://code.jquery.com/ui/1.10.3/jquery-ui.js')
+    script(type='text/javascript', src='/javascripts/testpage2.js')
+    link(rel='stylesheet', href='http://code.jquery.com/ui/1.8.20/themes/base/jquery-ui.css', type='text/css', media='all')  
+block content  
+    br
+    br
+    script
+        function allowDrop(ev)
+          {
+          ev.preventDefault();
+          }
+          function drag(ev)
+          {
+          ev.dataTransfer.setData("Text",ev.target.id);
+          }
+          function drop(ev)
+          {
+          ev.preventDefault();
+          var data=ev.dataTransfer.getData("Text");
+          ev.target.appendChild(document.getElementById(data));
+          }
+          var bin = document.querySelector('#bin');
+ 
+           addEvent(bin, 'dragover', function (e) {
+             if (e.preventDefault) e.preventDefault(); // allows us to drop
+             this.className = 'over';
+             e.dataTransfer.dropEffect = 'copy';
+             return false;
+           });
+        function handleDragOver(e) {
+          if (e.preventDefault) {
+            e.preventDefault(); // Necessary. Allows us to drop.
+          }
+
+          e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+
+          return false;
+        }
+        function handleDragLeave(e) {
+          this.classList.remove('over');  // this / e.target is previous target element.
+        }
+        function handleDragEnter(e) {
+          // this / e.target is the current hover target.
+          this.classList.add('over');
+        }
+
+
+    div.container.outline    
+        img#drag1(style='margin-left: auto; margin-right: auto; display: block', src='logo2.png', draggable='true', ondragstart='drag(event)', width='100px', height='69')
+    br
+    br
+    .span2.outline
+        .div1(ondrop='drop(event)', ondragover='allowDrop(event)') 
+          p 1
+    .span2.outline
+        .div1(ondrop='drop(event)', ondragover='allowDrop(event)')
+          p 2
+    .span2
+        .div1(ondrop='drop(event)', ondragover='allowDrop(event)')
+          p 3
+    .span2
+        .div1(ondrop='drop(event)', ondragover='allowDrop(event)')
+          p 4    
+    .span2
+        .div1(ondrop='drop(event)', ondragover='allowDrop(event)')
+          p 5 
+    .span2
+        .div1(ondrop='drop(event)', ondragover='allowDrop(event)') 
+          p 6
+    .span1
+        #div1(ondrop='drop(event)', ondragover='allowDrop(event)') 
+          p 7

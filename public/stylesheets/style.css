@@ -377,3 +377,71 @@ input[type="file"] {
   top: 150px; 
   width: 100%; 
 }
+
+/**Slider Shenanigans**/
+
+input[type='range'] {
+	position: relative;
+	width: 50em;
+}
+
+.steps-2 {
+    border: 1px solid transparent; /*follows #slider2 style for sizing purposes */
+    width: 800px;
+    position: relative;
+    height: 30px;
+}
+
+.tick {
+    border: 1px solid transparent; /*follows slide handle style for sizing purposes*/
+    position: absolute;
+    width: 1.2em;
+    margin-left: -.6em;
+    text-align:center;
+    left: 0;
+}
+
+
+/**Drag n drop**/
+.div1 {
+	width:70px;
+	height:70px;
+	padding: 3px;
+	border:5px dashed #aaaaaa;
+}
+
+.div1.over{
+	border:5px dashed #003456;
+    -webkit-transform: scale(1.2);
+}
+
+
+
+.div1 p {
+	font-size: 20px;
+	z-index: -5;
+	color: #888888;
+}
+
+[draggable] {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  /* Required to make elements draggable in old WebKit */
+  -khtml-user-drag: element;
+  -webkit-user-drag: element;
+}
+
+.column {
+  height: 70px;
+  width: 70px;
+  float: left;
+  padding: 3px;
+  border: 5px dashed #aaaaaa;
+}
+
+.column.over {
+  border: 5px dashed #aaaaaa;
+  -webkit-transform: scale(1.2);
+}

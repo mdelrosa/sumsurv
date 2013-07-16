@@ -49,7 +49,7 @@ exports.test_mail = function(req, res) {
 			var mailOptions = {
 			    from: "Autonomous Humans Lab<authumlab@gmail.com>", // sender address
 			    bcc: classroom_db[0].roster.join(","), // list of receivers
-			    subject: "Welcome to SIMS.", // Subject line
+			    subject: "Welcome to SIMS.2", // Subject line
 			    text: "Hello world", // plaintext body
 			    html:        
    			            '<div style="80%"><p><center><img src="http://i.imgur.com/6FO9p55.png" style="width:100%"/></center></p>' +
@@ -125,7 +125,7 @@ exports.test_mail = function(req, res) {
 			var mailOptions = {
 			    from: "Tim Bibbersun<authumlab@gmail.com>", // sender address
 			    to: classroom_db[0].roster.join(","), // list of receivers
-			    subject: "SIMS weekly survey", // Subject line
+			    subject: "SIMS weekly survey2", // Subject line
 			    text: "Hello world", // plaintext body
 			    html:        
    			            '<div style="80%"><p><center><img src="http://i.imgur.com/6FO9p55.png" style="width:100%"/></center></p>' +
