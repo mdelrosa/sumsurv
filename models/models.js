@@ -31,7 +31,8 @@ var responseSchema = mongoose.Schema({
 	participant: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
 	classroom: { type: mongoose.Schema.Types.ObjectId, ref: "Classroom"},
 	date: Object,
-	time: Object
+	time: Object,
+	userid: Number
 }),
 	Response = mongoose.model('Response', responseSchema);
 exports.response = Response;
@@ -42,7 +43,10 @@ var classroomSchema = mongoose.Schema({
 	owner: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
 	roster: [String],
 	survey: {type: mongoose.Schema.Types.ObjectId, ref: 'Survey'},
-	responses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Response" }]
+	responses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Response" }],
+	interval: { type: Object, required: true},
+	requests: { type: Array },
+	checker: { type: Array}
 }),
 	Classroom = mongoose.model('Classroom', classroomSchema);
 exports.classroom = Classroom;
@@ -51,7 +55,8 @@ exports.classroom = Classroom;
 var userSchema = mongoose.Schema({
 	username: { type: String, required: true, unique: true},
 	email: { type: String, required: true, unique: true},
-	password: {type: String, required: true}
+	password: {type: String, required: true},
+	info: { type: Object }
 });
 
 // Email list serve schema

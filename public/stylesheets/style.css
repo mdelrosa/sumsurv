@@ -49,6 +49,10 @@ a {
 	width: 100%;
 }
 
+#class-img {
+	width: 10em;
+}
+
 .inline {
 	display: inline;
 	margin-left: 1em
@@ -193,6 +197,14 @@ navbar .nav1 li.dropdown.open > .dropdown-toggle1, .navbar .nav1 li.dropdown.act
 	margin: 0.2em;
 }
 
+.day-square {
+	background-color: #5200ff;
+	padding: auto;
+	color: white;
+	text-align: center;
+	border-radius: 3px
+}
+
 /*footer stuff*/
 
 .footer {
@@ -247,9 +259,45 @@ navbar .nav1 li.dropdown.open > .dropdown-toggle1, .navbar .nav1 li.dropdown.act
 	min-width: 22.5em;
 }
 
+.popover-label {
+	width: 40px !important;
+}
+
+.popover-controls {
+	margin-left: 60px !important;
+}
+
+.controls .input-append #appendedInput {
+	width: 4em;
+}
+
+.controls .popover-select {
+	width: 4.5em;
+}
+
+.interval .row-fluid .popover {
+	min-width: 24em;
+}
+
 .name-input {
 	margin-top: auto;
 	margin-bottom: auto;
+}
+
+.roster {
+	width: 95%;
+	padding-left: auto !important;
+	padding-right: auto !important;
+}
+
+#roster-group {
+	width: 95%;
+	margin: 0 auto;
+}
+
+#roster-group button {
+	width: 33%;
+	font-size: small;
 }
 
 table.fixed {

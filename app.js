@@ -22,7 +22,7 @@ var express = require('express')
 // Seed the admin
 var admin = new User({
     username: 'stolktacular',
-    email: "Whoop@gmail.com",
+    email: "authumlab@gmail.com",
     password: "jsizzle",
     classes: []
   });
@@ -144,11 +144,13 @@ app.get('/reject', user.reject);
 // Survey creation partials
 app.get('/pages/current', survey.current_pages);
 app.get('/surveys/all', survey.all_surveys);
+app.get('/survey/deployed', survey.deployed);
 
 // Class creation partials
 app.get('/class/all', classroom.all);
 app.get('/class/roster', classroom.roster);
 app.get('/class/survey', classroom.survey);
+app.get('/class/requests', classroom.view_requests);
 
 
 //import text file
@@ -160,18 +162,27 @@ app.post('/import', survey.import);
 //exporting page route(s)
 app.get('/class/export', survey.export);
 
+// handling user object info
+app.post('/user/info/update', user.info_update);
+
 // handling survey objects
 app.post('/survey/create', survey.create);
 app.post('/survey/success', survey.save_response);
 
 // -- handling classroom objects
+// deletion
+app.post('/class/delete', classroom.delete)
 // roster
 app.post('/class/create', classroom.new_class);
 app.post('/class/roster/update', classroom.roster_update);
 app.post('/class/roster/remove', classroom.remove);
+app.post('/class/roster/add', classroom.roster_add);
 // survey
-app.post('/class/survey/update', classroom.survey_update)
-
+app.post('/class/survey/update', classroom.survey_update);
+// interval
+app.post('/class/interval', classroom.interval);
+// participant requests
+app.post('/class/request/add', classroom.part_add);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
@@ -273,7 +284,7 @@ app.post('/user/create', function(req, res, next) {
     req.session.userMessage = "Passwords did not match!";
     return res.redirect('/login');
   }
-  User.find({email: r.email}).exec(function(err, user_db) {
+  User.find({email: r.email.toLowerCase()}).exec(function(err, user_db) {
     if (user_db.length > 0) {
       req.session.userMessage = "Email already registered!";
       return res.redirect('/login');

@@ -2,6 +2,26 @@
 
 $(document).ready(function() {
 
+	$('body').click(function() {
+		var checkDirty = checkInputs()
+			, check = checkDirty[0]
+			, num = 0;
+		for (i=0;i<check.length-1;i++) {
+			if(check[i]!==undefined) {
+				num = num + 1;
+			}
+		}
+		var percent = num/(check.length-1)*100;
+		console.log(percent)
+		if(percent!==100) {
+			$('.bar').css('width', percent.toString()+"%");
+		}
+		else {
+			$('.bar').css('width', "100%");
+			$('.progress').addClass('progress-success').removeClass('active');
+		}
+	});
+
 	// Handle tab switching
 	$('#myTab li a').click(function (e) {
 	  e.preventDefault();

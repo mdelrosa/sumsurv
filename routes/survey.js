@@ -54,11 +54,54 @@ exports.all_surveys = function(req, res) {
     Survey.find({creator: req.user}).exec(function(err, surv_db) {
         if(err) {console.log("Unable to find surveys"); return false}
         else {
-            res.render('_surveys', {
-                surveys: surv_db
+            var survIDS = [];
+            for (i=0;i<surv_db.length;i++) {
+                survIDS[i] = surv_db[i].id;
+            }
+            Classroom.find({survey: {$in: survIDS}}).exec(function(err, classroom_db) {
+                if(err) {console.log("All surveys classroom error: ", err); return false}
+                else {
+                    console.log("classes: ", classroom_db);
+                    // finds number of occurrences of object with value
+                    var countArr = [];
+                    for (i=0;i<survIDS.length;i++) {
+                        countArr[i] = 0;
+                        for (j=0;j<classroom_db.length;j++) {
+                            if (classroom_db[j].id === survIDS[i]) {
+                                countArr[i] = countArr[i] + 1;
+                            }
+                        }
+                    }
+                    res.render('_surveys', {
+                        surveys: surv_db,
+                        countArr: countArr
+                    })
+                }
             })
         }
     })
+}
+
+// Render partial displaying classes which use this survey
+exports.deployed = function(req, res) {
+    Classroom.find({survey: req.query.survey}).populate('owner').exec(function(err, classroom_db) {
+        if(err) { console.log("Deployed classroom error: ", err); return false}
+        else { 
+            res.render('_deployed', {
+                classes: classroom_db,
+                survey: req.query.survName
+            })
+        }
+    })
+}
+
+function checkforid(checker, email) {
+    for(i=0; i < checker.length; i++) {
+        if (checker[i][email]) {
+            return i;
+        }
+    }
+    return false;
 }
 
 // Save an individual response to a survey
@@ -66,28 +109,75 @@ exports.save_response = function(req, res) {
     console.log("req.body", req.body);
     User.find({username: req.body.info.owner}).exec(function(err, found_user) {
         if(err) {console.log("Error in save_response user search: ", err); return false}
+        
         Classroom.find({name: req.body.info.className, owner: found_user[0].id}).exec(function(err2, found_class) {
-        	if(err2) {console.log("Error in save_response classroom search: ", err2); return false}
-            var new_response = new Response({
-                results: req.body.results,
-                participant: req.user.id,
-                classroom: found_class[0].id,
-                date: req.body.date,
-                time: req.body.time
-            });
-        	new_response.save(function(err, saved_response) {
-        		if(err) {
-        			console.log('Unable to save response');
-        		 	res.send({success:false})
-        		 	return false;
-        		}
-        		console.log('Successfully saved new response!');
-                Classroom.update({name: req.body.info.className, owner: found_user[0]}  , { $addToSet: { responses: saved_response.id }}).exec(function(err3, updated_class) {
-                    if(err3) { console.log("Err in classroom update: ", err3); return false }
-                    console.log("Successfully updated classroom!");
-                    res.send({success:true})
+        	if(err2) {console.log("Error in save_response classroom search: ", err2); return false}        
+            var checknum = checkforid(found_class[0].checker, req.user.email);
+            if(checknum > -1) {
+                var new_response = new Response({
+                    results: req.body.results,
+                    participant: req.user.id,
+                    date: req.body.date,
+                    time: req.body.time,
+                    classroom: found_class[0].id,
+                    userid: found_class[0].checker[checknum][req.user.email]
+                });   
+                responsesaver(new_response);  
+            }
+            else {
+                var pushed = {};
+                if(!found_class[0].checker) { //if checker doesn't exist
+                    pushed[req.user.email] = 1;
+                    Classroom.update({_id: found_class[0].id}, {$addToSet: {checker: pushed}}).exec(function(err, num) {
+                        if(err) {console.log("Error in pushing and checking of the userid: ", err); return false}
+                        else{
+                            var new_response = new Response({
+                                results: req.body.results,
+                                participant: req.user.id,
+                                date: req.body.date,
+                                time: req.body.time,
+                                classroom: found_class[0].id,
+                                userid: 1
+                            });     
+                            responsesaver(new_response);
+                        }
+
+                    })
+                }
+                else {
+                    var newid = found_class[0].checker.length + 1;
+                    pushed[req.user.email] = newid;
+                    Classroom.update({_id: found_class[0].id}, {$addToSet: {checker: pushed}}).exec(function(err, num) {
+                        if(err) {console.log("Error in giving new id to user: ", err); return false}
+                        else{
+                            var new_response = new Response({
+                                results: req.body.results,
+                                participant: req.user.id,
+                                date: req.body.date,
+                                time: req.body.time,
+                                classroom: found_class[0].id,
+                                userid: newid
+                            });     
+                            responsesaver(new_response);
+                        }
+                    })
+                }
+            }
+            function responsesaver(toSave) {
+            	toSave.save(function(err, saved_response) {
+            		if(err) {
+            			console.log('Unable to save response');
+            		 	res.send({success:false})
+            		 	return false;
+            		}
+            		console.log('Successfully saved new response!');
+                    Classroom.update({name: req.body.info.className, owner: found_user[0]}  , { $addToSet: { responses: saved_response.id }}).exec(function(err3, updated_class) {
+                        if(err3) { console.log("Err in classroom update: ", err3); return false }
+                        console.log("Successfully updated classroom!");
+                        res.send({success:true})
+                    });
                 });
-            });
+            }
         });
     });
 }
@@ -131,7 +221,7 @@ exports.export = function(req, res) {
                         answerdate = response_db[i-1].date.month.toString() + "/" + response_db[i-1].date.date.toString() + "/" + response_db[i-1].date.year.toString();
                         answertime = response_db[i-1].time.hour.toString() + ":" + response_db[i-1].time.minutes.toString() + ":" + response_db[i-1].time.seconds.toString();
                         //This just turns the array into a string with comma separated values.
-            			csvstr[i] = " ," + response_db[i-1].participant.email + "," + response_db[i-1].results.join(",") +","+ answerdate +  "," + answertime + ", ";
+            			csvstr[i] = " ," + response_db[i-1].userid + "," + response_db[i-1].results.join(",") +","+ answerdate +  "," + answertime + ", ";
             		}
                     res.header('Content-type', 'text/csv');
                     res.send(csvstr);

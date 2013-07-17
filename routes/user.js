@@ -42,10 +42,35 @@ exports.survey = function(req, res){
 
 exports.create = function(req, res) {
 	Survey.find({creator: req.user}).exec(function(err, user_surveys) {
-		res.render('create', {
-			title: baseHead + ' | Create New Survey',
-			user: req.user.username,
-			surveys: user_surveys
+        var survIDS = [];
+        for (i=0;i<user_surveys.length;i++) {
+            survIDS[i] = user_surveys[i].id;
+        }
+        Classroom.find({survey: {$in: survIDS}}).populate('survey').exec(function(err, classroom_db) {
+            if(err) {console.log("All surveys classroom error: ", err); return false}
+            else {
+                console.log("classes: ", classroom_db);
+                // finds number of occurrences of object with value
+                var countArr = [];
+                for (i=0;i<survIDS.length;i++) {
+                    countArr[i] = 0;
+                    for (j=0;j<classroom_db.length;j++) {
+                    	console.log("1: ", classroom_db[j].survey.id, "type: ", typeof classroom_db[j].survey);
+                    	console.log("2: ", survIDS[i], "type: ", typeof survIDS[i]);
+                    	console.log(classroom_db[j].survey.id === survIDS[i]);
+                        if (classroom_db[j].survey.id === survIDS[i]) {
+                            countArr[i] = countArr[i] + 1;
+                        }
+                    }
+                }
+                console.log("countArr: ", countArr);
+				res.render('create', {
+					title: baseHead + ' | Create New Survey',
+					user: req.user.username,
+					surveys: user_surveys,
+					countArr: countArr
+				});
+			}
 		});
 	});
 }
@@ -88,20 +113,45 @@ exports.part = function(req, res) {
 			res.render('participating', {
 				title: baseHead + " | Participating",
 				user: req.user.username,
-				classes: found_class
+				classes: found_class,
+				info: req.user.info
 			});
 		}
 	})
+}
+
+exports.info_update = function(req, res) {
+	var type = req.body.type
+		, val = req.body.value;
+		if (type === "gender") {
+				User.update({_id: req.user.id}, {$set: {'info.gender': val}}, {upsert:true}).exec(function(err, num) {
+				if(err) {console.log('User info update error:', err); return false}
+				else if (!num) {console.log("Nothing updated!"); res.send({success: false}); return false}
+				else {
+					res.send({success: true});
+				}
+			});
+		}
+		else if (type === "year") {
+			User.update({_id: req.user.id}, {$set: {'info.year': val}}, {upsert:true}).exec(function(err, num) {
+				if(err) {console.log('User info update error:', err); return false}
+				else if (!num) {console.log("Nothing updated!"); res.send({success: false}); return false}
+				else {
+					res.send({success: true});
+				}
+			})
+		}
 }
 
 exports.take = function(req, res) {
 	User.find({username: req.params.user}).exec(function(err0, found_user) {
 		if(err0) { console.log("Take user error: ", err0) }
 		else {
-			Classroom.find({name: req.params.class, owner: found_user[0]._id}).populate('owner').exec(function(err, found_class) {
+			Classroom.find({name: req.params.class, owner: found_user[0].id}).populate('owner').exec(function(err, found_class) {
 				if(err) { console.log("Take class error: ", err); return false}
 				else {
-					if (found_class[0].roster.indexOf(req.user.email.toLowerCase()) === -1) {
+					if (found_class[0].roster.indexOf(req.user.email) === -1) {
+						req.session.classID = found_class[0].id;
 						res.redirect('/error/not_in_roster');
 						return false
 					}
@@ -137,8 +187,10 @@ exports.take = function(req, res) {
 exports.err = function(req, res) {
 	res.render('not_roster', {
 		user: req.user.username,
-		title: baseHead + " | " + "Not In Roster"
-	})
+		title: baseHead + " | " + "Not In Roster",
+		classID: req.session.classID
+	});
+	req.session.classID = null;
 }
 
 // Handle auth

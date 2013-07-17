@@ -1,11 +1,29 @@
 //- roster.jade
 //- show roster div
 
+
 div.roster-header
-	h4.text-center Roster
+	h3.text-center Roster
+div.btn-group.text-center.pad#roster-group
+	if requests.length
+		button.btn.btn-inverse.requests.popper(data-toggle='popover', title="", data-content='<div class="requests"></div>', data-original-title='Requests')
+			i.icon-globe
+			- tail = (requests.length === 1 ? "Request" : "Requests")
+			|  #{requests.length} #{tail}
+	else
+		button.btn.requests
+			i.icon-globe
+			|  No Requests
+
+	button.btn.roster-add.popper(data-toggle='popover', title="", data-content='<div class="roster-add"><form class="form-inline roster-input"><textarea class="popover-textarea" type="textarea" placeholder="i.e. tim.bibberson@blargh.com, jim.jefferson@woohoo.com"></textarea><br><btn class="btn btn-text-roster">Enter</btn><input style="bold" type="file" name="files[]" multiple="multiple" id="files"></input></form></div>', data-original-title='Add Participants')
+		i.icon-plus
+		|  Edit Roster
+	button.btn.btn.btn-new.send-email
+		i.icon-envelope	
+		|   Send Survey
 if (roster && roster.length > 0)
-	div#table-roster
-		table.table.table-striped
+	div.pad-top#table-roster
+		table.table.table-striped#table-roster
 			tr
 				th Student
 				th Edit
@@ -17,11 +35,4 @@ if (roster && roster.length > 0)
 							i.icon-minus
 							|  Remove
 else
-	p Roster is empty!
-div.form-inline
-	button.btn.roster-add.popper(data-toggle='popover', title="", data-content='<div class="roster-add"><form class="form-inline roster-input"><textarea class="popover-textarea" type="textarea" placeholder="i.e. tim.bibberson@blargh.com, jim.jefferson@woohoo.com"></textarea><br><btn class="btn btn-text-roster">Enter</btn><input style="bold" type="file" name="files[]" multiple="multiple" id="files"></input></form></div>', data-original-title='Add Participants')
-		i.icon-plus
-		|  Add Participants
-	button.btn.btn.btn-new.send-email.pull-right
-		i.icon-envelope	
-		|   Send Survey
+	p.pad Roster is empty!

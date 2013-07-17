@@ -1,0 +1,18 @@
+//- _deployed.jade
+//- handle displaying table showing what classes are using this survey
+
+h3.center-text #{survey} Deployed Classes:
+table.table.table-striped.table-condensed
+	tr
+		th Name
+		th Leader
+		th Roster
+		th Responses
+
+	- for (i=0;i<classes.length;i++) {
+		tr
+			td #{classes[i].name}
+			td #{classes[i].owner.username}
+			td #{classes[i].roster.length}
+			td #{classes[i].responses.length}
+	- }
