@@ -61,8 +61,6 @@ $(document).ready(function() {
 			// Highlight unanswered questions
 			var unanswered = findAllOccurrences(undefined, results)
 				, highlightTabId = [];
-			console.log("unanswered:",unanswered);
-			console.log("radioQuest:",$radioQuest,"length:", $radioQuest.length);
 			for (i=0;i<unanswered.length;i++) {
 				if (unanswered[i] === 0) {
 					highlightTabId.push('status');
