@@ -164,7 +164,8 @@ exports.take = function(req, res) {
 										user: req.user.username,
 										title: baseHead + " | " + req.params.user + "'s " + req.params.class,
 										className: req.params.class,
-										owner: found_class[0].owner.username
+										owner: found_class[0].owner.username,
+										demo: req.user.info
 									});
 								}
 							}
