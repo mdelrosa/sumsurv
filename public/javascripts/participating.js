@@ -34,6 +34,7 @@ $(document).ready(function() {
 				var html = '<div class="input-append"><select id="appendedInput">'+
 						   '<option value="Male">Male</option>'+
 						   '<option value="Female">Female</option>'+
+						   '<option value="Other">Other</option>'+
 						   '<option value="N/A">Care not to specify</option>'+
 						   '</select><a class="btn add-on" id="gender">Ok!</a></div>';
 			}

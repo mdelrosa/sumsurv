@@ -27,12 +27,15 @@ block content
           i.icon-user.icon-white
           |  #{owner}
     br
-
+    if (demo)
+      div#demo
+        div#gender(name=demo.gender)
+        div#year(name=demo.year)
     div#survey-container
       ul.nav.nav-pills#myTab
+        //- li.active
+        //-   a(href='#demographic', data-toggle='pill') Demographic
         li.active
-          a(href='#demographic', data-toggle='pill') Demographic
-        li
           a(href='#status', data-toggle='pill') Status
         li
           a(href='#questions', data-toggle='pill') Questions
@@ -40,57 +43,57 @@ block content
           a(href='#comments', data-toggle='pill') Comments
    
       .tab-content#formHolder
-        #demographic.tab-pane.active
-          div.row-fluid
-            div.span3.table-question
-              table.table.table-striped.table-condensed.table-hover#table-question1
-                tr
-                  th With regard to gender, I identify as:
-                tr
-                  td
-                    input.mult-choice(type='radio', name="gender", value="Female")
-                    p.inline Female
-                tr
-                  td
-                    input.mult-choice(type='radio', name="gender", value="Male")
-                    p.inline Male
-                tr
-                  td
-                    input.mult-choice(type='radio', name="gender", value="Other")
-                    p.inline Other
-                tr
-                  td
-                    input.mult-choice(type='radio', name="gender", value="unspecified")
-                    p.inline Do not care to specify
-            div.span3.table-question
-              table.table.table-striped.table-condensed.table-hover#table-question2
-                tr
-                  th Please specify your year of study.
-                tr
-                  td
-                    input.mult-choice(type='radio', name="year", value="First-year")
-                    p.inline First-year
-                tr
-                  td
-                    input.mult-choice(type='radio', name="year", value="Sophomore")
-                    p.inline Sophomore
-                tr
-                  td
-                    input.mult-choice(type='radio', name="year", value="Junior")
-                    p.inline Junior
-                tr
-                  td
-                    input.mult-choice(type='radio', name="year", value="Senior")
-                    p.inline Senior
-          div.pull-right.pad-top.tab-control
-            a.btn.btn-info(href="#status") Next
-        #status.tab-pane
+        //- #demographic.tab-pane.active
+        //-   div.row-fluid
+        //-     div.span3.table-question
+        //-       table.table.table-striped.table-condensed.table-hover#table-question1
+        //-         tr
+        //-           th With regard to gender, I identify as:
+        //-         tr
+        //-           td
+        //-             input.mult-choice(type='radio', name="gender", value="Female")
+        //-             p.inline Female
+        //-         tr
+        //-           td
+        //-             input.mult-choice(type='radio', name="gender", value="Male")
+        //-             p.inline Male
+        //-         tr
+        //-           td
+        //-             input.mult-choice(type='radio', name="gender", value="Other")
+        //-             p.inline Other
+        //-         tr
+        //-           td
+        //-             input.mult-choice(type='radio', name="gender", value="N/A")
+        //-             p.inline Do not care to specify
+        //-     div.span3.table-question
+        //-       table.table.table-striped.table-condensed.table-hover#table-question2
+        //-         tr
+        //-           th Please specify your year of study.
+        //-         tr
+        //-           td
+        //-             input.mult-choice(type='radio', name="year", value="First-year")
+        //-             p.inline First-year
+        //-         tr
+        //-           td
+        //-             input.mult-choice(type='radio', name="year", value="Sophomore")
+        //-             p.inline Sophomore
+        //-         tr
+        //-           td
+        //-             input.mult-choice(type='radio', name="year", value="Junior")
+        //-             p.inline Junior
+        //-         tr
+        //-           td
+        //-             input.mult-choice(type='radio', name="year", value="Senior")
+        //-             p.inline Senior
+        //-   div.pull-right.pad-top.tab-control
+        //-     a.btn.btn-info(href="#status") Next
+        #status.tab-pane.active
           div.text-question
             h4 Provide a brief description of your current activities in the course.
             textarea.status-text(placeholder='Open-ended project work, laboratory experiments, research, lectures, problem sets, etc.')
           div.fluid-row
-            div.pull-left.tab-control
-              a.btn.btn-info(href="#demographic") Previous
+            //- div.pull-left.tab-control
+            //-   a.btn.btn-info(href="#demographic") Previous
             div.pull-right.tab-control
               a.btn.btn-info(href="#questions") Next
         #questions.tab-pane
