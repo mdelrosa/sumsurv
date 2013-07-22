@@ -12,6 +12,10 @@ var nodemailer = require("nodemailer")
 
 // New class creation
 exports.new_class = function(req, res) {
+	var d = new Date()
+		, month = d.getMonth()
+		, year = d.getFullYear()
+		, date = d.getDate();
 	Classroom.find({owner: req.user, name: req.body.name}).exec(function(err, db_classrooms) {
 		if (db_classrooms.length > 0) {
 			res.send({success: false, message: "This class already exists!"});
@@ -23,7 +27,8 @@ exports.new_class = function(req, res) {
 				roster: [],
 				surveys: null,
 				responses: [],
-				interval: { start: 4, end: 7 }
+				interval: { start: 4, end: 7 },
+				span: { start: { date: date, month: month, year: year} }
 			});
 			newClassroom.save(function(err) {
 	            if(err) {
@@ -120,6 +125,46 @@ exports.remove = function(req, res) {
 	})
 }
 
+// Render class span selection popover
+exports.view_span = function(req, res) {
+	Classroom.find({owner: req.user.id, name: req.query.name}).exec(function(err, found_class) {
+		if(err) { console.log("view_requests classroom error:", err); return false}
+		else {
+			if (req.query.editing === "start") {
+				var span = found_class[0].span.start
+			}
+			else if (req.query.editing === "end") {
+				var span = found_class[0].span.end
+			}
+			res.render('_span', {
+				span: span
+			});				
+		}
+	});		
+}
+
+// Edit class span
+exports.edit_span = function(req, res) {
+	if (req.body.editing === "start") {
+		Classroom.update({ owner: req.user.id, name: req.body.name }, { $set: { 'span.start':  req.body.n } }).exec(function(err, num) {
+			if(err || !num) { console.log("edit_span error:", err); return false }
+			else {
+				res.send({success: true});
+			}
+		})
+	}
+	else {
+		Classroom.update({ owner: req.user.id, name: req.body.name }, { $set: { 'span.end': req.body.n } }).exec(function(err, num) {
+			if(err || !num) { console.log("edit_span error:", err); return false }
+			else {
+				res.send({success: true});
+			}
+		})
+	}
+
+	res.send({success:true});
+}
+
 // Get a class's requests
 exports.view_requests = function(req, res) {
 	Classroom.find({owner: req.user.id, name: req.query.name}).exec(function(err, class_db) {
@@ -205,7 +250,8 @@ exports.survey = function(req, res) {
 					survey: found_class[0].survey,
 					responses: found_responses,
 					className: className,
-					interval: found_class[0].interval
+					interval: found_class[0].interval,
+					span: found_class[0].span
 				});
 			});
 		}

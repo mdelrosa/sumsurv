@@ -151,7 +151,7 @@ app.get('/class/all', classroom.all);
 app.get('/class/roster', classroom.roster);
 app.get('/class/survey', classroom.survey);
 app.get('/class/requests', classroom.view_requests);
-
+app.get('/class/span/view', classroom.view_span);
 
 //import text file
 app.get('/import', ensureAuthenticated, user.import);
@@ -179,6 +179,8 @@ app.post('/class/roster/remove', classroom.remove);
 app.post('/class/roster/add', classroom.roster_add);
 // survey
 app.post('/class/survey/update', classroom.survey_update);
+// span
+app.post('/class/span/edit', classroom.edit_span);
 // interval
 app.post('/class/interval', classroom.interval);
 // participant requests
