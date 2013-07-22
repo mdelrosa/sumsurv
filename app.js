@@ -238,7 +238,7 @@ app.post('/login', function(req, res, next) {
         }
       }
       else {
-        res.redirect('/');
+        res.redirect('/part');
       }
     });
   })(req, res, next);

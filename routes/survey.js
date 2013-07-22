@@ -104,6 +104,68 @@ function checkforid(checker, email) {
     return false;
 }
 
+//checks what week the survey was taken (week1, week2, etc.)
+function whatweek(endDay, endMonth, endYear) {
+    var startYear = 2013;
+    var startMonth = 6-1;
+    var startDay = 1;
+
+    endMonth = endMonth -1;
+
+    var differenceYear = endYear-startYear;
+    var differenceMonth = endMonth - startMonth;
+    var daysInBetween = 0;
+    var monthHolder = 0;
+    var monthsUntilNewYear = 0;
+    var remainderDays = 0;
+    var weeks = 0;
+    var monthsTillNew = 0;
+     
+    var whatDate = function(number){
+        if(number === 0 || number === 2 || number === 4 || number === 6 || number === 7 || number === 9 || number === 11){
+           return 31;    
+        }
+        else if(number === 1) {
+            return 28;    
+        }
+        else if(number === 3 || number === 5 ||  number === 8 || number === 10){
+            return 30;  
+        }
+        else {
+            console.log("Something is wrong in the same year loop");
+        }
+    };  
+
+
+    if(differenceYear === 0){//YEAR IS THE SAME
+        if(differenceMonth === 0){//MONTH IS THE SAME
+            daysInBetween = endDay - startDay;
+        }
+        else{//IF MONTH IS DIFFERENT BUT YEAR IS THE SAME
+            for(i=1; i < differenceMonth; i++){
+                daysInBetween = whatDate(startMonth + i) + daysInBetween;
+            }
+            daysInBetween = whatDate(startMonth) - startDay + daysInBetween;
+            daysInBetween = daysInBetween + endDay;
+        }
+    }
+    else {//YEAR IS DIFFERENT
+        monthsTillNew = 11 - startMonth;
+        for(i=1; i < monthsTillNew + 1; i++){//start to end of year
+            daysInBetween = whatDate(startMonth + i) + daysInBetween;
+        }//beginning of year to end month
+        for(i=0; i < endMonth; i++){
+            daysInBetween = whatDate(i) + daysInBetween;
+        }
+        daysInBetween = whatDate(startMonth) - startDay + daysInBetween;
+        daysInBetween = daysInBetween + endDay;
+    }
+    weeks = daysInBetween / 7;
+    weeks = Math.ceil(weeks);
+    return weeks;
+}
+
+
 // Save an individual response to a survey
 exports.save_response = function(req, res) {
     console.log("req.body", req.body);
@@ -113,6 +175,7 @@ exports.save_response = function(req, res) {
         Classroom.find({name: req.body.info.className, owner: found_user[0].id}).exec(function(err2, found_class) {
         	if(err2) {console.log("Error in save_response classroom search: ", err2); return false}        
             var checknum = checkforid(found_class[0].checker, req.user.email);
+
             if(checknum > -1) {
                 var new_response = new Response({
                     results: req.body.results,
@@ -120,7 +183,8 @@ exports.save_response = function(req, res) {
                     date: req.body.date,
                     time: req.body.time,
                     classroom: found_class[0].id,
-                    userid: found_class[0].checker[checknum][req.user.email]
+                    userid: found_class[0].checker[checknum][req.user.email],
+                    responseweek: whatweek(parseInt(req.body.date.date), parseInt(req.body.date.month), parseInt(req.body.date.year))
                 });   
                 responsesaver(new_response);  
             }
@@ -137,7 +201,8 @@ exports.save_response = function(req, res) {
                                 date: req.body.date,
                                 time: req.body.time,
                                 classroom: found_class[0].id,
-                                userid: 1
+                                userid: 1,
+                                responseweek: whatweek(parseInt(req.body.date.date), parseInt(req.body.date.month), parseInt(req.body.date.year))
                             });     
                             responsesaver(new_response);
                         }
@@ -156,7 +221,8 @@ exports.save_response = function(req, res) {
                                 date: req.body.date,
                                 time: req.body.time,
                                 classroom: found_class[0].id,
-                                userid: newid
+                                userid: newid,
+                                responseweek: whatweek(parseInt(req.body.date.date), parseInt(req.body.date.month), parseInt(req.body.date.year))
                             });     
                             responsesaver(new_response);
                         }
