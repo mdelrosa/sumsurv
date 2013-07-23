@@ -151,7 +151,7 @@ $(document).ready(function() {
 	var setSpanSquare = function(name, editing) {
 		var d = new Date();
 		$('.span-day').val(d.getDate());
-		$('.span-month').val(d.getMonth());
+		$('.span-month').val(d.getMonth()+1);
 		$('.span-year').val(d.getFullYear());
 
 		$('a.btn-span').click(function() {
@@ -165,7 +165,7 @@ $(document).ready(function() {
 				else {
 					if (res.success) {
 						console.log("yay");
-						$('.span-'+editing).html(date.toString()+'/'+(month+1).toString()+'/'+year.toString())
+						$('.span-'+editing).html((month+1).toString()+'/'+date.toString()+'/'+year.toString())
 					}
 				}
 			})
