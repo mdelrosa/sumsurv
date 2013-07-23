@@ -46,6 +46,7 @@ var classroomSchema = mongoose.Schema({
 	survey: {type: mongoose.Schema.Types.ObjectId, ref: 'Survey'},
 	responses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Response" }],
 	interval: { type: Object, required: true},
+	span: { type: Object },
 	requests: { type: Array },
 	checker: { type: Array}
 }),

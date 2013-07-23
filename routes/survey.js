@@ -97,7 +97,9 @@ exports.deployed = function(req, res) {
 
 function checkforid(checker, email) {
     for(i=0; i < checker.length; i++) {
+        console.log("checker:",checker,"email:",email);
         if (checker[i][email]) {
+            console.log("index:",i)
             return i;
         }
     }
@@ -168,15 +170,15 @@ function whatweek(endDay, endMonth, endYear) {
 
 // Save an individual response to a survey
 exports.save_response = function(req, res) {
-    console.log("req.body", req.body);
+    console.log("req.user", req.user);
     User.find({username: req.body.info.owner}).exec(function(err, found_user) {
         if(err) {console.log("Error in save_response user search: ", err); return false}
         
         Classroom.find({name: req.body.info.className, owner: found_user[0].id}).exec(function(err2, found_class) {
         	if(err2) {console.log("Error in save_response classroom search: ", err2); return false}        
-            var checknum = checkforid(found_class[0].checker, req.user.email);
-
-            if(checknum > -1) {
+            var checker = found_class[0].checker
+                , checknum = checkforid(checker, req.user.email);
+            if(checker && checker.length && checknum !== false) {
                 var new_response = new Response({
                     results: req.body.results,
                     participant: req.user.id,

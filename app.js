@@ -17,8 +17,8 @@ var express = require('express')
   , MongoStore = require('connect-mongo')(express)
   , Models = require('./models/models')
   , User = Models.User
-  , Survey = Models.survey;
-
+  , Survey = Models.survey
+  , Classroom = Models.classroom;
 // Seed the admin
 var admin = new User({
     username: 'stolktacular',
@@ -116,7 +116,7 @@ app.get('/export', ensureAuthenticated, user.exportcsv);
 app.get('/mail', user.mail);
 app.get('/classes', ensureAuthenticated, user.my_classes);
 app.get('/part', ensureAuthenticated, user.part);
-app.get('/:user/:class/take', ensureAuthenticated, user.take);
+app.get('/:user/:class/take', ensureAuthenticated, ensureDate, user.take);
 app.get('/error/not_in_roster', ensureAuthenticated, user.err);
 app.get('/testpage1', user.testpage1);
 app.get('/testpage2', user.testpage2);
@@ -151,7 +151,7 @@ app.get('/class/all', classroom.all);
 app.get('/class/roster', classroom.roster);
 app.get('/class/survey', classroom.survey);
 app.get('/class/requests', classroom.view_requests);
-
+app.get('/class/span/view', classroom.view_span);
 
 //import text file
 app.get('/import', ensureAuthenticated, user.import);
@@ -179,6 +179,8 @@ app.post('/class/roster/remove', classroom.remove);
 app.post('/class/roster/add', classroom.roster_add);
 // survey
 app.post('/class/survey/update', classroom.survey_update);
+// span
+app.post('/class/span/edit', classroom.edit_span);
 // interval
 app.post('/class/interval', classroom.interval);
 // participant requests
@@ -208,8 +210,40 @@ function ensureAuthenticated(req, res, next) {
 
 //date confirmation middleware
 function ensureDate(req, res, next) {
-  var datedata = new Date();
-  if (datedata.getDay() == 4 || datedata.getDay() == 5 || datedata.getDay() == 6 || datedata.getDay() == 0) {return next()}
+  var d = new Date();
+  // Helper function that parses/formats interval objects
+  function intCheckFormat(obj) {
+    var day = (parseInt(obj.day) === 7) ? 0 : parseInt(obj.day);
+    if (parseInt(obj.hour) === 12) {
+      var hour = (obj.time === "PM") ? 12 : 0;
+    }
+    else {
+      var hour = (obj.time === "PM") ? parseInt(obj.hour) + 12 : parseInt(obj.hour);
+    }
+    var minute = parseInt(obj.minute);
+    return { day: day, hour: hour, minute: minute }
+  }
+  User.find({ username: req.params.user }).exec(function(err, found_user) {
+    if(err) { console.log('ensureDate user search error:', err); return false }
+    else {
+      Classroom.find({ name: req.params.class, owner: found_user[0].id }).exec(function(err, found_class) {
+        if(err) { console.log('ensureDate class search error:', err); return false }
+        else {
+          var start = intCheckFormat(found_class[0].interval.start)
+              , end = intCheckFormat(found_class[0].interval.end);
+          if (end.day > start.day) {
+            if ((d.getDay() === start.day) && (d.getHour() >= start.hour))
+            if (d.getDay() >= interval.start.day && d.getDay<=interval.end.day) {
+              if (d.getTime) {
+                console.log('brb');
+              }
+            }
+          }
+         }
+      })
+    }  
+  })
+  if (d.getDay() == 4 || d.getDay() == 5 || d.getDay() == 6 || d.getDay() == 0) {return next()}
   res.redirect('/reject');
 }
 

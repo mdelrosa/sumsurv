@@ -96,6 +96,7 @@ $(document).ready(function() {
 		});
 	}
 
+	// Activate set interval submission in popover
 	var setDaySquare = function(name, editing) {
 		var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 			, editingDay = null;
@@ -131,9 +132,9 @@ $(document).ready(function() {
 		});
 	}
 
-	// Change start/end days
+	// Change interval start/end days
 	var setDate = function(name) {
-		$('a').popover({trigger: 'click', html: true, placement: 'top', callback: popoverDismiss()});
+		$('a').popover({trigger: 'click', html: true, placement: 'bottom', callback: popoverDismiss()});
 		var editing = null
 			, editingDay = null;
 		$('.change-start').click(function() {
@@ -143,7 +144,59 @@ $(document).ready(function() {
 		$('.change-end').click(function() {
 			editing = "end";
 			setDaySquare(name, editing);
+		});
+	}
+
+	// Activate set interval submission in popover
+	var setSpanSquare = function(name, editing) {
+		var d = new Date();
+		$('.span-day').val(d.getDate());
+		$('.span-month').val(d.getMonth());
+		$('.span-year').val(d.getFullYear());
+
+		$('a.btn-span').click(function() {
+			var date = $('.span-day').val()
+			, month = $('.span-month').val()-1
+			, year = $('.span-year').val()
+			, n = { date: date, month: month, year: year }
+			console.log(date.toString()+'/'+month.toString()+'/'+year.toString());
+			$.post('/class/span/edit', { editing: editing, name: name, n: n }, function(res) {
+				if (res.err) { console.log("Class span edit error:", req.err); return false }
+				else {
+					if (res.success) {
+						console.log("yay");
+						$('.span-'+editing).html(date.toString()+'/'+(month+1).toString()+'/'+year.toString())
+					}
+				}
+			})
 		})
+	}
+
+	// Change span start/end days
+	var setSpanDate = function(name) {
+		$('a').popover({trigger: 'click', html: true, placement: 'bottom', callback: popoverDismiss()});
+		var editing = null
+			, editingDay = null;
+		$('.span-start').click(function() {
+			editing = "start";
+			$.get('/class/span/view', { editing: editing, name: name }, function(data) {
+				if (data.err) {console.log("Class span view error:", data.err); return false}
+				else {
+					$('.popover-content').html(data);
+					setSpanSquare(name, editing);
+				}
+			})
+		});
+		$('.span-end').click(function() {
+			editing = "end";
+			$.get('/class/span/view', { editing: editing, name: name }, function(data) {
+				if (data.err) {console.log("Class span view error:", data.err); return false}
+				else {
+					$('.popover-content').html(data);
+					setSpanSquare(name, editing);
+				}
+			})
+		});
 	}
 
 	// handle popover dismissal
@@ -199,13 +252,16 @@ $(document).ready(function() {
 							if(res.err) { console.log("Unable to update class survey: ", res.err); return false}
 							else {
 								if(res.success) {
-									// Success stuff
+									$('h4#surv-name').fadeOut('fast', function() {
+										$(this).html(selectedSurv).fadeIn('fast');
+									});
 								}
 							}
 						});
 					});
 					$('.response-square').tooltip({html: true, placement: 'top', trigger: 'hover'});
 					setDate(name);
+					setSpanDate(name);
 				})
 			}
 		});
@@ -298,7 +354,6 @@ $(document).ready(function() {
 			});
 		});
 	}
-
 
 	// Activate jquery for importing roster
 	var activateImport = function() {
@@ -437,6 +492,5 @@ $(document).ready(function() {
 
 	    }
 	}  
-
 
 });
