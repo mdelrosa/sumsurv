@@ -26,9 +26,7 @@ $(document).ready(function() {
 					$('.create-container').fadeOut('fast', function() {
 						$('.page-name').empty();
 						$('.page-type').empty();
-						$(this).html(data).fadeIn('fast', function() {
-							$('.collapse').collapse();
-						});
+						$(this).html(data).fadeIn('fast', function() {});
 					});
 				}	
 			})

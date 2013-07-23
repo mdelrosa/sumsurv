@@ -75,7 +75,7 @@ exports.all_surveys = function(req, res) {
                     res.render('_surveys', {
                         surveys: surv_db,
                         countArr: countArr
-                    })
+                    });
                 }
             })
         }
