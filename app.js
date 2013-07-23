@@ -146,6 +146,9 @@ app.get('/pages/current', survey.current_pages);
 app.get('/surveys/all', survey.all_surveys);
 app.get('/survey/deployed', survey.deployed);
 
+// Survey response exporting
+app.get('/survey/export/all', survey.export_survey_all);
+
 // Class creation partials
 app.get('/class/all', classroom.all);
 app.get('/class/roster', classroom.roster);

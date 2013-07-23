@@ -207,7 +207,9 @@ function decommafy(str) {
 }
 
 exports.export = function(req, res) {
-    Classroom.find({owner: req.user.id, name: req.query.className}).exec(function(err, found_class) {
+    var owner = (req.query.user) ? req.query.user : req.user.id;
+    console.log("owner:",owner);
+    Classroom.find({owner: owner, name: req.query.className}).exec(function(err, found_class) {
         if(err) {console.log("Error in classroom export:", err); return false}
         else {
             Response.find({classroom: found_class[0].id}).populate('participant').exec(function(err2, response_db) {
@@ -234,6 +236,37 @@ exports.export = function(req, res) {
     });
 };
 
+exports.export_survey_all = function(req, res) {
+    Survey.find({creator: req.user._id, name: req.query.survName}).exec(function(err0, found_survey) {
+        if(err0) { console.log("Error in export_survey_all survey:", err0); return false }
+        else {
+            Classroom.find({survey: found_survey[0]._id}).populate('responses').exec(function(err, found_class) {
+                if(err) {console.log("Error in export_survey_all classroom:", err); return false}
+                else {
+                    var response_db = [];
+                    for (i=0;i<found_class.length;i++) {
+                        response_db = response_db.concat(found_class[i].responses);
+                    }
+                    var csvstr = [' , Id, Gender, Year, Status, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Comment, Answer Date, Time'];        
+                    var answerdate = "";
+                    var answertime = ";"
+                    for(i=1; i < response_db.length+1; i++) {
+                        //These two lines decommafy the written responses
+                        response_db[i-1].results[2] = decommafy(response_db[i-1].results[2]);
+                        response_db[i-1].results[19] = decommafy(response_db[i-1].results[19]);
+                        //takes the date the survey was taken and converts it to a x/x/xxxx format in string.
+                        answerdate = response_db[i-1].date.month.toString() + "/" + response_db[i-1].date.date.toString() + "/" + response_db[i-1].date.year.toString();
+                        answertime = response_db[i-1].time.hour.toString() + ":" + response_db[i-1].time.minutes.toString() + ":" + response_db[i-1].time.seconds.toString();
+                        //This just turns the array into a string with comma separated values.
+                        csvstr[i] = " ," + response_db[i-1].userid + "," + response_db[i-1].results.join(",") +","+ answerdate +  "," + answertime + ", ";
+                    }
+                    res.header('Content-type', 'text/csv');
+                    res.send(csvstr);
+                }
+            });
+        }
+    });
+}
 
 exports.import = function(req, res) {
     Emaillist.find().exec(function(err, emaillist_db) {
