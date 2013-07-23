@@ -58,6 +58,18 @@ a {
 	margin-left: 1em
 }
 
+.row-inline-left {
+	float: left;
+}
+
+.row-inline-right {
+	float: right;
+}
+
+.clearboth {
+	clear: both;
+}
+
 textarea {
 	min-width: 80%;
 	max-width: 95%;
