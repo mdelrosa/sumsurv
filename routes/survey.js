@@ -107,12 +107,17 @@ function checkforid(checker, email) {
 }
 
 //checks what week the survey was taken (week1, week2, etc.)
-function whatweek(endDay, endMonth, endYear) {
-    var startYear = 2013;
-    var startMonth = 6-1;
-    var startDay = 1;
+function whatweek(startDay, startMonth, startYear, endDay, endMonth, endYear) {
+    startMonth = startMonth;
 
-    endMonth = endMonth -1;
+    var startYear = startYear;
+    var startMonth = startMonth;
+    var startDay = startDay;
+
+    console.log("startyear ", startYear);
+    console.log("startday ", startDay);
+    console.log("startmonth ", startMonth);
+    endMonth = endMonth - 1;
 
     var differenceYear = endYear-startYear;
     var differenceMonth = endMonth - startMonth;
@@ -164,16 +169,17 @@ function whatweek(endDay, endMonth, endYear) {
     }
     weeks = daysInBetween / 7;
     weeks = Math.ceil(weeks);
+    if (weeks === 0){
+        weeks = 1;
+    };
     return weeks;
 }
-
 
 // Save an individual response to a survey
 exports.save_response = function(req, res) {
     console.log("req.user", req.user);
     User.find({username: req.body.info.owner}).exec(function(err, found_user) {
         if(err) {console.log("Error in save_response user search: ", err); return false}
-        
         Classroom.find({name: req.body.info.className, owner: found_user[0].id}).exec(function(err2, found_class) {
         	if(err2) {console.log("Error in save_response classroom search: ", err2); return false}        
             var checker = found_class[0].checker
@@ -186,7 +192,7 @@ exports.save_response = function(req, res) {
                     time: req.body.time,
                     classroom: found_class[0].id,
                     userid: found_class[0].checker[checknum][req.user.email],
-                    responseweek: whatweek(parseInt(req.body.date.date), parseInt(req.body.date.month), parseInt(req.body.date.year))
+                    responseweek: whatweek(parseInt(found_class[0].span.start.date), parseInt(found_class[0].span.start.month), parseInt(found_class[0].span.start.year), parseInt(req.body.date.date), parseInt(req.body.date.month), parseInt(req.body.date.year))
                 });   
                 responsesaver(new_response);  
             }
@@ -204,7 +210,7 @@ exports.save_response = function(req, res) {
                                 time: req.body.time,
                                 classroom: found_class[0].id,
                                 userid: 1,
-                                responseweek: whatweek(parseInt(req.body.date.date), parseInt(req.body.date.month), parseInt(req.body.date.year))
+                                responseweek: whatweek(parseInt(found_class[0].span.start.date), parseInt(found_class[0].span.start.month), parseInt(found_class[0].span.start.year), parseInt(req.body.date.date), parseInt(req.body.date.month), parseInt(req.body.date.year))
                             });     
                             responsesaver(new_response);
                         }
@@ -224,7 +230,7 @@ exports.save_response = function(req, res) {
                                 time: req.body.time,
                                 classroom: found_class[0].id,
                                 userid: newid,
-                                responseweek: whatweek(parseInt(req.body.date.date), parseInt(req.body.date.month), parseInt(req.body.date.year))
+                                responseweek: whatweek(parseInt(found_class[0].span.start.date), parseInt(found_class[0].span.start.month), parseInt(found_class[0].span.start.year), parseInt(req.body.date.date), parseInt(req.body.date.month), parseInt(req.body.date.year))
                             });     
                             responsesaver(new_response);
                         }
@@ -278,7 +284,7 @@ exports.export = function(req, res) {
             Response.find({classroom: found_class[0].id}).populate('participant').exec(function(err2, response_db) {
             	if(err2) {console.log("Error in response export: ", err2); return false}
                 else {
-                    var csvstr = [' , Id, Gender, Year, Status, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Comment, Answer Date, Time'];    	
+                    var csvstr = [' , Id, Response Week, Gender, Year, Status, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Comment, Answer Date, Time'];    	
                 	var answerdate = "";
                     var answertime = ";"
                     for(i=1; i < response_db.length+1; i++) {
@@ -289,7 +295,7 @@ exports.export = function(req, res) {
                         answerdate = response_db[i-1].date.month.toString() + "/" + response_db[i-1].date.date.toString() + "/" + response_db[i-1].date.year.toString();
                         answertime = response_db[i-1].time.hour.toString() + ":" + response_db[i-1].time.minutes.toString() + ":" + response_db[i-1].time.seconds.toString();
                         //This just turns the array into a string with comma separated values.
-            			csvstr[i] = " ," + response_db[i-1].userid + "," + response_db[i-1].results.join(",") +","+ answerdate +  "," + answertime + ", ";
+            			csvstr[i] = " ," + response_db[i-1].userid + "," + response_db[i-1].responseweek + "," + response_db[i-1].results.join(",") +","+ answerdate +  "," + answertime + ", ";
             		}
                     res.header('Content-type', 'text/csv');
                     res.send(csvstr);
