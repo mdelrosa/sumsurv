@@ -31,13 +31,13 @@ div.dates
 			div.span4
 				if (span.start)
 					- var sd = span.start.date, sm = parseInt(span.start.month)+1, sy = span.start.year;
-					a#span.btn.span-start.popper(data-toggle='popover', title data-content='<div class="progress progress-striped active"><div class="bar" style="width: 100%"></div></div>', data-original-title="Pick a Start Date") #{sd}/#{sm}/#{sy}
+					a#span.btn.span-start.popper(data-toggle='popover', title data-content='<div class="progress progress-striped active"><div class="bar" style="width: 100%"></div></div>', data-original-title="Pick a Start Date") #{sm}/#{sd}/#{sy}
 				else
 					a#span.btn.span-start.popper(data-toggle='popover', title data-content='<div class="progress progress-striped active"><div class="bar" style="width: 100%"></div></div>', data-original-title="Pick a Start Date") Select Start Date
 			div.offset2.span4
 				if (span.end)
 					- var ed = span.end.date, em = parseInt(span.end.month)+1, ey = span.end.year;
-					a#span.btn.span-end.popper(data-toggle='popover', title data-content='<div class="progress progress-striped active"><div class="bar" style="width: 100%"></div></div>', data-original-title="Pick an End Date") #{ed}/#{em}/#{ey}
+					a#span.btn.span-end.popper(data-toggle='popover', title data-content='<div class="progress progress-striped active"><div class="bar" style="width: 100%"></div></div>', data-original-title="Pick an End Date") #{em}/#{ed}/#{ey}
 				else
 					a#span.btn.span-end.popper(data-toggle='popover', title data-content='<div class="progress progress-striped active"><div class="bar" style="width: 100%"></div></div>', data-original-title="Pick an End Date") Select End Date
 		else
