@@ -234,93 +234,97 @@ function ensureDate(req, res, next) {
       Classroom.find({ name: req.params.class, owner: found_user[0].id }).exec(function(err, found_class) {
         if(err) { console.log('ensureDate class search error:', err); return false }
         else {
-          var today = new Date
-              , span = found_class[0].span
-              , begin = new Date(span.start.year, span.start.month, span.start.date)
-              , finish = new Date(span.end.year, span.end.month, span.end.date)
-          console.log('span:', span, '\ntoday:',today);
-          console.log('begin:', begin, '\nfinish', finish);
+          if (found_class.length > 0) {
+            var today = new Date
+                , span = found_class[0].span
+                , begin = new Date(span.start.year, span.start.month, span.start.date)
+                , finish = new Date(span.end.year, span.end.month, span.end.date)
+            console.log('span:', span, '\ntoday:',today);
+            console.log('begin:', begin, '\nfinish', finish);
 
-          if (today >= begin && today <= finish) {
-            var start = intCheckFormat(found_class[0].interval.start)
-                , end = intCheckFormat(found_class[0].interval.end);
-            if (end.day > start.day) {
-              // End comes after start; make sure d falls in between them
-              console.log('end.day > start.day');
-              if ( (d.getDay() > start.day && d.getDay()<end.day) || 
-                   (d.getHours() >= start.hour && d.getMinutes() >= start.minute && d.getDay() === start.day) ||
-                   (d.getHours() <= end.hour && d.getMinutes() <= end.minute && d.getDay() === end.day)) {
-                return next()
-              }
-              else { res.redirect('/reject') }
-            }
-            else if (end.day < start.day) {
-              console.log('end.day < start.day');
-              // End comes earlier in week than start; make sure d falls outside of them
-              if ( (d.getDay() > start.day || d.getDay() < end.day) ||
-                   (d.getHours() >= start.hour && d.getMinutes() >= start.minute && d.getDay() === start.day) ||
-                   (d.getHours() <= end.hour && d.getMinutes() <= end.minute && d.getDay() === end.day) ) {
-                return next()
-              }
-              else { res.redirect('/reject') }
-            }
-            else if (end.day===start.day) {
-              console.log('end.day === start.day');
-              // The end day is the same as the start day; check start/end times to see if we check between or outside
-              if (end.hour > start.hour) {
-                console.log('end.hour > start.hour');
-                // The end hour comes after the start hour; check in between times
-                if ( (d.getHours() > start.hour || ( d.getHours() === start.hour && d.getMinutes() >= start.minute)) &&
-                     (d.getHours() < end.hour || (d.getHours() === end.hour && d.getMinutes() < end.minute)) && 
-                     (d.getDay() === start.day) ) {
+            if (today >= begin && today <= finish) {
+              var start = intCheckFormat(found_class[0].interval.start)
+                  , end = intCheckFormat(found_class[0].interval.end);
+              if (end.day > start.day) {
+                // End comes after start; make sure d falls in between them
+                console.log('end.day > start.day');
+                if ( (d.getDay() > start.day && d.getDay()<end.day) || 
+                     (d.getHours() >= start.hour && d.getMinutes() >= start.minute && d.getDay() === start.day) ||
+                     (d.getHours() <= end.hour && d.getMinutes() <= end.minute && d.getDay() === end.day)) {
                   return next()
                 }
                 else { res.redirect('/reject') }
               }
-              else if (end.hour < start.hour) {
-                console.log('end.hour < start.hour');
-                // The end hour comes before the start hour; check outside the times
-                if ( (d.getDay() === start.day && ((d.getHours() >= start.hour && d.getMinutes() >= start.minute) || (d.getHours() <= end.hour && d.getMinutes() <= end.minute)) ) ||
-                     (d.getDay() !== start.day) ) {
+              else if (end.day < start.day) {
+                console.log('end.day < start.day');
+                // End comes earlier in week than start; make sure d falls outside of them
+                if ( (d.getDay() > start.day || d.getDay() < end.day) ||
+                     (d.getHours() >= start.hour && d.getMinutes() >= start.minute && d.getDay() === start.day) ||
+                     (d.getHours() <= end.hour && d.getMinutes() <= end.minute && d.getDay() === end.day) ) {
                   return next()
                 }
                 else { res.redirect('/reject') }
               }
-              else if (end.hour === start.hour) {
-                console.log('end.hour === start.hour');
-                // Interval starts/ends in the same hour of the same day... wut.
-                if (end.minute > start.minute) {
-                  console.log('end.minute > start.minute');
-                  // End after start; check between
-                  if ( (d.getMinutes() >= start.minute && d.getMinutes() <= end.minute) &&
-                       start.day === d.getDay() && start.hour === d.getHours() ) {
+              else if (end.day===start.day) {
+                console.log('end.day === start.day');
+                // The end day is the same as the start day; check start/end times to see if we check between or outside
+                if (end.hour > start.hour) {
+                  console.log('end.hour > start.hour');
+                  // The end hour comes after the start hour; check in between times
+                  if ( (d.getHours() > start.hour || ( d.getHours() === start.hour && d.getMinutes() >= start.minute)) &&
+                       (d.getHours() < end.hour || (d.getHours() === end.hour && d.getMinutes() < end.minute)) && 
+                       (d.getDay() === start.day) ) {
                     return next()
                   }
                   else { res.redirect('/reject') }
                 }
-                else if (end.minute < start.minute) {
-                  console.log('end.minute < start.minute');
-                  // End before start; reject between
-                  if ( (d.getMinutes() < start.minute && d.getMinutes() > end.minute) &&
-                       start.day === d.getDay() && start.hour === d.getHours() ) {
-                    res.redirect('/reject')
+                else if (end.hour < start.hour) {
+                  console.log('end.hour < start.hour');
+                  // The end hour comes before the start hour; check outside the times
+                  if ( (d.getDay() === start.day && ((d.getHours() >= start.hour && d.getMinutes() >= start.minute) || (d.getHours() <= end.hour && d.getMinutes() <= end.minute)) ) ||
+                       (d.getDay() !== start.day) ) {
+                    return next()
                   }
-                  else { return next() }
+                  else { res.redirect('/reject') }
                 }
+                else if (end.hour === start.hour) {
+                  console.log('end.hour === start.hour');
+                  // Interval starts/ends in the same hour of the same day... wut.
+                  if (end.minute > start.minute) {
+                    console.log('end.minute > start.minute');
+                    // End after start; check between
+                    if ( (d.getMinutes() >= start.minute && d.getMinutes() <= end.minute) &&
+                         start.day === d.getDay() && start.hour === d.getHours() ) {
+                      return next()
+                    }
+                    else { res.redirect('/reject') }
+                  }
+                  else if (end.minute < start.minute) {
+                    console.log('end.minute < start.minute');
+                    // End before start; reject between
+                    if ( (d.getMinutes() < start.minute && d.getMinutes() > end.minute) &&
+                         start.day === d.getDay() && start.hour === d.getHours() ) {
+                      res.redirect('/reject')
+                    }
+                    else { return next() }
+                  }
+                }
+              }
+            }
+            else {
+              if (today < begin) {
+                console.log("Before begin");
+                res.redirect('/reject');
+              }
+              else {
+                console.log("After finish");
+                res.redirect('/reject')
               }
             }
           }
           else {
-            if (today < begin) {
-              console.log("Before begin");
-              res.redirect('/reject');
-            }
-            else {
-              console.log("After finish");
-              res.redirect('/reject')
-            }
+            res.redirect('/');
           }
-        }
       })
     }  
   })
@@ -427,4 +431,3 @@ app.post('/user/create', function(req, res, next) {
     });
   });
 })
-
