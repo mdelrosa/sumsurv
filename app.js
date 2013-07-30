@@ -234,7 +234,7 @@ function ensureDate(req, res, next) {
       Classroom.find({ name: req.params.class, owner: found_user[0].id }).exec(function(err, found_class) {
         if(err) { console.log('ensureDate class search error:', err); return false }
         else {
-          if (found_class.length > 0) {
+            if(found_class.length > 0) {
             var today = new Date
                 , span = found_class[0].span
                 , begin = new Date(span.start.year, span.start.month, span.start.date)
@@ -325,6 +325,7 @@ function ensureDate(req, res, next) {
           else {
             res.redirect('/');
           }
+        } 
       })
     }  
   })
@@ -431,3 +432,4 @@ app.post('/user/create', function(req, res, next) {
     });
   });
 })
+
