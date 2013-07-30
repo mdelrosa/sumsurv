@@ -28,7 +28,7 @@ exports.decklist = function(req, res) {
 					var oldDate = found_class[i].maildeck.regular
 					oldDate.setDate(oldDate.getDate()+7);
 					update.push(found_class[i]._id);
-					var urllink = req.headers.host + "/" + encodeURIComponent(found_class[i].owner.username).toString() + "/" + encodeURIComponent(found_class[i].name).toString() + "/take"
+					var urllink = "http://" + req.headers.host + "/" + encodeURIComponent(found_class[i].owner.username).toString() + "/" + encodeURIComponent(found_class[i].name).toString() + "/take"
 					surveymail(found_class[i].roster, urllink);
 				}
 			}

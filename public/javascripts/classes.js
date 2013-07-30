@@ -448,7 +448,6 @@ $(document).ready(function() {
 	});
 	
 	var activateImport = function() {
-		console.log("activate!");
 		if(isAPIAvailable()) {
 	      $('#files').bind('change', handleFileSelect);
 	    }
@@ -471,9 +470,7 @@ $(document).ready(function() {
 	    // read the file metadata
 	      var output = ''
 	          output += '<span style="font-weight:bold;">' + escape(file.name) + '</span><br />\n';
-    	  console.log("activate!2");
 	      arrayafy(file);
-
 	    } 
 
 	    //saves the file into an array
