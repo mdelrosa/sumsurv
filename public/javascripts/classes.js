@@ -158,12 +158,13 @@ $(document).ready(function() {
 			var date = $('.span-day').val()
 			, month = $('.span-month').val()-1
 			, year = $('.span-year').val()
-			console.log(date.toString()+'/'+month.toString()+'/'+year.toString());
+			, n = { date: date, month: month, year: year };
 			$.post('/class/span/edit', { editing: editing, name: name, n: n }, function(res) {
 				if (res.err) { console.log("Class span edit error:", req.err); return false }
 				else {
 					if (res.success) {
 						$('.span-'+editing).html((month+1).toString()+'/'+date.toString()+'/'+year.toString())
+						$('.popper').popover('hide');
 					}
 				}
 			})

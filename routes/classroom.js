@@ -160,7 +160,7 @@ exports.edit_span = function(req, res) {
 					else {
 						console.log("start:", req.body.n);
 						var n = req.body.n
-							, intStart = 																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																							found_class[0].interval.start
+							, intStart = found_class[0].interval.start
 							, date = new Date(n.year, n.month, n.date )
 							, intDay = (parseInt(intStart.day) === 7) ? 0 : parseInt(intStart.day)
 							, spanDay = date.getDay()
