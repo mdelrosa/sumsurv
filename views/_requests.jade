@@ -1,0 +1,18 @@
+//- _requests.jade
+//- partial displaying all requests in class
+
+table.table-condensed.table-striped.table-requests
+	if requests.length
+		for request in requests
+			if (request.type === "add")
+				tr
+					td
+						p(name=request.userID)  #{request.type} #{request.username} to class?
+					td
+						a.label.label-success.add-action(name="accept")
+							i.icon-ok-sign.icon-white
+					td
+						a.label.label-important.add-action(name="deny")
+							i.icon-remove-circle.icon-white
+	else
+		h5.text-center No new requests!

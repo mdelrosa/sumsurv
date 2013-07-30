@@ -7,18 +7,47 @@ block scripts
 	script(type='text/javascript', src='/javascripts/participating.js')
 
 block content
-	div.fluid-row.pad
-		if (classes.length)
-			for room in classes
-				div.span3.outline.text-center
-					h3 #{room.name}
-					img.about-img(src="paperbig.png")
-					a.btn.btn-info.margin(href='/'+room.owner.username+'/'+room.name+'/take') Take Survey
-		else
-			div.span3.outline.text-center
-				h3 Sorry!
-				img.about-img(src="error.png", title="'Now you're just a potoo I used to know'" )
-				p.margin You are not on any class rosters!
+	div.row-fluid.pad
+		div.span3.pad.outline#user-info
+			h4 #{user}'s Information
+			label Gender
+			if (!info || !info.gender)
+				div.input-append
+					select#appendedInput
+						option(value="Male") Male
+						option(value="Female") Female
+						option(value="Other") Other
+						option(value="N/A") Care not to specify
+					a.btn.add-on#gender Ok!
+			else
+				a.edit-info#gender #{info.gender}
+			label.pad-top Year
+			if (!info || !info.year)
+				div.input-append
+					select#appendedInput
+						option(value="First-year") First-year
+						option(value="Sophomore") Sophomore
+						option(value="Junior") Junior
+						option(value="Senior") Senior
+					a.btn.add-on#year Ok!
+			else
+				a.edit-info#year #{info.year}
+			div.pad-top
+				a.btn.btn-mini.btn-info(data-toggle="tooltip", title data-original-title="This information will be used by researchers to identify your demographic. Your username, email address, and other personal information will not be associated with your responses.") Who Sees This?
+		div.span9.outline.pad
+			p.lead You are participating in:
+			div.row-fluid
+				if (classes.length)
+					for room in classes
+						div.span3.outline.text-center
+							h3 #{room.name}
+							img#class-img(src="paperbig.png")
+							a.btn.btn-info.margin(href='/'+room.owner.username+'/'+room.name+'/take') Take Survey
+				else
+					div.span3.outline.text-center
+						h3 Sorry!
+						img#class-img(src="error.png", title="'Now you're just a potoo I used to know'" )
+						p.margin You are not on any class rosters!
 
-	- var html = "<script>var width = $('img.about-img').width(); $('img.about-img').css({'height':width+'px'})</script>"
-	| !{html}
+			- var html = "<script>var width = $('img.about-img').width(); $('img.about-img').css({'height':width+'px'})</script>"
+			| !{html}

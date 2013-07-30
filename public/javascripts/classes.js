@@ -3,9 +3,205 @@
 
 $(document).ready(function() {
 
+	// Handle request popover
+	var activateRequest = function(name) {
+		$('button.requests').popover({trigger: 'click', html: true, placement: 'bottom', callback: popoverDismiss()});
+		$('button.requests').click(function() {
+			$('div.requests').html('<div class="progress progress-striped active">'+
+			   '<div class="bar" style="width: 100%;"></div>'+
+			   '</div>')
+			$.get('/class/requests', { name: name }, function(data) {
+				if(data.err) { console.log("Error in class requests:", data.err) }
+				else {
+					$('div.requests').html(data);
+					$('.add-action').click(function() {
+						var classID = $(this).parent().prev().children('p').attr('name')
+							, $clicked = $(this);
+						if ($clicked.attr('name') === "accept") {
+							$.post('/class/roster/add', { userID: classID, className: name }, function(res) {
+								if(res.err) {console.log("Class roster add error:", res.err); return false}
+								else {
+									if (res.success) {
+										// create a deffered object
+										var $dfd = $.Deferred()
+											, remover = function(n) {
+												n.remove("tr");
+											}
+											, roster = function(n) {
+												$('table#table-roster').append('<tr><td>'+res.email+'</td><td><button class="btn btn-small btn-remove"><i class="icon-minus"></i> Remove</button></td></tr>');
+												var reqNum = $('.table-requests tbody').children().length;
+												if(reqNum === 0) {
+													$('button.requests').popover('hide');
+													$('button.requests').html('<i class="icon-globe"></i>  No Requests').toggleClass('btn-inverse');
+												}
+												else {
+													word = (reqNum) ? " Request" : " Requests";
+													$('button.requests').html('<i class="icon-globe icon-inverse"></i>  '+reqNum.toString()+word);
+												}
+											};
+										$dfd.done(remover).done(roster);
+										// ensure that tablecheck is performed after element is removed
+										$clicked.parents("tr").fadeOut('fast', function() {
+											$dfd.resolve(this);
+										})
+									}
+								}
+							});
+						}
+					});
+				}
+			});
+		});
+	}
+
+	// Activate class deletion button and render appropriate html
+	var setDeleteClass = function(name) {
+		$('#class-delete').click(function() {
+			$.post('/class/delete', {name: name}, function(res) {
+				if(res.err) { console.log("Class delete error: ", res.err); return false }
+				else if (res.success) {
+					$('.roster').slideUp(function() {
+						$(this).html('<h3 class="text-center"> Roster</h3>').slideDown('fast');
+					});
+					$('.survey').slideUp(function() {
+						$(this).html('<h3 class="text-center"> Survey</h3>').slideDown('fast');
+					});
+					$('#class-header').fadeOut('fast', function() {
+						$('#class-header').html("<h2 class='span6'> Current Class</h2>"+
+												"<div class='offset1 span4 alert alert-success margin'>"+
+												"<button type='button' class='close' data-dismiss='alert'>&times;"+
+												"</button><strong> " + name + " </strong>"+
+												"was deleted!</div>").fadeIn('fast');
+
+					});
+					$.get('/class/all', function(data) {
+						if(data.err) { console.log("Unable to load all classes.") }
+						else {
+							$(".class-container").fadeOut("fast", function() {
+								$(this).html(data).fadeIn("fast", function() {
+									activateEdit();
+								});
+							})
+						}
+					});
+				}
+				else {
+					$('#class-current').append("<div class='alert alert-success margin'>"+
+											"<button type='button' class='close' data-dismiss='alert'>&times;"+
+											"</button><strong> " + name + " </strong>"+
+											"could not be deleted!</div>");
+
+				}
+			})
+		});
+	}
+
+	// Activate set interval submission in popover
+	var setDaySquare = function(name, editing) {
+		var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+			, editingDay = null;
+		$('.btn-interval').click(function() {
+			var interval = {day: $('#select-day :selected').val(), hour: $('.hour-select :selected').val(), minute: $('.minute-select :selected').val(), time: $('.ampm-select :selected').val()};
+			if (editing === "start") {
+				$.post('/class/interval', { start: interval, className: name }, function(res) {
+					if(res.err) { console.log("Class interval error: ", res.err); return false}
+					else if (res.success) {
+						$('.change-start').html(days[interval.day-1] + " @ " + interval.hour + ":" +interval.minute + " " + interval.time);
+						return false
+					} 
+					else {
+						console.log("Unable to save new start date");
+						return false
+					}
+				});
+			}
+			else if (editing === "end") {
+				$.post('/class/interval', { end: interval, className: name }, function(res) {
+					if(res.err) { console.log("Class interval error: ", res.err); return false}
+					else if (res.success) {
+						$('.change-end').html(days[interval.day-1] + " @ " + interval.hour + ":" +interval.minute + " " + interval.time);
+						return false
+					} 
+					else {
+						console.log("Unable to save new end date");
+						return false
+					}
+				});
+			}
+			$('a').popover('hide');
+		});
+	}
+
+	// Change interval start/end days
+	var setDate = function(name) {
+		$('a').popover({trigger: 'click', html: true, placement: 'bottom', callback: popoverDismiss()});
+		var editing = null
+			, editingDay = null;
+		$('.change-start').click(function() {
+			editing = "start";
+			setDaySquare(name, editing);
+		});
+		$('.change-end').click(function() {
+			editing = "end";
+			setDaySquare(name, editing);
+		});
+	}
+
+	// Activate set interval submission in popover
+	var setSpanSquare = function(name, editing) {
+		var d = new Date();
+		$('.span-day').val(d.getDate());
+		$('.span-month').val(d.getMonth()+1);
+		$('.span-year').val(d.getFullYear());
+
+		$('a.btn-span').click(function() {
+			var date = $('.span-day').val()
+			, month = $('.span-month').val()-1
+			, year = $('.span-year').val()
+			, n = { date: date, month: month, year: year }
+			console.log(date.toString()+'/'+month.toString()+'/'+year.toString());
+			$.post('/class/span/edit', { editing: editing, name: name, n: n }, function(res) {
+				if (res.err) { console.log("Class span edit error:", req.err); return false }
+				else {
+					if (res.success) {
+						console.log("yay");
+						$('.span-'+editing).html((month+1).toString()+'/'+date.toString()+'/'+year.toString())
+					}
+				}
+			})
+		})
+	}
+
+	// Change span start/end days
+	var setSpanDate = function(name) {
+		$('a').popover({trigger: 'click', html: true, placement: 'bottom', callback: popoverDismiss()});
+		var editing = null
+			, editingDay = null;
+		$('.span-start').click(function() {
+			editing = "start";
+			$.get('/class/span/view', { editing: editing, name: name }, function(data) {
+				if (data.err) {console.log("Class span view error:", data.err); return false}
+				else {
+					$('.popover-content').html(data);
+					setSpanSquare(name, editing);
+				}
+			})
+		});
+		$('.span-end').click(function() {
+			editing = "end";
+			$.get('/class/span/view', { editing: editing, name: name }, function(data) {
+				if (data.err) {console.log("Class span view error:", data.err); return false}
+				else {
+					$('.popover-content').html(data);
+					setSpanSquare(name, editing);
+				}
+			})
+		});
+	}
+
 	// handle popover dismissal
 	var popoverDismiss = function() {
-		$('body').click('on', function(e) {		$('.popper').each(function() {
+		$('body').click('on', function(e) { $('.popper').each(function() {
 				if(!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
 					$(this).popover('hide');
 				}
@@ -16,6 +212,10 @@ $(document).ready(function() {
 	// change roster/survey div
 	var setClassDiv = function(name) {
 		// Render current class' roster/survey
+		$('#class-header').fadeOut('fast', function() {
+			$(this).html('<h2 class="span6"> ' + name + '</h2><div class="span6 btn-group pull-right"><a class="btn btn-info" href="/class/export?className='+name+'">Export Data </a><a class="btn btn-danger" id="class-delete"> Delete Class</a></div>').fadeIn('fast');
+			setDeleteClass(name)
+		});
 		$.get('/class/roster', { className: name }, function(data) {
 			if(data.err) { console.log("Unable to fetch roster.") }
 			else {
@@ -36,6 +236,7 @@ $(document).ready(function() {
 						});
 					});
 					activateRosterEdit();
+					activateRequest(name);
 					sendemail();
 				})
 			}
@@ -51,12 +252,16 @@ $(document).ready(function() {
 							if(res.err) { console.log("Unable to update class survey: ", res.err); return false}
 							else {
 								if(res.success) {
-									// Success stuff
+									$('h4#surv-name').fadeOut('fast', function() {
+										$(this).html(selectedSurv).fadeIn('fast');
+									});
 								}
 							}
 						});
 					});
 					$('.response-square').tooltip({html: true, placement: 'top', trigger: 'hover'});
+					setDate(name);
+					setSpanDate(name);
 				})
 			}
 		});
@@ -149,7 +354,6 @@ $(document).ready(function() {
 			});
 		});
 	}
-
 
 	// Activate jquery for importing roster
 	var activateImport = function() {
@@ -284,26 +488,9 @@ $(document).ready(function() {
 	        console.log("data: ", data);
 	        console.log("csv: ", csv);
 	        $('textarea').html(csv);   
-	  //      var html = '';
-	  //      var n = 0;
-	  //      for(var row in data) {
-	  //        html += + data[n] + ;
-	  //        n += 1;
-	  //      }
-	  //      $('#contents').html(html);
-	         // $.post('/import', {emailarray: data}, function(res) {
-	  //        if(res.err) {console.log("Unable to save your response."); return false}
-	  //       else {
-	  //          // display success alert
-	  //          $('#main-container').append("<div class='alert alert-success'>"+
-	  //                        "<button type='button' class='close' data-dismiss='alert'>&times;"+
-	  //                        "</button><strong>Your file has been uploaded </strong></div>");
-	  //       }
-	         // })
 	      }
 
 	    }
 	}  
-
 
 });
