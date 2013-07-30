@@ -47,7 +47,8 @@ var classroomSchema = mongoose.Schema({
 	interval: { type: Object, required: true},
 	span: { type: Object },
 	requests: { type: Array },
-	checker: { type: Array}
+	checker: { type: Array },
+	maildeck: { type: Object }
 }),
 	Classroom = mongoose.model('Classroom', classroomSchema);
 exports.classroom = Classroom;

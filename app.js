@@ -129,6 +129,8 @@ app.get('/error', user.error);
 
 // Mail routes
 app.get('/mail/send', mail.test_mail);
+app.get('/mail/list', mail.list);
+app.get('/mail/decklist', mail.decklist);
 
 // user routes
 app.get('/login', user.login);
