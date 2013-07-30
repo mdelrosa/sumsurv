@@ -158,13 +158,11 @@ $(document).ready(function() {
 			var date = $('.span-day').val()
 			, month = $('.span-month').val()-1
 			, year = $('.span-year').val()
-			, n = { date: date, month: month, year: year }
 			console.log(date.toString()+'/'+month.toString()+'/'+year.toString());
 			$.post('/class/span/edit', { editing: editing, name: name, n: n }, function(res) {
 				if (res.err) { console.log("Class span edit error:", req.err); return false }
 				else {
 					if (res.success) {
-						console.log("yay");
 						$('.span-'+editing).html((month+1).toString()+'/'+date.toString()+'/'+year.toString())
 					}
 				}

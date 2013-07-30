@@ -15,7 +15,7 @@ exports.list = function(req, res) {
 
 exports.decklist = function(req, res) {
 	// -- We would like something that will require auth between the GAE server and this node server
-	console.log("req.header:",req.headers);
+	console.log("req.headers.host:",req.headers.host);
 	Classroom.find({}).populate('owner').exec(function(err, found_class) {
 		if(err) { console.log("Decklist class error:", err); res.send({ success: false })}
 		else {
@@ -28,7 +28,7 @@ exports.decklist = function(req, res) {
 					var oldDate = found_class[i].maildeck.regular
 					oldDate.setDate(oldDate.getDate()+7);
 					update.push(found_class[i]._id);
-					var urllink = "localhost:3000/" + encodeURIComponent(found_class[i].owner.username).toString() + "/" + encodeURIComponent(found_class[i].name).toString() + "/take"
+					var urllink = req.headers.host + "/" + encodeURIComponent(found_class[i].owner.username).toString() + "/" + encodeURIComponent(found_class[i].name).toString() + "/take"
 					surveymail(found_class[i].roster, urllink);
 				}
 			}
