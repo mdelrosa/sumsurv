@@ -4,12 +4,34 @@ $(document).ready(function() {
 
 	// handle popover dismissal
 	var popoverDismiss = function() {
-		$('body').click('on', function(e) {		$('.popper').each(function() {
+		$('body').click('on', function(e) {		
+			$('.popper').each(function() {
 				if(!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
 					$(this).popover('hide');
 				}
 			})
 		})
+	}
+
+	var activateOverview = function() {
+
+		$('.overview-link').click(function() {
+
+			var survID = $(this).attr('name')
+				, survName = $(this).parent().prev().html();
+			console.log('survName:', survName);
+			$.get('/survey/deployed', { survName: survName, survey: survID }, function(data) {
+				if(data.err) { console.log("Survey classes error: ", data.err); return false}
+				else {
+					$('.create-container').fadeOut('fast', function() {
+						$('.page-name').empty();
+						$('.page-type').empty();
+						$(this).html(data).fadeIn('fast', function() {});
+					});
+				}	
+			})
+		})
+
 	}
 
 	// activate jquery functions on edit buttons
@@ -54,6 +76,9 @@ $(document).ready(function() {
 	// initialize page adding button
 	var pageAdd = function() {
 		$('.add-page').click(function() {
+			$('.create-container').fadeOut('fast', function() {
+				$(this).empty();
+			});
 			$('.page-name').html('<div class="form-inline name-input"><input class="input-small" type="text" placeholder="Page Name"></input><button class="btn btn-pagename"><i class="icon-check"></i> Enter</button></div>').fadeIn("fast");
 			$('.page-type').html('<div class="form-inline"><select><option>Multiple Choice</option><option>Radio Scale</option><option>Text</option></select><button class="btn btn-pageinfo"><i class="icon-check"></i> Enter</button></div>')
 		})
@@ -64,6 +89,7 @@ $(document).ready(function() {
 	}
 
 	activateEdit();
+	activateOverview();
 
 	// initialize new-survey popover
 	$('.btn-new').popover({trigger: 'click', html: true, placement: 'right', callback: popoverDismiss()});
@@ -124,8 +150,8 @@ $(document).ready(function() {
 		});
 	});
 
-	$('.btn-pagename').click(function() {
-		$()
-	});
+	// $('.btn-pagename').click(function() {
+	// 	$()
+	// });
 
 });

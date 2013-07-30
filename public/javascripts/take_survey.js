@@ -2,6 +2,25 @@
 
 $(document).ready(function() {
 
+	$('body').click(function() {
+		var checkDirty = checkInputs()
+			, check = checkDirty[0]
+			, num = 0;
+		for (i=0;i<check.length-1;i++) {
+			if(check[i]!==undefined) {
+				num = num + 1;
+			}
+		}
+		var percent = num/(check.length-1)*100;
+		if(percent!==100) {
+			$('.bar').css('width', percent.toString()+"%");
+		}
+		else {
+			$('.bar').css('width', "100%");
+			$('.progress').addClass('progress-success').removeClass('active');
+		}
+	});
+
 	// Handle tab switching
 	$('#myTab li a').click(function (e) {
 	  e.preventDefault();
@@ -30,8 +49,7 @@ $(document).ready(function() {
 
 		var resultsArray = checkInputs(),
 			results = resultsArray[0],
-			$demoQuest = resultsArray[1][0],
-			$radioQuest = resultsArray[1][2];
+			$radioQuest = resultsArray[1][1];
 
 		if (results.indexOf(undefined) > -1) {
 			// survey was not completed, notify user
@@ -43,17 +61,12 @@ $(document).ready(function() {
 			// Highlight unanswered questions
 			var unanswered = findAllOccurrences(undefined, results)
 				, highlightTabId = [];
-			console.log(unanswered)
 			for (i=0;i<unanswered.length;i++) {
-				if (unanswered[i] < $demoQuest.length) {
-					$('div.table-question table').children().toggleClass('warning', 250);
-					highlightTabId.push('demographic');
-				}
-				else if (unanswered[i] < $demoQuest.length + 1){
+				if (unanswered[i] === 0) {
 					highlightTabId.push('status');
 				}
-				else if (unanswered[i] < $demoQuest.length + 1 + $radioQuest.length) {
-					$('tr#question'+(unanswered[i]-$demoQuest.length).toString()).toggleClass('warning', 250);
+				else if (unanswered[i] <= $radioQuest.length) {
+					$('tr#question'+unanswered[i].toString()).toggleClass('warning', 250);
 					highlightTabId.push('questions');
 				}
 				else {
@@ -81,12 +94,14 @@ $(document).ready(function() {
 				, info = new Object();
 			info["owner"] = $('span#owner').attr('name');
 			info["className"] = $('span#className').attr('name');
+			// Grab demographic info
+			var demo = new Array;
+			demo[0] = $('#demo #gender').attr('name');
+			demo[1] = $('#demo #year').attr('name');
 			// survey was completed, post survey
-			console.log(info);
-			$.post('/survey/success', {results: results, date: date, info: info, time: time}, function(res) {
+			$.post('/survey/success', {results: demo.concat(results), date: date, info: info, time: time}, function(res) {
 				if(res.err) {console.log("Unable to save your response."); return false}
 				else {
-
 					// collapse form
 					$('#survey-container').slideUp(function() {
 						// display success alert
@@ -137,30 +152,14 @@ $(document).ready(function() {
 
 	// Check all inputs in survey
 	var checkInputs = function() {
-		var $demoQuest = $('div.table-question table')
-		, $statusQuest = $('textarea.status-text')
+		var $statusQuest = $('textarea.status-text')
 		, $radioQuest = $('form tr.question')
 		, $comments = $('textarea.comment-text')
 		, results = new Array
-		, questionArray = [$demoQuest, $statusQuest, $radioQuest, $comments];
+		, questionArray = [$statusQuest, $radioQuest, $comments];
 
 		// ** NOTE: Each of these for loops will most likely become a helper **
 		// ** function once we write the generalized code **
-
-		// Demographic tab
-		for (i=0;i<$demoQuest.length;i++) {
-			// grab demographic responses
-			var answers = $demoQuest[i].getElementsByTagName('input'),
-				res = undefined
-
-			//find checked button in response
-			for (j=0;j<answers.length;j++) {
-				if (answers[j].checked) {
-					res = answers[j].value;
-				}
-			}
-			results.push(res);
-		}
 
 		// Status tab
 		if ($statusQuest.val().length === 0) {

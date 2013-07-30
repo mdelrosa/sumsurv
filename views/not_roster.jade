@@ -3,8 +3,19 @@
 
 extends layout
 
+block scripts
+	script(type='text/javascript', src='/javascripts/notroster.js')
+
 block content
-	div.hero.container
-		div.row-fluid
-			h1 This is not the survey you're looking for.
+	div.row-fluid.container.pad
+		div.span8
+			h2.text-center This is not the survey you're looking for.
 			img(src='http://fogsmoviereviews.files.wordpress.com/2011/09/starwars4_1938.jpg')
+		div.span4.text-center.thumbnail
+			if classID
+				h3 If this is a mistake...
+				p Then request to be added to the class roster!
+				button.btn.btn-block.btn-info(name=classID) Send Request
+			else
+				h3 Were you even looking for a class?
+				p I think not.

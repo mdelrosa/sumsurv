@@ -9,10 +9,16 @@ else
 			th Name
 			th Deployed?
 			th Editing
-		for survey in surveys
+
+		- for (i=0;i<surveys.length;i++) {
 			tr
-				td #{survey.name}
-				td Not deployed
+				td #{surveys[i].name}
+				if (countArr[i] === 0)
+					td Not deployed
+				else
+					td
+						a.overview-link(name=surveys[i].id) #{countArr[i]} Classes
 				td
-					a.edit-link(name=survey.name)
+					a.edit-link(name=surveys[i].name)
 						icon.icon-edit
+		- }

@@ -1,0 +1,37 @@
+//- _span.jade
+//- render partial for displaying span selection controls
+
+form.form-horizontal
+  - var dateObj = new Date
+  if span
+    - var days = new Date(span.year, span.month, 0).getDate();
+  else
+    - var days = new Date(dateObj.getFullYear(), dateObj.getMonth(), 0).getDate()
+    - var span = { year: dateObj.getFullYear() }
+  .control-group
+    .popover-controls.controls
+      .input-append
+        select#appendedInput.popover-select.span-day
+            - for (i=1;i<days+1;i++) {
+              option(val=i) #{i}
+            - }
+        span.add-on Day
+  .control-group
+    .popover-controls.controls
+      .input-append
+        select#appendedInput.popover-select.span-month
+            - for (i=1;i<13;i++) {
+              option(val=i) #{i}
+            - }
+        span.add-on Month
+  .control-group
+    .popover-controls.controls
+      .input-append
+          select#appendedInput.popover-select.span-year
+                - for (i=span.year;i<span.year+5;i++) {
+                  option(val=i) #{i}
+                - }
+          span.add-on Year
+  .control-group
+    .controls
+      a.btn.btn-span Submit

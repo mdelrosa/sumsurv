@@ -1,0 +1,42 @@
+//- _deployed.jade
+//- handle displaying table showing what classes are using this survey
+
+div.form-inline
+	h3.center-text.row-inline-left #{survey} Deployed Classes:
+	a.btn.btn-info.row-inline-right(href="/survey/export/all?survName="+survey) Export All
+div.accordion.clearboth#accordion-prime
+	- for (i=0;i<classes.length;i++) {
+		div.accordion-group
+			div.accordion-heading
+				a.accordion-toggle(data-toggle="collapse", data-parent="#accordion-prime", href="#collapse"+i.toString()) #{classes[i].owner.username}'s #{classes[i].name}
+			div.accordion-body.collapse(id="collapse"+i.toString())
+				div.accordion-inner
+					if (classes[i].roster.length > 1)
+						p This class has #{classes[i].roster.length} students.
+					else if (classes[i].roster.length === 1)
+						p This class has 1 student.
+					else
+						p This class has no students.
+					if (classes[i].responses.length > 1)
+						p This class has #{classes[i].responses.length} responses.
+					else if (classes[i].responses.length === 1)
+						p This class has 1 response.
+					else
+						p This class has no responses.
+					a.btn.btn-info(href='/class/export?className='+classes[i].name+'&user='+classes[i].owner.id) Export Responses
+
+		- }
+//- table.table.table-striped.table-condensed
+//- 	tr
+//- 		th Name
+//- 		th Leader
+//- 		th Roster
+//- 		th Responses
+
+//- 	- for (i=0;i<classes.length;i++) {
+//- 		tr
+//- 			td #{classes[i].name}
+//- 			td #{classes[i].owner.username}
+//- 			td #{classes[i].roster.length}
+//- 			td #{classes[i].responses.length}
+//- 	- }
