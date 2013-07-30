@@ -127,14 +127,19 @@ exports.remove = function(req, res) {
 
 // Render class span selection popover
 exports.view_span = function(req, res) {
-	Classroom.find({owner: req.user.id, name: req.query.name}).exec(function(err, found_class) {
+	Classroom.find({owner: req.user._id, name: req.query.name}).exec(function(err, found_class) {
 		if(err) { console.log("view_requests classroom error:", err); return false}
 		else {
-			if (req.query.editing === "start") {
-				var span = found_class[0].span.start
+			if (found_class.span) {
+				if (req.query.editing === "start") {
+					var span = found_class[0].span.start
+				}
+				else if (req.query.editing === "end") {
+					var span = found_class[0].span.end
+				}
 			}
-			else if (req.query.editing === "end") {
-				var span = found_class[0].span.end
+			else {
+				var span = null;
 			}
 			res.render('_span', {
 				span: span
@@ -266,7 +271,7 @@ exports.part_add = function(req, res) {
 
 // Render survey partial
 exports.survey = function(req, res) {
-	Classroom.find({name: req.query.className, owner: req.user.id}).populate('survey').exec(function(err, found_class) {
+	Classroom.find({name: req.query.className, owner: req.user._id}).populate('survey').exec(function(err, found_class) {
 		if(err) { console.log("Survey error: ", err); return false}
 		else {
 			Response.where('_id').in(found_class[0].responses).populate('participant').exec(function(err2, found_responses) {
