@@ -207,7 +207,6 @@ var surveymail = function(roster, urllink) {
 	    }else{
 	        console.log("Message sent: " + response.message);
 	        smtpTransport.close();
-	        res.send("success");
 	    }
 		    // if you don't want to use this transport object anymore, uncomment following line
 	        // shut down the connection pool, no more messages

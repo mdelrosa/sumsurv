@@ -150,7 +150,7 @@ exports.view_span = function(req, res) {
 
 // Edit class span
 exports.edit_span = function(req, res) {
-	// maildeck initializing stuff goes here
+	// Initialize maildeck on updating the start day
 	if (req.body.editing === "start") {
 		Classroom.update({ owner: req.user.id, name: req.body.name }, { $set: { 'span.start':  req.body.n } }).exec(function(err, num) {
 			if(err || !num) { console.log("edit_span error:", err); return false }
@@ -158,7 +158,6 @@ exports.edit_span = function(req, res) {
 				Classroom.find({ owner: req.user.id, name: req.body.name }).exec(function(err, found_class) {
 					if(err) { console.log("edit_span search error:", err); return false}
 					else {
-						console.log("start:", req.body.n);
 						var n = req.body.n
 							, intStart = found_class[0].interval.start
 							, date = new Date(n.year, n.month, n.date )
@@ -172,9 +171,9 @@ exports.edit_span = function(req, res) {
 						date.setUTCHours(hourUp+4);
 						date.setUTCMinutes(parseInt(intStart.minute));
 						// If we are initializing the span such that it begins before today, set maildeck for next week's int
-						// if (new Date > date) {
-						// 	date.setDate(date.getDate()+7);
-						// }
+						if (new Date > date) {
+							date.setDate(date.getDate()+7);
+						}
 						Classroom.update({ owner: req.user.id, name: req.body.name }, { $set: { 'maildeck.regular': date } }, function(err, num) {
 							if (err || !num) { console.log("Classroom maildeck update err:", err); return false}
 							else {

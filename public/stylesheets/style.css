@@ -509,3 +509,11 @@ input[type='range'] {
   border: 5px dashed #aaaaaa;
   -webkit-transform: scale(1.2);
 }
+
+.no-pad {
+	padding: 0em;
+}
+
+.right-align{
+	float: right;
+}

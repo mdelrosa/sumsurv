@@ -84,7 +84,7 @@ exports.all_surveys = function(req, res) {
 
 // Render partial displaying classes which use this survey
 exports.deployed = function(req, res) {
-    Classroom.find({survey: req.query.survey}).populate('owner').exec(function(err, classroom_db) {
+    Classroom.find({survey: req.query.survey}).populate('responses owner').exec(function(err, classroom_db) {
         if(err) { console.log("Deployed classroom error: ", err); return false}
         else { 
             res.render('_deployed', {
@@ -106,12 +106,77 @@ function checkforid(checker, email) {
     return false;
 }
 
+//checks what week the survey was taken (week1, week2, etc.)
+function whatweek(startDay, startMonth, startYear, endDay, endMonth, endYear) {
+    startMonth = startMonth;
+
+    var startYear = startYear;
+    var startMonth = startMonth;
+    var startDay = startDay;
+
+    endMonth = endMonth - 1;
+
+    var differenceYear = endYear-startYear;
+    var differenceMonth = endMonth - startMonth;
+    var daysInBetween = 0;
+    var monthHolder = 0;
+    var monthsUntilNewYear = 0;
+    var remainderDays = 0;
+    var weeks = 0;
+    var monthsTillNew = 0;
+     
+    var whatDate = function(number){
+        if(number === 0 || number === 2 || number === 4 || number === 6 || number === 7 || number === 9 || number === 11){
+           return 31;    
+        }
+        else if(number === 1) {
+            return 28;    
+        }
+        else if(number === 3 || number === 5 ||  number === 8 || number === 10){
+            return 30;  
+        }
+        else {
+            console.log("Something is wrong in the same year loop");
+        }
+    };  
+
+
+    if(differenceYear === 0){//YEAR IS THE SAME
+        if(differenceMonth === 0){//MONTH IS THE SAME
+            daysInBetween = endDay - startDay;
+        }
+        else{//IF MONTH IS DIFFERENT BUT YEAR IS THE SAME
+            for(i=1; i < differenceMonth; i++){
+                daysInBetween = whatDate(startMonth + i) + daysInBetween;
+            }
+            daysInBetween = whatDate(startMonth) - startDay + daysInBetween;
+            daysInBetween = daysInBetween + endDay;
+        }
+    }
+    else {//YEAR IS DIFFERENT
+        monthsTillNew = 11 - startMonth;
+        for(i=1; i < monthsTillNew + 1; i++){//start to end of year
+            daysInBetween = whatDate(startMonth + i) + daysInBetween;
+        }//beginning of year to end month
+        for(i=0; i < endMonth; i++){
+            daysInBetween = whatDate(i) + daysInBetween;
+        }
+        daysInBetween = whatDate(startMonth) - startDay + daysInBetween;
+        daysInBetween = daysInBetween + endDay;
+    }
+    weeks = daysInBetween / 7;
+    weeks = Math.ceil(weeks);
+    if (weeks === 0){
+        weeks = 1;
+    };
+    return weeks;
+}
+
 // Save an individual response to a survey
 exports.save_response = function(req, res) {
     console.log("req.user", req.user);
     User.find({username: req.body.info.owner}).exec(function(err, found_user) {
         if(err) {console.log("Error in save_response user search: ", err); return false}
-        
         Classroom.find({name: req.body.info.className, owner: found_user[0].id}).exec(function(err2, found_class) {
         	if(err2) {console.log("Error in save_response classroom search: ", err2); return false}        
             var checker = found_class[0].checker
@@ -123,7 +188,8 @@ exports.save_response = function(req, res) {
                     date: req.body.date,
                     time: req.body.time,
                     classroom: found_class[0].id,
-                    userid: found_class[0].checker[checknum][req.user.email]
+                    userid: found_class[0].checker[checknum][req.user.email],
+                    responseweek: whatweek(parseInt(found_class[0].span.start.date), parseInt(found_class[0].span.start.month), parseInt(found_class[0].span.start.year), parseInt(req.body.date.date), parseInt(req.body.date.month), parseInt(req.body.date.year))
                 });   
                 responsesaver(new_response);  
             }
@@ -140,7 +206,8 @@ exports.save_response = function(req, res) {
                                 date: req.body.date,
                                 time: req.body.time,
                                 classroom: found_class[0].id,
-                                userid: 1
+                                userid: 1,
+                                responseweek: whatweek(parseInt(found_class[0].span.start.date), parseInt(found_class[0].span.start.month), parseInt(found_class[0].span.start.year), parseInt(req.body.date.date), parseInt(req.body.date.month), parseInt(req.body.date.year))
                             });     
                             responsesaver(new_response);
                         }
@@ -159,7 +226,8 @@ exports.save_response = function(req, res) {
                                 date: req.body.date,
                                 time: req.body.time,
                                 classroom: found_class[0].id,
-                                userid: newid
+                                userid: newid,
+                                responseweek: whatweek(parseInt(found_class[0].span.start.date), parseInt(found_class[0].span.start.month), parseInt(found_class[0].span.start.year), parseInt(req.body.date.date), parseInt(req.body.date.month), parseInt(req.body.date.year))
                             });     
                             responsesaver(new_response);
                         }
@@ -215,7 +283,7 @@ exports.export = function(req, res) {
             Response.find({classroom: found_class[0].id}).populate('participant').exec(function(err2, response_db) {
             	if(err2) {console.log("Error in response export: ", err2); return false}
                 else {
-                    var csvstr = [' , Id, Gender, Year, Status, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Comment, Answer Date, Time'];    	
+                    var csvstr = [' , Id, Response Week, Gender, Year, Status, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Comment, Answer Date, Time'];    	
                 	var answerdate = "";
                     var answertime = ";"
                     for(i=1; i < response_db.length+1; i++) {
@@ -226,7 +294,7 @@ exports.export = function(req, res) {
                         answerdate = response_db[i-1].date.month.toString() + "/" + response_db[i-1].date.date.toString() + "/" + response_db[i-1].date.year.toString();
                         answertime = response_db[i-1].time.hour.toString() + ":" + response_db[i-1].time.minutes.toString() + ":" + response_db[i-1].time.seconds.toString();
                         //This just turns the array into a string with comma separated values.
-            			csvstr[i] = " ," + response_db[i-1].userid + "," + response_db[i-1].results.join(",") +","+ answerdate +  "," + answertime + ", ";
+            			csvstr[i] = " ," + response_db[i-1].userid + "," + response_db[i-1].responseweek + "," + response_db[i-1].results.join(",") +","+ answerdate +  "," + answertime + ", ";
             		}
                     res.header('Content-type', 'text/csv');
                     res.send(csvstr);
@@ -247,7 +315,7 @@ exports.export_survey_all = function(req, res) {
                     for (i=0;i<found_class.length;i++) {
                         response_db = response_db.concat(found_class[i].responses);
                     }
-                    var csvstr = [' , Id, Gender, Year, Status, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Comment, Answer Date, Time'];        
+                    var csvstr = [' , Id, Response Week, Gender, Year, Status, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Comment, Answer Date, Time'];        
                     var answerdate = "";
                     var answertime = ";"
                     for(i=1; i < response_db.length+1; i++) {
@@ -258,7 +326,7 @@ exports.export_survey_all = function(req, res) {
                         answerdate = response_db[i-1].date.month.toString() + "/" + response_db[i-1].date.date.toString() + "/" + response_db[i-1].date.year.toString();
                         answertime = response_db[i-1].time.hour.toString() + ":" + response_db[i-1].time.minutes.toString() + ":" + response_db[i-1].time.seconds.toString();
                         //This just turns the array into a string with comma separated values.
-                        csvstr[i] = " ," + response_db[i-1].userid + "," + response_db[i-1].results.join(",") +","+ answerdate +  "," + answertime + ", ";
+                        csvstr[i] = " ," + response_db[i-1].userid + "," + response_db[i-1].responseweek + "," + response_db[i-1].results.join(",") +","+ answerdate +  "," + answertime + ", ";
                     }
                     res.header('Content-type', 'text/csv');
                     res.send(csvstr);
@@ -267,6 +335,41 @@ exports.export_survey_all = function(req, res) {
         }
     });
 }
+
+exports.export_weeks = function(req, res) {
+    var owner = (req.query.user) ? req.query.user : req.user.id;
+    var weeks = req.query.weeksarray.split(",");
+    for(k=0; k<weeks.length; k++){
+        weeks[k] = parseInt(weeks[k]);
+    }
+    var classid = req.query.classid;
+        console.log("weeks on survey.js ", weeks);
+        console.log("classid on survey.js ", classid);
+        Response.find({classroom: classid}).populate('responses').exec(function(err, found_class) {
+            if(err) {console.log("Error in export_survey_all classroom:", err); return false}
+            else {
+                var csvstr = [' , Id, Response Week, Gender, Year, Status, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Comment, Answer Date, Time'];        
+                var answerdate = "";
+                var answertime = ";"
+                for(i=1; i < found_class.length+1; i++) {
+                    for(j=0; j<weeks.length; j++) {
+                        if(found_class[i-1].responseweek === weeks[j]){
+                            //These two lines decommafy the written responses
+                            found_class[i-1].results[2] = decommafy(found_class[i-1].results[2]);
+                            found_class[i-1].results[19] = decommafy(found_class[i-1].results[19]);
+                            //takes the date the survey was taken and converts it to a x/x/xxxx format in string.
+                            answerdate = found_class[i-1].date.month.toString() + "/" + found_class[i-1].date.date.toString() + "/" + found_class[i-1].date.year.toString();
+                            answertime = found_class[i-1].time.hour.toString() + ":" + found_class[i-1].time.minutes.toString() + ":" + found_class[i-1].time.seconds.toString();
+                            //This just turns the array into a string with comma separated values.
+                            csvstr[i] = " ," + found_class[i-1].userid + "," + found_class[i-1].responseweek + "," + found_class[i-1].results.join(",") +","+ answerdate +  "," + answertime + ", ";
+                        }
+                    }
+                }
+                res.header('Content-type', 'text/csv');
+                res.send(csvstr);
+            }
+        });
+};
 
 exports.import = function(req, res) {
     Emaillist.find().exec(function(err, emaillist_db) {

@@ -26,12 +26,36 @@ $(document).ready(function() {
 					$('.create-container').fadeOut('fast', function() {
 						$('.page-name').empty();
 						$('.page-type').empty();
-						$(this).html(data).fadeIn('fast', function() {});
+						$(this).html(data).fadeIn('fast', function() {
+							var ids = [];
+							$('.btn.btn-small.btn-inverse.right-align').click(function(){
+								var currentid = $(this).attr('id')
+								ids.push(currentid);
+								ids = ids.getUnique();
+								$('.comment-text').html(ids.join(","));
+								$('.weeksdata').attr('href', '/survey/export/weeks?weeksarray='+$('.comment-text').val()+'&classid=' +$('.comment-text').attr('name'));
+							})
+							$('.comment-text').on('keyup', function() {
+								$('.weeksdata').attr('href', '/survey/export/weeks?weeksarray='+$('.comment-text').val()+'&classid=' +$('.comment-text').attr('name'));
+							})
+						});
 					});
 				}	
 			})
 		})
 
+	}
+
+	Array.prototype.getUnique = function(){
+		var u = {}, a = [];
+	    for(var i = 0, l = this.length; i < l; ++i){
+	      	if(u.hasOwnProperty(this[i])) {
+	         	continue;
+	      	}
+	        a.push(this[i]);
+	        u[this[i]] = 1;
+	   }
+	   return a;
 	}
 
 	// activate jquery functions on edit buttons

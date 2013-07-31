@@ -2,7 +2,6 @@
 // Handle class editing/creation
 
 $(document).ready(function() {
-
 	// Handle request popover
 	var activateRequest = function(name) {
 		$('button.requests').popover({trigger: 'click', html: true, placement: 'bottom', callback: popoverDismiss()});
@@ -147,55 +146,46 @@ $(document).ready(function() {
 		});
 	}
 
-	// Activate set interval submission in popover
-	var setSpanSquare = function(name, editing) {
+	// Activate set interval submission in popover (this is span)
+	var setSpanSquare = function(name) {
+		//var editing = ($('a.btn.add-on.btn-inverse').attr('id') === 'startspan') ? "start" : "end";
 		var d = new Date();
 		$('.span-day').val(d.getDate());
 		$('.span-month').val(d.getMonth()+1);
 		$('.span-year').val(d.getFullYear());
-
-		$('a.btn-span').click(function() {
-			var date = $('.span-day').val()
-			, month = $('.span-month').val()-1
-			, year = $('.span-year').val()
-			, n = { date: date, month: month, year: year };
-			$.post('/class/span/edit', { editing: editing, name: name, n: n }, function(res) {
-				if (res.err) { console.log("Class span edit error:", req.err); return false }
-				else {
-					if (res.success) {
-						$('.span-'+editing).html((month+1).toString()+'/'+date.toString()+'/'+year.toString())
-						$('.popper').popover('hide');
-					}
-				}
-			})
-		})
+		setDatePicker(name);
 	}
 
+	var setDatePicker = function(name){
+		$('a.btn.add-on.btn-inverse').click(function(){
+			var alldate = $(this).prev().val();
+			var dateArr = alldate.split("/")
+			, date = dateArr[1]
+			, month = dateArr[0]-1
+			, year = dateArr[2]
+			, n = { date: date, month: month, year: year }
+			var editing = ($(this).attr('id') === 'setstart') ? "start" : "end";
+			$.post('/class/span/edit', { editing: editing, name: name, n: n }, function(res) {
+					if (res.err) { console.log("Class span edit error:", req.err); return false }
+					else {
+						if (res.success) {
+							console.log("yay");
+							$('.span-'+editing).html((month+1).toString()+'/'+date.toString()+'/'+year.toString())
+						}
+					}
+				})
+		})
+	}
 	// Change span start/end days
 	var setSpanDate = function(name) {
 		$('a').popover({trigger: 'click', html: true, placement: 'bottom', callback: popoverDismiss()});
 		var editing = null
 			, editingDay = null;
-		$('.span-start').click(function() {
-			editing = "start";
-			$.get('/class/span/view', { editing: editing, name: name }, function(data) {
-				if (data.err) {console.log("Class span view error:", data.err); return false}
-				else {
-					$('.popover-content').html(data);
-					setSpanSquare(name, editing);
-				}
-			})
-		});
-		$('.span-end').click(function() {
-			editing = "end";
-			$.get('/class/span/view', { editing: editing, name: name }, function(data) {
-				if (data.err) {console.log("Class span view error:", data.err); return false}
-				else {
-					$('.popover-content').html(data);
-					setSpanSquare(name, editing);
-				}
-			})
-		});
+		$('.datepicker').datepicker();
+		$('.datepicker2').datepicker();
+		$('input.datepicker').val($('input.datepicker').attr('default-val'));
+		$('input.datepicker2').val($('input.datepicker2').attr('default-val'));
+		setSpanSquare(name);
 	}
 
 	// handle popover dismissal
@@ -252,7 +242,7 @@ $(document).ready(function() {
 							else {
 								if(res.success) {
 									$('h4#surv-name').fadeOut('fast', function() {
-										$(this).html(selectedSurv).fadeIn('fast');
+										$(this).html(selectedSurv).fadeIn('fast')
 									});
 								}
 							}
@@ -403,9 +393,7 @@ $(document).ready(function() {
 	// name new class
 	$('.btn-new').click(function() {
 		$('.btn-name').click(function() {
-
 			$('div.alert').remove();
-
 			var className = $('.class-name').val();
 			if (className.length > 0) {
 				$.post('/class/create', {name: className}, function(res) {
