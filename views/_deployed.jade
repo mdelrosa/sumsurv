@@ -5,27 +5,114 @@ div.form-inline
 	h3.center-text.row-inline-left #{survey} Deployed Classes:
 	a.btn.btn-info.row-inline-right(href="/survey/export/all?survName="+survey) Export All
 div.accordion.clearboth#accordion-prime
-	- for (i=0;i<classes.length;i++) {
+	- for (z=0;z<classes.length;z++) {
 		div.accordion-group
 			div.accordion-heading
-				a.accordion-toggle(data-toggle="collapse", data-parent="#accordion-prime", href="#collapse"+i.toString()) #{classes[i].owner.username}'s #{classes[i].name}
-			div.accordion-body.collapse(id="collapse"+i.toString())
-				div.accordion-inner
-					if (classes[i].roster.length > 1)
-						p This class has #{classes[i].roster.length} students.
-					else if (classes[i].roster.length === 1)
-						p This class has 1 student.
-					else
-						p This class has no students.
-					if (classes[i].responses.length > 1)
-						p This class has #{classes[i].responses.length} responses.
-					else if (classes[i].responses.length === 1)
-						p This class has 1 response.
-					else
-						p This class has no responses.
-					a.btn.btn-info(href='/class/export?className='+classes[i].name+'&user='+classes[i].owner.id) Export Responses
+				a.accordion-toggle(data-toggle="collapse", data-parent="#accordion-prime", href="#collapse"+z.toString()) #{classes[z].owner.username}'s #{classes[z].name}
+			div.accordion-body.collapse(id="collapse"+z.toString())
+				div.accordion-inner.no-pad
+					.span6
+						table.table.table-striped(style= 'width:100%')
+							tr
+								th Week:
+								th Number of Responses
 
-		- }
+								-var numberofweeks = whatweek(parseInt(classes[z].span.start.date), parseInt(classes[z].span.start.month), parseInt(classes[z].span.start.year), parseInt(classes[z].span.end.date), parseInt(classes[z].span.end.month), parseInt(classes[z].span.end.year));
+								-for(j=1; j<numberofweeks+1; j++){
+							tr 
+								td Week #{j}
+								-	var counter = 0;
+								-	for(k=0; k< classes[z].responses.length;k++){
+								-		if(classes[z].responses[k].responseweek === j) {
+								-			counter = counter + 1;
+								-		}
+								-	}
+								-if(counter > 1){var text = counter + " responses"}
+								-else if(counter === 1){text = "1 response"}
+								-else if(counter === 0){text = "no responses"}
+								-else{"something went wrong here"}
+								td #{text}
+									a.btn.btn-small.btn-inverse.right-align(id=j) Select  
+								-}								
+					.span6
+						br
+						br
+						div.text-question
+							h4 Enter desired weeks:
+							textarea.comment-text(placeholder='Example: 1,2,5 (comma separated numbers)', name=classes[z].id)
+						br
+						.btn-group
+							a.btn.btn-primary(class='weeksdata', id='select-weeks', href='') Export Selected Weeks
+							a.btn.btn-info(href='/class/export?className='+classes[z].name+'&user='+classes[z].owner.id) Export Entire Class
+	-}
+
+
+//checks what week the survey was taken (week1, week2, etc.)
+-function whatweek(startDay, startMonth, startYear, endDay, endMonth, endYear) {
+-    startMonth = startMonth;
+
+-    var startYear = startYear;
+-    var startMonth = startMonth;
+-    var startDay = startDay;
+
+-    console.log("startyear ", startYear);
+-    console.log("startday ", startDay);
+-    console.log("startmonth ", startMonth);
+-    endMonth = endMonth - 1;
+
+-    var differenceYear = endYear-startYear;
+-    var differenceMonth = endMonth - startMonth;
+-    var daysInBetween = 0;
+-    var monthHolder = 0;
+-    var monthsUntilNewYear = 0;
+-    var remainderDays = 0;
+-    var weeks = 0;
+-    var monthsTillNew = 0;
+     
+-    var whatDate = function(number){
+-        if(number === 0 || number === 2 || number === 4 || number === 6 || number === 7 || number === 9 || number === 11){
+-           return 31;    
+-        }
+-        else if(number === 1) {
+-            return 28;    
+-        }
+-        else if(number === 3 || number === 5 ||  number === 8 || number === 10){
+-            return 30;  
+-        }
+-        else {
+-            console.log("Something is wrong in the same year loop");
+-        }
+-    };  
+-    if(differenceYear === 0){//YEAR IS THE SAME
+-        if(differenceMonth === 0){//MONTH IS THE SAME
+-            daysInBetween = endDay - startDay;
+-        }
+-        else{//IF MONTH IS DIFFERENT BUT YEAR IS THE SAME
+-            for(i=1; i < differenceMonth; i++){
+-                daysInBetween = whatDate(startMonth + i) + daysInBetween;
+-            }
+-            daysInBetween = whatDate(startMonth) - startDay + daysInBetween;
+-            daysInBetween = daysInBetween + endDay;
+-        }
+-    }
+-    else {//YEAR IS DIFFERENT
+-        monthsTillNew = 11 - startMonth;
+-        for(i=1; i < monthsTillNew + 1; i++){//start to end of year
+-            daysInBetween = whatDate(startMonth + i) + daysInBetween;
+-        }//beginning of year to end month
+-        for(i=0; i < endMonth; i++){
+-            daysInBetween = whatDate(i) + daysInBetween;
+-        }
+-        daysInBetween = whatDate(startMonth) - startDay + daysInBetween;
+-        daysInBetween = daysInBetween + endDay;
+-    }
+-    weeks = daysInBetween / 7;
+-    weeks = Math.ceil(weeks);
+-    if (weeks === 0){
+-        weeks = 1;
+-    };
+-    return weeks;
+-}
 //- table.table.table-striped.table-condensed
 //- 	tr
 //- 		th Name

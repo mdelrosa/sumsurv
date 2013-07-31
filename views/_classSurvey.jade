@@ -25,27 +25,21 @@ div.responses
 		p.pad No responses so far!
 
 div.dates
-	h4 Span
+	h4 Span:
 	div.pad.row-fluid
-		if span
-			div.span4
-				if (span.start)
-					- var sd = span.start.date, sm = parseInt(span.start.month)+1, sy = span.start.year;
-					a#span.btn.span-start.popper(data-toggle='popover', title data-content='<div class="progress progress-striped active"><div class="bar" style="width: 100%"></div></div>', data-original-title="Pick a Start Date") #{sm}/#{sd}/#{sy}
-				else
-					a#span.btn.span-start.popper(data-toggle='popover', title data-content='<div class="progress progress-striped active"><div class="bar" style="width: 100%"></div></div>', data-original-title="Pick a Start Date") Select Start Date
-			div.offset2.span4
-				if (span.end)
-					- var ed = span.end.date, em = parseInt(span.end.month)+1, ey = span.end.year;
-					a#span.btn.span-end.popper(data-toggle='popover', title data-content='<div class="progress progress-striped active"><div class="bar" style="width: 100%"></div></div>', data-original-title="Pick an End Date") #{em}/#{ed}/#{ey}
-				else
-					a#span.btn.span-end.popper(data-toggle='popover', title data-content='<div class="progress progress-striped active"><div class="bar" style="width: 100%"></div></div>', data-original-title="Pick an End Date") Select End Date
-		else
-			div.span4
-				a#span.btn.span-start.popper(data-toggle='popover', title data-content='<div class="progress progress-striped active"><div class="bar" style="width: 100%"></div></div>', data-original-title="Pick a Start Date") Select Start Date
-			div.offset2.span4
-				a#span.btn.span-end.popper(data-toggle='popover', title data-content='<div class="progress progress-striped active"><div class="bar" style="width: 100%"></div></div>', data-original-title="Pick an End Date") Select End Date	
-
+		div.span4
+			-var startText = (span.start) ? (parseInt(span.start.month)+1).toString() + "/" + span.start.date + "/" +span.start.year : "";
+			h5 Start Date:
+			.input-append
+				input.datepicker(default-val=startText, type='text', placeholder='Pick a start date', id='startspan', name='start', style='width: 50%') #{span.start.date}
+				a.btn.add-on.btn-inverse(id='setstart') Set
+				
+		div.offset2.span4
+			-var endText = (span.end) ? (parseInt(span.end.month)+1).toString() + "/" + span.end.date + "/" +span.end.year : "";
+			h5 End Date:
+			.input-append
+				input.datepicker2(default-val=endText, type='text', placeholder='Pick a end date', id='endspan', name='end', style='width: 50%') #{span.end.date}
+				a.btn.add-on.btn-inverse(id='setend') Set			
 div.interval
 	h4 Interval:
 	div.pad.row-fluid

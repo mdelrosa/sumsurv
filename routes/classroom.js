@@ -145,6 +145,7 @@ exports.view_span = function(req, res) {
 
 // Edit class span
 exports.edit_span = function(req, res) {
+	console.log("req.body ", req.body);
 	if (req.body.editing === "start") {
 		Classroom.update({ owner: req.user.id, name: req.body.name }, { $set: { 'span.start':  req.body.n } }).exec(function(err, num) {
 			if(err || !num) { console.log("edit_span error:", err); return false }
@@ -161,8 +162,6 @@ exports.edit_span = function(req, res) {
 			}
 		})
 	}
-
-	res.send({success:true});
 }
 
 // Get a class's requests

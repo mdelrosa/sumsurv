@@ -148,6 +148,7 @@ app.get('/survey/deployed', survey.deployed);
 
 // Survey response exporting
 app.get('/survey/export/all', survey.export_survey_all);
+app.get('/survey/export/weeks', survey.export_weeks);
 
 // Class creation partials
 app.get('/class/all', classroom.all);
