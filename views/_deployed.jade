@@ -4,6 +4,7 @@
 div.form-inline
 	h3.center-text.row-inline-left #{survey} Deployed Classes:
 	a.btn.btn-info.row-inline-right(href="/survey/export/all?survName="+survey) Export All
+	-var selector = "select"
 div.accordion.clearboth#accordion-prime
 	- for (z=0;z<classes.length;z++) {
 		div.accordion-group
@@ -16,7 +17,6 @@ div.accordion.clearboth#accordion-prime
 							tr
 								th Week:
 								th Number of Responses
-
 								-var numberofweeks = whatweek(parseInt(classes[z].span.start.date), parseInt(classes[z].span.start.month), parseInt(classes[z].span.start.year), parseInt(classes[z].span.end.date), parseInt(classes[z].span.end.month), parseInt(classes[z].span.end.year));
 								-for(j=1; j<numberofweeks+1; j++){
 							tr 
@@ -32,14 +32,14 @@ div.accordion.clearboth#accordion-prime
 								-else if(counter === 0){text = "no responses"}
 								-else{"something went wrong here"}
 								td #{text}
-									a.btn.btn-small.btn-inverse.right-align(id=j) Select  
+									a.btn.btn-small.btn-inverse.right-align(id=j) #{selector}
 								-}								
 					.span6
 						br
 						br
 						div.text-question
-							h4 Enter desired weeks:
-							textarea.comment-text(placeholder='Example: 1,2,5 (comma separated numbers)', name=classes[z].id)
+							h4 Selected weeks:
+							textarea.comment-text.input-xlarge(type='text', placeholder='Use black buttons to select weeks you want to export data from.', disabled='disabled', name=classes[z].id)
 						br
 						.btn-group
 							a.btn.btn-primary(class='weeksdata', id='select-weeks', href='') Export Selected Weeks
@@ -113,17 +113,3 @@ div.accordion.clearboth#accordion-prime
 -    };
 -    return weeks;
 -}
-//- table.table.table-striped.table-condensed
-//- 	tr
-//- 		th Name
-//- 		th Leader
-//- 		th Roster
-//- 		th Responses
-
-//- 	- for (i=0;i<classes.length;i++) {
-//- 		tr
-//- 			td #{classes[i].name}
-//- 			td #{classes[i].owner.username}
-//- 			td #{classes[i].roster.length}
-//- 			td #{classes[i].responses.length}
-//- 	- }

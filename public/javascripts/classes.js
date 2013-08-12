@@ -170,10 +170,17 @@ $(document).ready(function() {
 					else {
 						if (res.success) {
 							console.log("yay");
-							$('.span-'+editing).html((month+1).toString()+'/'+date.toString()+'/'+year.toString())
+							$('.span-'+editing).html((month+1).toString()+'/'+date.toString()+'/'+year.toString());
+							$('.alert').remove();
+							$('#main-container').append("<div class='alert alert-success'>"+
+							 						"<button type='button' class='close' data-dismiss='alert'>&times;"+
+							  						"</button><strong>Date set! </strong></div>");
+							setInterval('5000', $('.alert').fadeOut('slow', function() {
+							 	$(this).remove();	
+							}));
 						}
 					}
-				})
+			})
 		})
 	}
 	// Change span start/end days
