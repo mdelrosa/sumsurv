@@ -44,8 +44,8 @@ $(document).ready(function() {
 									$(this).html('select');
 								}
 								$('.comment-text').html(ids.join(","));
-								console.log("ids ids ids ", $('.comment-text').val())
-								$('.weeksdata').attr('href', '/survey/export/weeks?weeksarray='+$('.comment-text').val()+'&classid=' +$('.comment-text').attr('name'));
+								var classId = $(this).parents('.span6').map(function() {return this}).next().children('.text-question').children('textarea').attr('name');
+								$('.weeksdata').attr('href', '/survey/export/weeks?weeksarray='+$('.comment-text').val()+'&classid=' +classId);
 							})
 						});
 					});					

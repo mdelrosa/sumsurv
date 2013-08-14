@@ -256,6 +256,7 @@ $(document).ready(function() {
 						});
 					});
 					$('.response-square').tooltip({html: true, placement: 'top', trigger: 'hover'});
+					$('.icon-question-sign').tooltip({html: true, placement: 'top', trigger: 'hover'});
 					setDate(name);
 					setSpanDate(name);
 				})

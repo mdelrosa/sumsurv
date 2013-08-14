@@ -213,7 +213,7 @@ navbar .nav1 li.dropdown.open > .dropdown-toggle1, .navbar .nav1 li.dropdown.act
 
 .response-square {
 	background-color: #4d1b7b;
-	margin: 0.2em;
+	margin-top: 0.5em;
 	border-radius: 5px;
 	color: white;
 	text-align: center;
