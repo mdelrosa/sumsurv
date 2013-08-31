@@ -6,13 +6,15 @@ $(document).ready(function() {
 		$('a.add-on').click(function() {
 			var type = $(this).attr('id') //button id
 				, val = $(this).prev().children(':selected').val(); //selected val
-			console.log("add-on here")
 			$.post('/user/info/update', { type: type, value: val }, function(res) {
 				if (res.err) { console.log("User update info error:", res.err); return false}
 				else {
 					if(res.success) {
-						$('a.add-on#'+type).parent().replaceWith('<a class="edit-info" id=+'+type+'+>'+val+'</a>');
+						$('a.add-on#'+type).parent().replaceWith('<a class="edit-info" id='+type+'>'+val+'</a>');
 						editActivate();
+						if (!$('a.add-on').length) {
+							$('div.alert').remove();
+						}
 					}
 				}
 			})

@@ -127,7 +127,7 @@ app.get('/export', ensureAuthenticated, user.exportcsv);
 app.get('/mail', user.mail);
 app.get('/classes', ensureAuthenticated, user.my_classes);
 app.get('/part', ensureAuthenticated, user.part);
-app.get('/:user/:class/take', ensureAuthenticated, ensureDate, user.take);
+app.get('/:user/:class/take', ensureAuthenticated, ensureDate, ensureDemo, user.take);
 app.get('/error/not_in_roster', ensureAuthenticated, user.err);
 app.get('/testpage1', user.testpage1);
 app.get('/testpage2', user.testpage2);
@@ -223,6 +223,14 @@ function ensureAuthenticated(req, res, next) {
     }
   }
   res.redirect('/login');
+}
+
+// Demographic middleware; if info is not filled out, then catch user and send to participating
+function ensureDemo(req, res, next) {
+	if(req.user.info && req.user.info.gender && req.user.info.year) { return next() }
+	else {
+		res.redirect('/part')
+	}
 }
 
 //date confirmation middleware

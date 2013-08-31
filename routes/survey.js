@@ -275,12 +275,18 @@ function decommafy(str) {
 }
 
 exports.export = function(req, res) {
+    if(req.query.user) {console.log('req.query.user:',req.query.user)}
+    else {console.log('No req.query.user')}
+    if(req.user) {console.log('req.user:', req.user);}
+    else {console.log('No req.user')}
     var owner = (req.query.user) ? req.query.user : req.user.id;
     console.log("owner:",owner);
     Classroom.find({owner: owner, name: req.query.className}).exec(function(err, found_class) {
+        console.log("Found class:", found_class[0]);
         if(err) {console.log("Error in classroom export:", err); return false}
         else {
             Response.find({classroom: found_class[0].id}).populate('participant').exec(function(err2, response_db) {
+                console.log("response_db:",response_db);
             	if(err2) {console.log("Error in response export: ", err2); return false}
                 else {
                     var csvstr = [' , Id, Response Week, Gender, Year, Status, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Comment, Answer Date, Time'];    	

@@ -32,6 +32,10 @@ block content
 					a.btn.add-on#year Ok!
 			else
 				a.edit-info#year #{info.year}
+			if (!info || !info.gender || !info.year)
+				div.alert
+					button(type="button", class="close", data-dismiss="alert") &times;
+					p Please fill this out!
 			div.pad-top
 				a.btn.btn-mini.btn-info(data-toggle="tooltip", title data-original-title="This information will be used by researchers to identify your demographic. Your username, email address, and other personal information will not be associated with your responses.") Who Sees This?
 		div.span9.outline.pad
@@ -42,7 +46,7 @@ block content
 						div.span3.outline.text-center
 							h3 #{room.name}
 							img#class-img(src="paperbig.png")
-							a.btn.btn-info.margin(href='/'+room.owner.username+'/'+room.name+'/take') Take Survey
+							a.btn.btn-info.margin#class-link(href='/'+room.owner.username+'/'+room.name+'/take') Take Survey
 				else
 					div.span3.outline.text-center
 						h3 Sorry!
