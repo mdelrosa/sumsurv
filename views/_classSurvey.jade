@@ -15,33 +15,43 @@ div.form-inline.pad
 				option #{surv.name}
 	button.btn.btn-surv-select Select
 
-div.responses
+div.responses.row-fluid
 	h4 Responses:
 	if (responses.length)
-		div.row-fluid.pad
-			for response in responses
-				div.span1.response-square(data-toggle='tooltip', data-original-title=response.userid, name=response.id)
+		-var weeks = whatweek(parseInt(span.start.date), parseInt(span.start.month), parseInt(span.start.year), parseInt(span.end.date), parseInt(span.end.month), parseInt(span.end.year))
+		-for (i=1;i<weeks+1;i++) {
+		-	var num = 0;
+		-	for(j=0;j<responses.length;j++) {
+		-		if(responses[j].responseweek === i) {num = num + 1}
+		-	}
+		div.span1.response-square(data-toggle='tooltip', title="Week "+i.toString()) #{num}
+		-}
 	else
 		p.pad No responses so far!
-
 div.dates
 	h4 Span:
+		i.icon-question-sign(data-toggle="tooltip", title data-original-title="These are the start and end dates of your course. By setting these, you will change the number of weeks that appear above in the responses section.")
 	div.pad.row-fluid
-		div.span4
+		div.span4#start-date
 			-var startText = (span.start) ? (parseInt(span.start.month)+1).toString() + "/" + span.start.date + "/" +span.start.year : "";
 			h5 Start Date:
 			.input-append
 				input.datepicker(default-val=startText, type='text', placeholder='Pick a start date', id='startspan', name='start', style='width: 50%') #{span.start.date}
 				a.btn.add-on.btn-inverse(id='setstart') Set
-				
+			div.container#main-container(style='width: 90%')	
 		div.offset2.span4
 			-var endText = (span.end) ? (parseInt(span.end.month)+1).toString() + "/" + span.end.date + "/" +span.end.year : "";
 			h5 End Date:
 			.input-append
 				input.datepicker2(default-val=endText, type='text', placeholder='Pick a end date', id='endspan', name='end', style='width: 50%') #{span.end.date}
-				a.btn.add-on.btn-inverse(id='setend') Set			
+				a.btn.add-on.btn-inverse(id='setend') Set
+			div.container#main-container(style='width: 90%')
+	//- div.text-center
+	//- 	a.btn.btn-mini.btn-info(data-toggle="tooltip", title data-original-title="These are the start and end dates of your course. By setting these, you will change the number of weeks that appear above in the responses section.") What is this?
+				
 div.interval
 	h4 Interval:
+		i.icon-question-sign(data-toggle="tooltip", title data-original-title="These are the days of the week that your survey will be available for your class.")
 	div.pad.row-fluid
 		- var days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 		- var time = ["AM", "PM"];
@@ -61,3 +71,67 @@ div.interval
 				a#interval.btn.change-start.popper(data-toggle='popover', title data-content='<form class="form-horizontal"><div class="control-group"><label class="popover-label control-label">Day</label><div class="popover-controls controls"><select id="select-day"><option value=1>Monday</option><option value=2>Tuesday</option><option value=3>Wednesday</option><option value=4>Thursday</option><option value=5>Friday</option><option value=6>Saturday</option><option value=7>Sunday</option></select></div></div><div class="control-group"><label class="popover-label control-label">Time</label><div class="popover-controls controls"><div class="input-append"><select id="appendedInput" class="popover-select hour-select" ><option value=1>1</option><option value=2>2</option><option value=3>3</option><option value=4>4</option><option value=5>5</option><option value=6>6</option><option value=7>7</option><option value=8>8</option><option value=9>9</option><option value=10>10</option><option value=11>11</option><option value=12>12</option></select><span class="add-on">:</span></div><div class="input-append"><select id="appendedInput" class="minute-select"><option val=0>00</option><option val=10>10</option><option val=20>20</option><option val=30>30</option><option val=40>40</option><option val=50>50</option></select><span class="add-on">@</span></div><select class="popover-select ampm-select"><option val=0>AM</option><option val=1>PM</option></select></div></div><div class="control-group"><div class="controls"><a class="btn btn-interval">Submit</a></div></div></form>', data-original-title='Pick a Start Day') Select Start
 			div.offset2.span4
 				a#interval.btn.change-end.popper.pull-right(data-toggle='popover', title data-content='<form class="form-horizontal"><div class="control-group"><label class="popover-label control-label">Day</label><div class="popover-controls controls"><select id="select-day"><option value=1>Monday</option><option value=2>Tuesday</option><option value=3>Wednesday</option><option value=4>Thursday</option><option value=5>Friday</option><option value=6>Saturday</option><option value=7>Sunday</option></select></div></div><div class="control-group"><label class="popover-label control-label">Time</label><div class="popover-controls controls"><div class="input-append"><select id="appendedInput" class="popover-select hour-select" ><option value=1>1</option><option value=2>2</option><option value=3>3</option><option value=4>4</option><option value=5>5</option><option value=6>6</option><option value=7>7</option><option value=8>8</option><option value=9>9</option><option value=10>10</option><option value=11>11</option><option value=12>12</option></select><span class="add-on">:</span></div><div class="input-append"><select id="appendedInput" class="minute-select"><option val=0>00</option><option val=10>10</option><option val=20>20</option><option val=30>30</option><option val=40>40</option><option val=50>50</option></select><span class="add-on">@</span></div><select class="popover-select ampm-select"><option val=0>AM</option><option val=1>PM</option></select></div></div><div class="control-group"><div class="controls"><a class="btn btn-interval">Submit</a></div></div></form>', data-original-title='Pick an End Day') Select End
+	//- div.text-center
+	//- 	a.btn.btn-mini.btn-info(data-toggle="tooltip", title data-original-title="These are the days of the week that your survey will be available for your class.") What is this?
+
+//checks what week the survey was taken (week1, week2, etc.)
+-function whatweek(startDay, startMonth, startYear, endDay, endMonth, endYear) {
+-    startMonth = startMonth;
+
+-    var startYear = startYear;
+-    var startMonth = startMonth;
+-    var startDay = startDay;
+
+-    var differenceYear = endYear-startYear;
+-    var differenceMonth = endMonth - startMonth;
+-    var daysInBetween = 0;
+-    var monthHolder = 0;
+-    var monthsUntilNewYear = 0;
+-    var remainderDays = 0;
+-    var weeks = 0;
+-    var monthsTillNew = 0;
+     
+-    var whatDate = function(number){
+-        if(number === 0 || number === 2 || number === 4 || number === 6 || number === 7 || number === 9 || number === 11){
+-           return 31;    
+-        }
+-        else if(number === 1) {
+-            return 28;    
+-        }
+-        else if(number === 3 || number === 5 ||  number === 8 || number === 10){
+-            return 30;  
+-        }
+-        else {
+-            console.log("Something is wrong in the same year loop");
+-        }
+-    };  
+-    if(differenceYear === 0){//YEAR IS THE SAME
+-        if(differenceMonth === 0){//MONTH IS THE SAME
+-            daysInBetween = endDay - startDay;
+-        }
+-        else{//IF MONTH IS DIFFERENT BUT YEAR IS THE SAME
+-            for(i=1; i < differenceMonth; i++){
+-                daysInBetween = whatDate(startMonth + i) + daysInBetween;
+-            }
+-            daysInBetween = whatDate(startMonth) - startDay + daysInBetween;
+-            daysInBetween = daysInBetween + endDay;
+-        }
+-    }
+-    else {//YEAR IS DIFFERENT
+-        monthsTillNew = 11 - startMonth;
+-        for(i=1; i < monthsTillNew + 1; i++){//start to end of year
+-            daysInBetween = whatDate(startMonth + i) + daysInBetween;
+-        }//beginning of year to end month
+-        for(i=0; i < endMonth; i++){
+-            daysInBetween = whatDate(i) + daysInBetween;
+-        }
+-        daysInBetween = whatDate(startMonth) - startDay + daysInBetween;
+-        daysInBetween = daysInBetween + endDay;
+-    }
+-    weeks = daysInBetween / 7;
+-    weeks = Math.ceil(weeks);
+-    if (weeks === 0){
+-        weeks = 1;
+-    };
+-    return weeks;
+-}

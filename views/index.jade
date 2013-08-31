@@ -12,7 +12,6 @@ html
 		link(href='http://fonts.googleapis.com/css?family=Merriweather+Sans:400,700,800', rel='stylesheet', type='text/css')
 		block scripts
 	include _navbar.jade
-		div.container-fluid
 	.jumbotron.masthead
 			.container
 					br
@@ -25,4 +24,5 @@ html
 					br
 
 	body
-		include _footer.jade
+		.container-fluid
+			include _footer.jade

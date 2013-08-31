@@ -170,10 +170,17 @@ $(document).ready(function() {
 					else {
 						if (res.success) {
 							console.log("yay");
-							$('.span-'+editing).html((month+1).toString()+'/'+date.toString()+'/'+year.toString())
+							$('.span-'+editing).html((month+1).toString()+'/'+date.toString()+'/'+year.toString());
+							$('.alert').remove();
+							$('#main-container').append("<div class='alert alert-success'>"+
+							 						"<button type='button' class='close' data-dismiss='alert'>&times;"+
+							  						"</button><strong>Date set! </strong></div>");
+							setInterval('5000', $('.alert').fadeOut('slow', function() {
+							 	$(this).remove();	
+							}));
 						}
 					}
-				})
+			})
 		})
 	}
 	// Change span start/end days
@@ -249,6 +256,7 @@ $(document).ready(function() {
 						});
 					});
 					$('.response-square').tooltip({html: true, placement: 'top', trigger: 'hover'});
+					$('.icon-question-sign').tooltip({html: true, placement: 'top', trigger: 'hover'});
 					setDate(name);
 					setSpanDate(name);
 				})
@@ -282,6 +290,7 @@ $(document).ready(function() {
 
 	// activate roster jquery
 	var activateRosterEdit = function() {
+		rosterSearch();
 		$('.roster-add').click(function() {
 			activateImport();
 			$('.btn-text-roster').click(function() {
@@ -311,6 +320,27 @@ $(document).ready(function() {
 					
 				}
 			});
+		});
+	}
+
+	var rosterSearch = function() {
+		var $tr = $('#table-roster tr:gt(0)');
+		$('body').keyup(function() {
+			var searchFor = $('.search-query').val();
+			if (searchFor) {
+				for (i=0;i<$tr.length;i++) {
+					console.log($tr[i].firstChild.textContent);
+					if ($tr[i].firstChild.textContent.indexOf(searchFor) < 0) {
+						$('#table-roster tr').eq(i+1).hide();
+					}
+					else {
+						$('#table-roster tr').eq(i+1).show();
+					}
+				}
+			}
+			else {
+				$('#table-roster tr').show();
+			}
 		});
 	}
 
