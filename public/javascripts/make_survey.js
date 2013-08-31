@@ -28,22 +28,39 @@ $(document).ready(function() {
 						$('.page-type').empty();
 						$(this).html(data).fadeIn('fast', function() {
 							var ids = [];
-							$('.btn.btn-small.btn-inverse.right-align').click(function(){
+							$('.btn-small.btn-inverse.right-align').click(function(){
 								var currentid = $(this).attr('id')
-								ids.push(currentid);
-								ids = ids.getUnique();
+								if($(this).html() === 'select') {
+									console.log("hello in if statement");
+									ids.push(currentid);
+									ids = ids.getUnique();
+									$(this).html('unselect');
+								}
+								else{
+									console.log("hello in if statement");
+									removeElement(ids, currentid);
+									console.log("array: ", ids)
+									ids = ids.getUnique();
+									$(this).html('select');
+								}
 								$('.comment-text').html(ids.join(","));
-								$('.weeksdata').attr('href', '/survey/export/weeks?weeksarray='+$('.comment-text').val()+'&classid=' +$('.comment-text').attr('name'));
-							})
-							$('.comment-text').on('keyup', function() {
-								$('.weeksdata').attr('href', '/survey/export/weeks?weeksarray='+$('.comment-text').val()+'&classid=' +$('.comment-text').attr('name'));
+								var classId = $(this).parents('.span6').map(function() {return this}).next().children('.text-question').children('textarea').attr('name');
+								$('.weeksdata').attr('href', '/survey/export/weeks?weeksarray='+$('.comment-text').val()+'&classid=' +classId);
 							})
 						});
-					});
+					});					
 				}	
 			})
 		})
 
+	}
+
+	var removeElement = function(ids, currentid){
+		for(i=0; i<ids.length; i++){
+			if(ids[i] === currentid) {
+				ids.splice(i,1);
+			};
+		};
 	}
 
 	Array.prototype.getUnique = function(){

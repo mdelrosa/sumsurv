@@ -13,10 +13,11 @@ html
 		link(rel='stylesheet', href='http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css')
 		block scripts
 	body
+		include _navbar.jade
 		#wrap
 			#main
-				include _navbar.jade
 				div.container-fluid
 					block content
 		#footer
-			include _footer.jade
+			.container-fluid
+				include _footer.jade
