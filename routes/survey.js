@@ -275,12 +275,18 @@ function decommafy(str) {
 }
 
 exports.export = function(req, res) {
+    if(req.query.user) {console.log('req.query.user:',req.query.user)}
+    else {console.log('No req.query.user')}
+    if(req.user) {console.log('req.user:', req.user);}
+    else {console.log('No req.user')}
     var owner = (req.query.user) ? req.query.user : req.user.id;
     console.log("owner:",owner);
     Classroom.find({owner: owner, name: req.query.className}).exec(function(err, found_class) {
+        console.log("Found class:", found_class[0]);
         if(err) {console.log("Error in classroom export:", err); return false}
         else {
             Response.find({classroom: found_class[0].id}).populate('participant').exec(function(err2, response_db) {
+                console.log("response_db:",response_db);
             	if(err2) {console.log("Error in response export: ", err2); return false}
                 else {
                     var csvstr = [' , Id, Response Week, Gender, Year, Status, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Comment, Answer Date, Time'];    	
@@ -343,25 +349,23 @@ exports.export_weeks = function(req, res) {
         weeks[k] = parseInt(weeks[k]);
     }
     var classid = req.query.classid;
-        console.log("weeks on survey.js ", weeks);
-        console.log("classid on survey.js ", classid);
-        Response.find({classroom: classid}).populate('responses').exec(function(err, found_class) {
+        Response.find({classroom: classid}).exec(function(err, response_db) {
             if(err) {console.log("Error in export_survey_all classroom:", err); return false}
             else {
                 var csvstr = [' , Id, Response Week, Gender, Year, Status, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Comment, Answer Date, Time'];        
                 var answerdate = "";
                 var answertime = ";"
-                for(i=1; i < found_class.length+1; i++) {
+                for(i=0; i < response_db.length; i++) {
                     for(j=0; j<weeks.length; j++) {
-                        if(found_class[i-1].responseweek === weeks[j]){
+                        if(response_db[i].responseweek === weeks[j]){
                             //These two lines decommafy the written responses
-                            found_class[i-1].results[2] = decommafy(found_class[i-1].results[2]);
-                            found_class[i-1].results[19] = decommafy(found_class[i-1].results[19]);
+                            response_db[i].results[2] = decommafy(response_db[i].results[2]);
+                            response_db[i].results[19] = decommafy(response_db[i].results[19]);
                             //takes the date the survey was taken and converts it to a x/x/xxxx format in string.
-                            answerdate = found_class[i-1].date.month.toString() + "/" + found_class[i-1].date.date.toString() + "/" + found_class[i-1].date.year.toString();
-                            answertime = found_class[i-1].time.hour.toString() + ":" + found_class[i-1].time.minutes.toString() + ":" + found_class[i-1].time.seconds.toString();
+                            answerdate = response_db[i].date.month.toString() + "/" + response_db[i].date.date.toString() + "/" + response_db[i].date.year.toString();
+                            answertime = response_db[i].time.hour.toString() + ":" + response_db[i].time.minutes.toString() + ":" + response_db[i].time.seconds.toString();
                             //This just turns the array into a string with comma separated values.
-                            csvstr[i] = " ," + found_class[i-1].userid + "," + found_class[i-1].responseweek + "," + found_class[i-1].results.join(",") +","+ answerdate +  "," + answertime + ", ";
+                            csvstr[i+1] = " ," + response_db[i].userid + "," + response_db[i].responseweek + "," + response_db[i].results.join(",") +","+ answerdate +  "," + answertime + ", ";
                         }
                     }
                 }

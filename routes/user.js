@@ -108,6 +108,7 @@ exports.my_classes = function(req, res) {
 
 exports.part = function(req, res) {
 	Classroom.where("roster").in([req.user.email]).populate('owner').exec(function(err, found_class) {
+		console.log('req.query.message:',req.query.message);
 		if(err) {console.log("Participating static error: ", err); return false}
 		else {
 			res.render('participating', {

@@ -84,21 +84,19 @@ var app = express();
 
 mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/sumsurv');
 
-app.listen(process.env.NODE_ENV === 'production' ? 80 : 8000, function() {
-  console.log("Ready");
-
-  // if run as root, downgrade to the owner of this file
-  if (process.getuid() === 0) {
-    require('fs').stat(__filename, function(err, stats) {
-      if (err) return console.log(err);
-      process.setuid(stats.uid);
-    })
-  }
-
-});
-
 app.configure(function(){
-  app.set('port', process.env.PORT || 3000);
+  app.listen(process.env.NODE_ENV === 'production' ? 80 : 3000, function() {
+	  console.log("Ready");
+
+	  // if run as root, downgrade to the owner of this file
+	  if (process.getuid() === 0) {
+	    require('fs').stat(__filename, function(err, stats) {
+	      if (err) return console.log(err);
+	      process.setuid(stats.uid);
+	    })
+	  }
+
+	});
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.set('secret', process.env.SESSION_SECRET || 'terrible, terrible secret')
@@ -129,7 +127,7 @@ app.get('/export', ensureAuthenticated, user.exportcsv);
 app.get('/mail', user.mail);
 app.get('/classes', ensureAuthenticated, user.my_classes);
 app.get('/part', ensureAuthenticated, user.part);
-app.get('/:user/:class/take', ensureAuthenticated, ensureDate, user.take);
+app.get('/:user/:class/take', ensureAuthenticated, ensureDate, ensureDemo, user.take);
 app.get('/error/not_in_roster', ensureAuthenticated, user.err);
 app.get('/testpage1', user.testpage1);
 app.get('/testpage2', user.testpage2);
@@ -225,6 +223,14 @@ function ensureAuthenticated(req, res, next) {
     }
   }
   res.redirect('/login');
+}
+
+// Demographic middleware; if info is not filled out, then catch user and send to participating
+function ensureDemo(req, res, next) {
+	if(req.user.info && req.user.info.gender && req.user.info.year) { return next() }
+	else {
+		res.redirect('/part')
+	}
 }
 
 //date confirmation middleware
