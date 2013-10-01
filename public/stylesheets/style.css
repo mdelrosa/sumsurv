@@ -124,9 +124,9 @@ textarea {
 	right: 0;
 	bottom: 0;
 	left: 0;
-	background: url(startup.jpg);  background-size: 100%;
-	opacity: .4;
-}
+	background: url(jumbotron.jpg);  background-size: 100%;
+	opacity: .3;
+ }
 
 .jumbotron .container {
 	position: relative;
