@@ -132,11 +132,16 @@ exports.test_mail = function(req, res) {
 			        // shut down the connection pool, no more messages
 			});	
 			// setup e-mail data with unicode symbols
-			new cronJob('00 00 * * * *', function() {
+			var hour = parseInt(classroom_db[0].interval.start.hour);
+			var day = parseInt(classroom_db[0].interval.start.day);
+			hour = (classroom_db[0].interval.start.time === "AM") ? hour : hour+12;
+			day = (day === 7) ? 0 : day;
+			var cronTime = '00 '+classroom_db[0].interval.start.minute+" "+hour.toString()+" * * "+day.toString();
+			console.log(cronTime);
+			var job = new cronJob(cronTime, function() {
 			//first * is which second, next is minute, next is the hour, ? ? and then day of the week.	
-				surveymail(classroom_db[0], urllink);
+				surveymail(classroom_db[0].roster, urllink);
 			}, null, true, "America/New_York");
-
 		   };
 
 	  });	
@@ -144,6 +149,7 @@ exports.test_mail = function(req, res) {
 
 var surveymail = function(roster, urllink) {
 	var smtpTransport = nodemailer.createTransport("SMTP", {
+
 		service: "Gmail",
 		auth: {
 			user: "authumlab@gmail.com",

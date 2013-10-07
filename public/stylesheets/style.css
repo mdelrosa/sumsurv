@@ -357,9 +357,10 @@ table.fixed td {
 	border-radius: 5px;
 }
 
-input[type="file"] {
+input#files {
 	height: 40px;
 	line-height: 0px;
+	width:80%;
 }
 
 /*parallax up in this*/
