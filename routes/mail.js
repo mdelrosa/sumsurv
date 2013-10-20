@@ -120,17 +120,17 @@ exports.test_mail = function(req, res) {
 			    		//html body
 			}
 				// send mail with defined transport object
-			smtpTransport.sendMail(mailOptions, function(error, response){
-			    if(error){
-			        console.log(error);
-			    }else{
-			        console.log("Message sent: " + response.message);
-			        smtpTransport.close();
-			        res.send("success");
-			    }
-				    // if you don't want to use this transport object anymore, uncomment following line
-			        // shut down the connection pool, no more messages
-			});	
+			// smtpTransport.sendMail(mailOptions, function(error, response){
+			//     if(error){
+			//         console.log(error);
+			//     }else{
+			//         console.log("Message sent: " + response.message);
+			//         smtpTransport.close();
+			//         res.send("success");
+			//     }
+			// 	    // if you don't want to use this transport object anymore, uncomment following line
+			//         // shut down the connection pool, no more messages
+			// });	
 			// setup e-mail data with unicode symbols
 			var hour = parseInt(classroom_db[0].interval.start.hour);
 			var day = parseInt(classroom_db[0].interval.start.day);
