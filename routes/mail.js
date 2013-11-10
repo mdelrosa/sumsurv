@@ -14,45 +14,6 @@ exports.list = function(req, res) {
 	res.send({success: true});
 }
 
-exports.decklist = function(req, res) {
-	// -- We would like something that will require auth between the GAE server and this node server
-	console.log("req.headers.host:",req.headers.host);
-	Classroom.find({}).populate('owner').exec(function(err, found_class) {
-		if(err) { console.log("Decklist class error:", err); res.send({ success: false })}
-		else {
-			var update = [];
-			for (i=0;i<found_class.length;i++) {
-				console.log("Class", found_class[i]._id, "Maildeck", i, ":", found_class[i].maildeck);
-				if (found_class[i].maildeck) { console.log("regular:",found_class[i].maildeck.regular, "now:", new Date, "before now:", found_class[i].maildeck.regular <= new Date)}
-				if (found_class[i].maildeck && found_class[i].maildeck.regular <= new Date) {
-					// At the moment, we will assume that the class interval has not changed. We will update the class by rolling the date forward by a week.
-					var oldDate = found_class[i].maildeck.regular
-					oldDate.setDate(oldDate.getDate()+7);
-					update.push(found_class[i]._id);
-					var urllink = "http://" + req.headers.host + "/" + encodeURIComponent(found_class[i].owner.username).toString() + "/" + encodeURIComponent(found_class[i].name).toString() + "/take"
-					surveymail(found_class[i].roster, urllink);
-				}
-			}
-			if(update.length > 0) {
-				Classroom.update({ _id: {$in: update } }, { 'maildeck.regular': oldDate }).exec(function(err, num) {
-					if(err) { console.log("Decklist classroom error:", err); res.send({success:false, message: "Classroom update error:"+err})}
-					else {
-						if(!num) {
-							res.send({success: false, message: "Classroom update error: No classes found."})
-						}
-						else {
-							res.send({success: true, updated: true, classes: update})
-						}
-					}
-				})
-			}
-			else {
-				res.send({success: true, updated: false, message: "Maildeck clear!"})
-			}
-		}	
-	})
-}
-
 exports.test_mail = function(req, res) {
 	  Classroom.find({name: req.query.name}).populate("owner responses").exec(function(err, classroom_db) {
 		   if(err) {console.log('Unable to find responses'); return false}
@@ -121,23 +82,33 @@ exports.test_mail = function(req, res) {
 			    		//html body
 			}
 				// send mail with defined transport object
-			smtpTransport.sendMail(mailOptions, function(error, response){
-			    if(error){
-			        console.log(error);
-			    }else{
-			        console.log("Message sent: " + response.message);
-			        smtpTransport.close();
-			        res.send("success");
-			    }
-				    // if you don't want to use this transport object anymore, uncomment following line
-			        // shut down the connection pool, no more messages
-			});	
+			// smtpTransport.sendMail(mailOptions, function(error, response){
+			//     if(error){
+			//         console.log(error);
+			//     }else{
+			//         console.log("Message sent: " + response.message);
+			//         smtpTransport.close();
+			//         res.send("success");
+			//     }
+			// 	    // if you don't want to use this transport object anymore, uncomment following line
+			//         // shut down the connection pool, no more messages
+			// });	
 			// setup e-mail data with unicode symbols
 			var hour = parseInt(classroom_db[0].interval.start.hour);
 			var day = parseInt(classroom_db[0].interval.start.day);
 			hour = (classroom_db[0].interval.start.time === "AM") ? hour : hour+12;
 			day = (day === 7) ? 0 : day;
+			var spanEnd = {
+				"date": parseInt(classroom_db[0].span.end.date),
+				"month": parseInt(classroom_db[0].span.end.month),
+				"year": parseInt(classroom_db[0].span.end.year)
+			}
+			var datedata = new Date()
+				, date = datedata.getDate()
+				, month = datedata.getMonth()
+				, year = datedata.getFullYear();
 			var cronTime = '00 '+classroom_db[0].interval.start.minute+" "+hour.toString()+" * * "+day.toString();
+<<<<<<< HEAD
 			console.log(cronTime);
 			// var job = new cronJob(cronTime, function() {
 			// //first * is which second, next is minute, next is the hour, ? ? and then day of the week.	
@@ -170,12 +141,21 @@ exports.test_mail = function(req, res) {
 					}
 				}
 			})
+=======
+			console.log("spanEnd:",spanEnd);
+			console.log("today:", date, month, year);
+			console.log("cronTime:",cronTime);
+			var job = new cronJob(cronTime, function() {
+			//first * is which second, next is minute, next is the hour, ? ? and then day of the week.	
+				surveymail(classroom_db[0].roster, spanEnd, urllink, job);
+			}, null, true, "America/New_York");
+>>>>>>> ab8ba0a2e0bbad5ee60bdcb9eb241ec261ec769c
 		   };
 
 	  });	
 }
 
-var surveymail = function(roster, urllink) {
+var surveymail = function(roster, spanEnd, urllink) {
 	var smtpTransport = nodemailer.createTransport("SMTP", {
 
 		service: "Gmail",
@@ -234,6 +214,7 @@ var surveymail = function(roster, urllink) {
 	    		'<p style="color: #999999">This will fill up space about home potoo yes please why that tut tut singaling yeh?</center></p></footer></center></div></div>'
 	    		,//html body
 	}
+<<<<<<< HEAD
 		// send mail with defined transport object
 	smtpTransport.sendMail(mailOptions, function(error, response){
 	    if(error){
@@ -294,21 +275,4 @@ var surveymail = function(roster, urllink) {
 	        }
 	    }
 	    else {//YEAR IS DIFFERENT
-	        monthsTillNew = 11 - startMonth;
-	        for(i=1; i < monthsTillNew + 1; i++){//start to end of year
-	            daysInBetween = whatDate(startMonth + i) + daysInBetween;
-	        }//beginning of year to end month
-	        for(i=0; i < endMonth; i++){
-	            daysInBetween = whatDate(i) + daysInBetween;
-	        }
-	        daysInBetween = whatDate(startMonth) - startDay + daysInBetween;
-	        daysInBetween = daysInBetween + endDay;
-	    }
-	    weeks = daysInBetween / 7;
-	    weeks = Math.ceil(weeks);
-	    if (weeks === 0){
-	        weeks = 1;
-	    };
-	    return weeks;
-	}	
-}
+	        monthsTillNew = 11 - startM
