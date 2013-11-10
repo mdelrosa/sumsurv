@@ -2,7 +2,8 @@
 // Handle sending emails
 var Models = require('../models/models')
     , Emaillist = Models.emaillist
-    , Classroom = Models.classroom;
+    , Classroom = Models.classroom
+    , User = Models.User;
 
 var nodemailer = require("nodemailer")
     , cronJob = require('cron').CronJob;
@@ -53,7 +54,7 @@ exports.decklist = function(req, res) {
 }
 
 exports.test_mail = function(req, res) {
-	  Classroom.find({name: req.query.name}).populate("owner").exec(function(err, classroom_db) {
+	  Classroom.find({name: req.query.name}).populate("owner responses").exec(function(err, classroom_db) {
 		   if(err) {console.log('Unable to find responses'); return false}
 		   else{
 			var smtpTransport = nodemailer.createTransport("SMTP", {
@@ -138,10 +139,37 @@ exports.test_mail = function(req, res) {
 			day = (day === 7) ? 0 : day;
 			var cronTime = '00 '+classroom_db[0].interval.start.minute+" "+hour.toString()+" * * "+day.toString();
 			console.log(cronTime);
-			var job = new cronJob(cronTime, function() {
-			//first * is which second, next is minute, next is the hour, ? ? and then day of the week.	
-				surveymail(classroom_db[0].roster, urllink);
-			}, null, true, "America/New_York");
+			// var job = new cronJob(cronTime, function() {
+			// //first * is which second, next is minute, next is the hour, ? ? and then day of the week.	
+			// 	surveymail(classroom_db[0].roster, urllink);
+			// }, null, true, "America/New_York");
+
+			//var job2 = new cronJob(cronTime, function()) {
+			//this job is to send emails to only the people who have not taken a survey for the week.
+			//	remindmail(classroom_db[0].roster, classroom_db[0].responses);	
+			//}
+			console.log("classroom_db[0].roster", classroom_db[0].roster);
+			console.log("classroom_db[0].responses", classroom_db[0].responses);
+			User.find({email: {$in: classroom_db[0].roster}}).exec(function(err, user_db) {
+				if(err)  {console.log('Unable to find users'); return false}
+				else {
+					var currentId = 0;
+					var month = datedata.getMonth()+1; 
+					var date = datedata.getDate(); 
+					var year = datedata.getFullYear();
+					var whatweeknow = whatweek(parseInt(found_class[0].span.start.date), parseInt(found_class[0].span.start.month), parseInt(found_class[0].span.start.year), date, month, year);
+					for (i=0; i<user_db.length; i++) {
+						currentId = user_db[i].id;
+						for(j=0; j<classroom_db[0].responses.length; j++) {
+							if(currentId === classroom_db[0].responses[j].id) {
+								if(classroom_db[0].responses[j].responseweek < whatweeknow){
+										
+								}
+							}
+						}
+					}
+				}
+			})
 		   };
 
 	  });	
@@ -217,4 +245,70 @@ var surveymail = function(roster, urllink) {
 		    // if you don't want to use this transport object anymore, uncomment following line
 	        // shut down the connection pool, no more messages
 	});	
+
+	//checks what week the survey was taken (week1, week2, etc.)
+	function whatweek(startDay, startMonth, startYear, endDay, endMonth, endYear) {
+	    startMonth = startMonth;
+
+	    var startYear = startYear;
+	    var startMonth = startMonth;
+	    var startDay = startDay;
+
+	    endMonth = endMonth - 1;
+
+	    var differenceYear = endYear-startYear;
+	    var differenceMonth = endMonth - startMonth;
+	    var daysInBetween = 0;
+	    var monthHolder = 0;
+	    var monthsUntilNewYear = 0;
+	    var remainderDays = 0;
+	    var weeks = 0;
+	    var monthsTillNew = 0;
+	     
+	    var whatDate = function(number){
+	        if(number === 0 || number === 2 || number === 4 || number === 6 || number === 7 || number === 9 || number === 11){
+	           return 31;    
+	        }
+	        else if(number === 1) {
+	            return 28;    
+	        }
+	        else if(number === 3 || number === 5 ||  number === 8 || number === 10){
+	            return 30;  
+	        }
+	        else {
+	            console.log("Something is wrong in the same year loop");
+	        }
+	    };  
+
+
+	    if(differenceYear === 0){//YEAR IS THE SAME
+	        if(differenceMonth === 0){//MONTH IS THE SAME
+	            daysInBetween = endDay - startDay;
+	        }
+	        else{//IF MONTH IS DIFFERENT BUT YEAR IS THE SAME
+	            for(i=1; i < differenceMonth; i++){
+	                daysInBetween = whatDate(startMonth + i) + daysInBetween;
+	            }
+	            daysInBetween = whatDate(startMonth) - startDay + daysInBetween;
+	            daysInBetween = daysInBetween + endDay;
+	        }
+	    }
+	    else {//YEAR IS DIFFERENT
+	        monthsTillNew = 11 - startMonth;
+	        for(i=1; i < monthsTillNew + 1; i++){//start to end of year
+	            daysInBetween = whatDate(startMonth + i) + daysInBetween;
+	        }//beginning of year to end month
+	        for(i=0; i < endMonth; i++){
+	            daysInBetween = whatDate(i) + daysInBetween;
+	        }
+	        daysInBetween = whatDate(startMonth) - startDay + daysInBetween;
+	        daysInBetween = daysInBetween + endDay;
+	    }
+	    weeks = daysInBetween / 7;
+	    weeks = Math.ceil(weeks);
+	    if (weeks === 0){
+	        weeks = 1;
+	    };
+	    return weeks;
+	}	
 }

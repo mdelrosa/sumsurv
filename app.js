@@ -18,6 +18,7 @@ var express = require('express')
   , Models = require('./models/models')
   , User = Models.User
   , Survey = Models.survey
+  , cronJob = require('cron').CronJob
   , Classroom = Models.classroom;
 // Seed the admin
 var admin = new User({
@@ -51,7 +52,13 @@ admin.save(function(err, stolk) {
       }
     })
   }
+  console.log("Before the beginning there was chicken.");
+  var cronMaster = '00 00,15,30,45,56 * * * *';
+  var jobMaster = new cronJob(cronMaster, function() {
+      console.log("Gimmie 15 doe.");
+  }, null, true, "America/New_York");
 });
+
 
 // Passport session setup.
 passport.serializeUser(function(user, done) {
