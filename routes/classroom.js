@@ -175,8 +175,6 @@ exports.edit_span = function(req, res) {
 						while (new Date > date) {
 							date.setDate(date.getDate()+7);
 						}
-						// Initialize reminder time
-
 						Classroom.update({ owner: req.user.id, name: req.body.name }, { $set: { 'maildeck.regular': date } }, function(err, num) {
 							if (err || !num) { console.log("Classroom maildeck update err:", err); return false}
 							else {
@@ -192,7 +190,34 @@ exports.edit_span = function(req, res) {
 		Classroom.update({ owner: req.user.id, name: req.body.name }, { $set: { 'span.end': req.body.n } }).exec(function(err, num) {
 			if(err || !num) { console.log("edit_span error:", err); return false }
 			else {
-				res.send({success: true});
+				Classroom.find({ owner: req.user.id, name: req.body.name }).exec( function(err, found_class) {
+					// Initialize reminder time
+					var n = found_class[0].span.start
+						, intEnd = found_class[0].interval.end
+						, remindDate = new Date(n.year, n.month, n.date)
+						, intDay = (parseInt(intEnd.day)===7) ? 0 : parseInt(intEnd.day)
+						, spanDay = remindDate.getDay()
+				    	, addToDate = (spanDay <= intDay) ? intDay - spanDay : (7 - spanDay) + intDay;
+			    	console.log('remindDate first:', remindDate);
+					remindDate.setDate(remindDate.getDate() + addToDate);
+					console.log('remindDate second:', remindDate);
+					// Change to 24 hour
+					var hourUp = (intEnd.time === "PM") ? ((intEnd.hour === '12') ? 12 : 12 + parseInt(intEnd.hour)) : ((intEnd.hour === '12') ? 0 : parseInt(intEnd.hour));
+					// Add 4 hours to standardize for EST time
+					remindDate.setUTCHours(hourUp+4);
+					remindDate.setUTCMinutes(parseInt(intEnd.minute));
+					console.log('remindDate third:', remindDate);
+					// Subtract ten hours from reminderDate
+					remindDate.setUTCHours(remindDate.getUTCHours()-12);
+					console.log('remindDate fourth:', remindDate);
+					res.send({success: true});
+					Classroom.update({ owner: req.user.id, name: req.body.name }, { $set: { 'maildeck.reminder': remindDate } }, function(err, num) {
+						if (err || !num) { console.log("Classroom maildeck update err:", err); return false}
+						else {
+							res.send({success: true});
+						}
+					})
+				})
 			}
 		})
 	}
