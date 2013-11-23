@@ -131,7 +131,10 @@ textarea {
 	right: 0;
 	bottom: 0;
 	left: 0;
-	background: url(jumbotron.jpg);  background-size: 100%;
+	background: url(jumbotron.jpg);;
+	background-repeat: no-repeat;
+	height: 100%;
+	width: 100%;
 	opacity: .3;
  }
 

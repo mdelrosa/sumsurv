@@ -56,7 +56,7 @@ admin.save(function(err, stolk) {
   }
 });
 
-var job = new cronJob("00 00,10,20,30,40,50 * * * *", function() {
+var job = new cronJob("00 * * * * *", function() {
   //first * is which second, next is minute, next is the hour, ? ? and then day of the week.  
   Classroom.find({}).populate('owner').exec(function(err, found_class) {
     if(err) { console.log("Decklist class error:", err); res.send({ success: false })}
@@ -89,7 +89,9 @@ var job = new cronJob("00 00,10,20,30,40,50 * * * *", function() {
           surveymail(found_class[i].roster, urllink);
         }
         // Check reminder maildeck
-        // if (found_class[i].maildeck.reminder && found_class[i].reminder <)
+        if (found_class[i].maildeck.reminder && found_class[i].reminder <= new Date) {
+          
+        }
       }
       if(update.length > 0) {
     
