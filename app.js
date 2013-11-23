@@ -57,15 +57,15 @@ admin.save(function(err, stolk) {
 });
 
 
-var job = new cronJob("* * * * *", function() {
+var job = new cronJob("00 * * * * *", function() {
   //first * is which second, next is minute, next is the hour, ? ? and then day of the week.  
-  Classroom.find({}).populate('owner').exec(function(err, found_class) {
+  Classroom.find({}).populate('owner responses').exec(function(err, found_class) {
     if(err) { console.log("Decklist class error:", err); res.send({ success: false })}
     else {
       var update = [];
       for (i=0;i<found_class.length;i++) {
-        console.log("what is i", i);
-        console.log("Class", found_class[i]._id, "Maildeck", i, ":", found_class[i].maildeck);
+        var iClass = found_class[i]
+            , responses = iClass.responses;
         // Check regular maildeck
         if (found_class[i].maildeck) { console.log("regular:",found_class[i].maildeck.regular, "now:", new Date, "before now:", found_class[i].maildeck.regular <= new Date)}
         if (found_class[i].maildeck && found_class[i].maildeck.regular <= new Date) {
@@ -90,8 +90,6 @@ var job = new cronJob("* * * * *", function() {
           var urllink = "http://localhost:3000/" + encodeURIComponent(found_class[i].owner.username).toString() + "/" + encodeURIComponent(found_class[i].name).toString() + "/take"
           surveymail(found_class[i].roster, urllink);
         }
-        // Check reminder maildeck
-        //if (found_class[i].maildeck.reminder && found_class[i].reminder < new Date){
           var datedata = new Date()
         , date = datedata.getDate()
         , month = datedata.getMonth()
@@ -99,26 +97,21 @@ var job = new cronJob("* * * * *", function() {
           //console.log("found_class[i].roster", found_class[i].roster);
           //console.log("found_class[i].responses", found_class[i].responses);
           var roster = found_class[i].roster;
-          User.find({email: {$in: found_class[i].roster}}).exec(function(err, user_db) {
+          User.find({email: {$in: roster}}).exec(function(err, user_db) {
             if(err)  {console.log('Unable to find users'); return false}
-            else {
-              console.log("found_class[i]", found_class[i]);
+            else {              
               var currentId = 0;
               var month = datedata.getMonth()+1; 
               var date = datedata.getDate(); 
               var year = datedata.getFullYear();
-              var whatweeknow = whatweek(parseInt(found_class[0].span.start.date), parseInt(found_class[0].span.start.month), parseInt(found_class[0].span.start.year), date, month, year);
-              console.log("user_db", user_db);
+              var whatweeknow = whatweek(parseInt(iClass.span.start.date), parseInt(iClass.span.start.month), parseInt(iClass.span.start.year), date, month, year);
               for (k=0; k<user_db.length; k++) {
                 currentId = user_db[k].id;
-                console.log("k", k);
                 //console.log("currentID", currentId);
-                for(j=0; j<found_class[i].responses.length; j++) {
-                  console.log("j", j);
-                  //console.log("Gimmie duh responses", found_class[i].responses);
-                  if(currentId === found_class[i].responses[j].id) {
-                    if(found_class[i].responses[j].responseweek === whatweeknow){
-                      roster.splice(roster.indexOf(user_db[i].email), 1);
+                for(j=0; j<responses.length; j++) {
+                  if(currentId === responses[j].participant.toString()) {
+                    if(responses[j].responseweek === whatweeknow){
+                      roster.splice(roster.indexOf(user_db[k].email), 1);
                       //console.log("This is the new roster doe", roster);
                         break;
                     }
@@ -412,22 +405,8 @@ function whatweek(startDay, startMonth, startYear, endDay, endMonth, endYear) {
       }
       else {//YEAR IS DIFFERENT
           monthsTillNew = 11 - startM
-      // send mail with defined transport object
-      var endDate = spanEnd.date
-      , endMonth = spanEnd.month
-      , endYear = spanEnd.year;
-      // if (year <= endYear && month <= endMonth && date <= endDate) {
-      smtpTransport.sendMail(mailOptions, function(error, response){
-        if(error){
-            console.log(error);
-        }else{
-            console.log("Message sent: " + response.message);
-            smtpTransport.close();
-        }
-          // if you don't want to use this transport object anymore, uncomment following line
-            // shut down the connection pool, no more messages
-      }); 
-    }
+      }
+      return Math.ceil(daysInBetween/7)
 }
 
 
