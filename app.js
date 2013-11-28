@@ -65,10 +65,11 @@ var job = new cronJob("00 * * * * *", function() {
       var update = [];
       for (i=0;i<found_class.length;i++) {
         var iClass = found_class[i]
-            , responses = iClass.responses;
+        , responses = iClass.responses
+        , roster = iClass.roster;
         // Check regular maildeck
-        if (found_class[i].maildeck) { console.log("regular:",found_class[i].maildeck.regular, "now:", new Date, "before now:", found_class[i].maildeck.regular <= new Date)}
-        if (found_class[i].maildeck && found_class[i].maildeck.regular <= new Date) {
+        if (iClass.maildeck) { console.log("regular:", iClass.maildeck.regular, "now:", new Date, "before now:", iClass.maildeck.regular <= new Date)}
+        if (iClass.maildeck && iClass.maildeck.regular <= new Date) {
           // At the moment, we will assume that the class interval has not changed. We will update the class by rolling the date forward by a week.
           var oldDate = found_class[i].maildeck.regular
           while (oldDate <= new Date) {
@@ -88,26 +89,23 @@ var job = new cronJob("00 * * * * *", function() {
           // req.headers.host
           // http://motivationsurvey.com/
           var urllink = "http://localhost:3000/" + encodeURIComponent(found_class[i].owner.username).toString() + "/" + encodeURIComponent(found_class[i].name).toString() + "/take"
-          surveymail(found_class[i].roster, urllink);
+          // send email
+          surveymail(found_class[i].roster, urllink, "regular");
         }
-          var datedata = new Date()
-        , date = datedata.getDate()
-        , month = datedata.getMonth()
-        , year = datedata.getFullYear();
-          //console.log("found_class[i].roster", found_class[i].roster);
-          //console.log("found_class[i].responses", found_class[i].responses);
-          var roster = found_class[i].roster;
+        }
+        if (iClass.maildeck) { console.log("reminder:", iClass.maildeck.reminder, "now:", new Date, "before now:", iClass.maildeck.regular <= new Date)}
+        if (iClass.maildeck && iClass.maildeck.reminder <= new Date) {
           User.find({email: {$in: roster}}).exec(function(err, user_db) {
             if(err)  {console.log('Unable to find users'); return false}
             else {              
               var currentId = 0;
+              var datedata = new Date();
               var month = datedata.getMonth()+1; 
               var date = datedata.getDate(); 
               var year = datedata.getFullYear();
               var whatweeknow = whatweek(parseInt(iClass.span.start.date), parseInt(iClass.span.start.month), parseInt(iClass.span.start.year), date, month, year);
               for (k=0; k<user_db.length; k++) {
                 currentId = user_db[k].id;
-                //console.log("currentID", currentId);
                 for(j=0; j<responses.length; j++) {
                   if(currentId === responses[j].participant.toString()) {
                     if(responses[j].responseweek === whatweeknow){
@@ -118,14 +116,29 @@ var job = new cronJob("00 * * * * *", function() {
                   }
                 }
               }
-              console.log("Roster of the new, post-for loop", roster);
+              // Send email (if there's anyone who needs to be reminded)
+              if (roster.length) {
+                surveymail(roster, urllink, "remind");  
+              }
+              // Update maildeck
+              var oldDate = iClass.maildeck.reminder
+              while (oldDate <= new Date) {
+                oldDate.setDate(oldDate.getDate()+7);
+              }
+              Classroom.update({ _id: iClass._id }, { 'maildeck.reminder': oldDate }).exec(function(err, num) {
+                if(err) { console.log("Decklist classroom error:", err); res.send({success:false, message: "Classroom update error:"+err})}
+                else {
+                  if(!num) {
+                    console.log("Decklist update error: No classes found");
+                  }
+                  else {
+                    console.log("Decklist update success:", update);
+                  }
+                }
+              })
             }
-          }) 
-      //}
-      }  
-      if(update.length > 0) {
-    
-      }
+          })
+        }
       else {
         console.log("Maildeck clear!");
       }
@@ -133,7 +146,7 @@ var job = new cronJob("00 * * * * *", function() {
   })
 }, null, true, "America/New_York");
 
-var surveymail = function(roster, spanEnd, urllink) {
+var surveymail = function(roster, urllink, type) {
   var smtpTransport = nodemailer.createTransport("SMTP", {
 
     service: "Gmail",
@@ -170,13 +183,9 @@ var surveymail = function(roster, spanEnd, urllink) {
       firstday = 28 + firstday;
     };        
   };
-  var mailOptions = {
-      from: "Autonomous Humans Lab<authumlab@gmail.com>", // sender address
-      bcc: roster.join(","), // list of receivers
-      subject: "SIMS Weekly ", // Subject line
-      text: "Hello world", // plaintext body
-      html:        
-                '<div style="80%"><p><center><img src="http://i.imgur.com/6FO9p55.png" style="width:100%"/></center></p>' +
+  var htmlBody;
+  if (type === "regular") {
+    htmlBody = '<div style="80%"><p><center><img src="http://i.imgur.com/6FO9p55.png" style="width:100%"/></center></p>' +
           '<p>Hey everyone!</p>' + 
           '<p></p>' +
           '<p>It’s that time of week again (Thursday, hopefully). This survey is for the week of ' +first+ " to " +last+ '. Treat this survey as a reflection on your activities this week. If you’re interested in recording your responses (we hope you are), the survey will be up until Sunday night.</p>' + 
@@ -190,8 +199,31 @@ var surveymail = function(roster, spanEnd, urllink) {
           '<p>Autonomous Humans Lab</p>' +
           '<div style="background-color: #dcdcdc"><center><footer><p style="color: #999999">Footah Mason del Rosario Doyung Lee Alex Dillon Jon Stolk Potoo</p>' +
           '<p style="color: #999999">This will fill up space about home potoo yes please why that tut tut singaling yeh?</center></p></footer></center></div></div>'
-          ,//html body
   }
+  else {
+    htmlBody = '<div style="80%"><p><center><img src="http://i.imgur.com/6FO9p55.png" style="width:100%"/></center></p>' +
+          '<p>Hey everyone!</p>' + 
+          '<p></p>' +
+          "<p>It seems that you have not taken this week's survey yet... This makes us terribly sad. If you would like to make us happy you can click the link below.</p>" + 
+          '<p></p>' +
+          '<p>Remember to email mason.delrosario@students.olin.edu or Doyung.lee@students.olin.edu if you have any issues or comments!</center></p>' +
+          '<p></p>' +
+          '<p>Here’s the link:</p>'+
+          '<p><center><a href="'+urllink+'" target="survey page"><img src="http://i.imgur.com/MaVMQlI.png" /></a></center></p>' +
+          '<p> </p>' +
+          '<p>Happy surveying,</p>' +
+          '<p>Autonomous Humans Lab</p>' +
+          '<div style="background-color: #dcdcdc"><center><footer><p style="color: #999999">Footah Mason del Rosario Doyung Lee Alex Dillon Jon Stolk Potoo</p>' +
+          '<p style="color: #999999">This will fill up space about home potoo yes please why that tut tut singaling yeh?</center></p></footer></center></div></div>'
+  }
+  var mailOptions = {
+      from: "Autonomous Humans Lab<authumlab@gmail.com>", // sender address
+      bcc: roster.join(","), // list of receivers
+      subject: "SIMS Weekly ", // Subject line
+      text: "Hello world", // plaintext body
+      html:  htmlBody
+  }
+
   // send mail with defined transport object
     smtpTransport.sendMail(mailOptions, function(error, response){
         if(error){
