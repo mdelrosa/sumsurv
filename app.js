@@ -64,11 +64,13 @@ var job = new cronJob("00 * * * * *", function() {
     else {
       var update = [];
       for (i=0;i<found_class.length;i++) {
+        console.log('Class name:'+found_class[i].name+ " ---");
         var iClass = found_class[i]
         , responses = iClass.responses
         , roster = iClass.roster;
         // Check regular maildeck
         if (iClass.maildeck) { console.log("regular:", iClass.maildeck.regular, "now:", new Date, "before now:", iClass.maildeck.regular <= new Date)}
+        else {console.log("Regular not defined.")}
         if (iClass.maildeck && iClass.maildeck.regular <= new Date) {
           // At the moment, we will assume that the class interval has not changed. We will update the class by rolling the date forward by a week.
           var oldDate = found_class[i].maildeck.regular
@@ -92,8 +94,8 @@ var job = new cronJob("00 * * * * *", function() {
           // send email
           surveymail(found_class[i].roster, urllink, "regular");
         }
-        }
         if (iClass.maildeck) { console.log("reminder:", iClass.maildeck.reminder, "now:", new Date, "before now:", iClass.maildeck.regular <= new Date)}
+        else {console.log("Reminder not defined.")}
         if (iClass.maildeck && iClass.maildeck.reminder <= new Date) {
           User.find({email: {$in: roster}}).exec(function(err, user_db) {
             if(err)  {console.log('Unable to find users'); return false}
@@ -139,8 +141,6 @@ var job = new cronJob("00 * * * * *", function() {
             }
           })
         }
-      else {
-        console.log("Maildeck clear!");
       }
     } 
   })
@@ -188,9 +188,9 @@ var surveymail = function(roster, urllink, type) {
     htmlBody = '<div style="80%"><p><center><img src="http://i.imgur.com/6FO9p55.png" style="width:100%"/></center></p>' +
           '<p>Hey everyone!</p>' + 
           '<p></p>' +
-          '<p>It’s that time of week again (Thursday, hopefully). This survey is for the week of ' +first+ " to " +last+ '. Treat this survey as a reflection on your activities this week. If you’re interested in recording your responses (we hope you are), the survey will be up until Sunday night.</p>' + 
+          '<p>It’s that time of week again. This survey is for the week of ' +first+ " to " +last+ '. Treat this survey as a reflection on your activities this week.</p>' + 
           '<p></p>' +
-          '<p>Remember to email mason.delrosario@students.olin.edu or Doyung.lee@students.olin.edu if you have any issues or comments!</center></p>' +
+          '<p>Remember to email alexander.dillon@olin.edu if you have any issues or comments!</center></p>' +
           '<p></p>' +
           '<p>Here’s the link:</p>'+
           '<p><center><a href="'+urllink+'" target="survey page"><img src="http://i.imgur.com/MaVMQlI.png" /></a></center></p>' +
@@ -206,7 +206,7 @@ var surveymail = function(roster, urllink, type) {
           '<p></p>' +
           "<p>It seems that you have not taken this week's survey yet... This makes us terribly sad. If you would like to make us happy you can click the link below.</p>" + 
           '<p></p>' +
-          '<p>Remember to email mason.delrosario@students.olin.edu or Doyung.lee@students.olin.edu if you have any issues or comments!</center></p>' +
+          '<p>Remember to email alexander.dillon@olin.edu if you have any issues or comments!</center></p>' +
           '<p></p>' +
           '<p>Here’s the link:</p>'+
           '<p><center><a href="'+urllink+'" target="survey page"><img src="http://i.imgur.com/MaVMQlI.png" /></a></center></p>' +
