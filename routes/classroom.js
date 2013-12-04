@@ -107,6 +107,7 @@ exports.roster = function(req, res) {
 	Classroom.find({name: req.query.className, owner: req.user}).exec(function(err, found_class) {
 		if(err) { console.log("Roster error: ", err); return false}
 		else {
+			console.log(found_class[0]);
 			res.render("_roster", {
 				roster: found_class[0].roster,
 				requests: found_class[0].requests
@@ -158,28 +159,32 @@ exports.edit_span = function(req, res) {
 				Classroom.find({ owner: req.user.id, name: req.body.name }).exec(function(err, found_class) {
 					if(err) { console.log("edit_span search error:", err); return false}
 					else {
-						var n = req.body.n
-							, intStart = found_class[0].interval.start
-							, date = new Date(n.year, n.month, n.date )
-							, intDay = (parseInt(intStart.day) === 7) ? 0 : parseInt(intStart.day)
-							, spanDay = date.getDay()
-							, addToDate = (spanDay <= intDay) ? intDay - spanDay : (7 - spanDay) + intDay;
-						date.setDate(date.getDate()+addToDate);
-						// change to 24 hour
-						var hourUp = (intStart.time === "PM") ? ((intStart.hour === '12') ? 12 : 12 + parseInt(intStart.hour)) : ((intStart.hour === '12') ? 0 : parseInt(intStart.hour));
-						// add four to time to standardize for EST, add one more for each time zone to the left
-						date.setUTCHours(hourUp+4);
-						date.setUTCMinutes(parseInt(intStart.minute));
-						// If we are initializing the span such that it begins before today, set maildeck for next week's int
-						if (new Date > date) {
-							date.setDate(date.getDate()+7);
-						}
-						Classroom.update({ owner: req.user.id, name: req.body.name }, { $set: { 'maildeck.regular': date } }, function(err, num) {
-							if (err || !num) { console.log("Classroom maildeck update err:", err); return false}
-							else {
-								res.send({success: true})
-							}
-						})
+						res.send({success:true})
+						// console.log('req.body.n',req.body.n);
+						// var n = req.body.n
+						// 	, intStart = found_class[0].interval.start
+						// 	, date = new Date(n.year, n.month, n.date )
+						// 	, intDay = (parseInt(intStart.day) === 7) ? 0 : parseInt(intStart.day)
+						// 	, spanDay = date.getDay()
+						// 	, addToDate = (spanDay <= intDay) ? intDay - spanDay : (7 - spanDay) + intDay;
+						// date.setDate(date.getDate()+addToDate);
+						// // change to 24 hour
+						// var hourUp = (intStart.time === "PM") ? ((intStart.hour === '12') ? 12 : 12 + parseInt(intStart.hour)) : ((intStart.hour === '12') ? 0 : parseInt(intStart.hour));
+						// // add four to time to standardize for EST, add one more for each time zone to the left
+						// date.setUTCHours(hourUp+4);
+						// date.setUTCMinutes(parseInt(intStart.minute));
+						// // If we are initializing the span such that it begins before today, set maildeck for next week's int
+						// while (new Date > date) {
+						// 	date.setDate(date.getDate()+7);
+						// }
+						// Classroom.update({ owner: req.user.id, name: req.body.name }, { $set: { 'maildeck.regular': date } }, function(err, num) {
+						// 	if (err || !num) { console.log("Classroom maildeck update err:", err); return false}
+						// 	else {
+						// 		res.send({success: true})
+						// 	}
+						// });
+						var update = maildeck_update(req.user.id, req.body.name, found_class[0]);
+						if (update) { return true };
 					}
 				})
 			}
@@ -189,10 +194,83 @@ exports.edit_span = function(req, res) {
 		Classroom.update({ owner: req.user.id, name: req.body.name }, { $set: { 'span.end': req.body.n } }).exec(function(err, num) {
 			if(err || !num) { console.log("edit_span error:", err); return false }
 			else {
-				res.send({success: true});
+				res.send({success:true})
+				Classroom.find({ owner: req.user.id, name: req.body.name }).exec( function(err, found_class) {
+					// // Initialize reminder time
+					// var n = found_class[0].span.start
+					// 	, intEnd = found_class[0].interval.end
+					// 	, remindDate = new Date(n.year, n.month, n.date)
+					// 	, intDay = (parseInt(intEnd.day)===7) ? 0 : parseInt(intEnd.day)
+					// 	, spanDay = remindDate.getDay()
+				 //    	, addToDate = (spanDay <= intDay) ? intDay - spanDay : (7 - spanDay) + intDay;
+			  //   	console.log('remindDate first:', remindDate);
+					// remindDate.setDate(remindDate.getDate() + addToDate);
+					// console.log('remindDate second:', remindDate);
+					// // Change to 24 hour
+					// var hourUp = (intEnd.time === "PM") ? ((intEnd.hour === '12') ? 12 : 12 + parseInt(intEnd.hour)) : ((intEnd.hour === '12') ? 0 : parseInt(intEnd.hour));
+					// // Add 4 hours to standardize for EST time
+					// remindDate.setUTCHours(hourUp+4);
+					// remindDate.setUTCMinutes(parseInt(intEnd.minute));
+					// console.log('remindDate third:', remindDate);
+					// // Subtract ten hours from reminderDate
+					// remindDate.setUTCHours(remindDate.getUTCHours()-12);
+					// console.log('remindDate fourth:', remindDate);
+					// Classroom.update({ owner: req.user.id, name: req.body.name }, { $set: { 'maildeck.reminder': remindDate } }, function(err, num) {
+					// 	if (err || !num) { console.log("Classroom maildeck update err:", err); return false }
+					// 	else {
+					// 		res.send({success: true});
+					// 	}
+					// })
+					var update = maildeck_update(req.user.id, req.body.name, found_class[0]);
+					if (update) { return true };
+				})
 			}
 		})
 	}
+}
+
+// Update maildeck of a classroom
+var maildeck_update = function(owner, name, classroom) {
+	var s = classroom.span.start
+		, intStart = classroom.interval.start
+		, dateRem = new Date(s.year, s.month, s.date)
+		, dateReg = new Date(s.year, s.month, s.date)
+		, intReg = classroom.interval.start
+		, intRem = classroom.interval.end
+		, spanDay = dateRem.getDay()
+		, dayRem = (parseInt(intRem.day) === 7) ? 0 : parseInt(intRem.day)
+		, dayReg = (parseInt(intReg.day) === 7) ? 0 : parseInt(intReg.day)
+		, addReg = (spanDay <= dayReg) ? dayReg - spanDay : (7 - spanDay) + dayReg
+		, addRem = (spanDay <= intRem) ? dayRem - spanDay : (7 - spanDay) + dayRem
+		, hourRem = (intRem.time === "PM") ? ((intRem.hour === '12') ? 12 : 12 + parseInt(intRem.hour)) : ((intRem.hour === '0') ? 0 : parseInt(intRem.hour))
+		, hourReg = (intReg.time === "PM") ? ((intReg.hour === '12') ? 12 : 12 + parseInt(intReg.hour)) : ((intReg.hour === '0') ? 0 : parseInt(intReg.hour));
+	console.log('intReg:',intReg);
+	console.log('intRem:',intRem);
+	dateRem.setDate(dateRem.getDate() + addRem);
+	dateReg.setDate(dateReg.getDate() + addReg);
+	console.log('dateRem1:',dateRem);
+	console.log('dateReg1:',dateReg);
+	dateRem.setUTCHours(hourRem+4);
+	dateReg.setUTCHours(hourReg+4);
+	console.log('dateRem2:',dateRem);
+	console.log('dateReg2:',dateReg);
+	dateRem.setUTCMinutes(parseInt(intRem.minute));
+	dateReg.setUTCMinutes(parseInt(intReg.minute));
+	dateRem.setUTCHours(dateRem.getUTCHours()-12);
+	console.log('dateRem3:',dateRem);
+	console.log('dateReg3:',dateReg);
+	while ( new Date > dateRem ) {
+		dateRem.setDate(dateRem.getDate()+7);
+	}
+	while ( new Date > dateReg ) {
+		dateReg.setDate(dateReg.getDate()+7);
+	}
+	Classroom.update({ owner: owner, name: name }, { $set: { 'maildeck.reminder': dateRem, 'maildeck.regular': dateReg } }, function(err, num) {
+		if (err || !num) { console.log("Classroom maildeck update err:", err); return false }
+		else {
+			return true;
+		}
+	});
 }
 
 // Get a class's requests
@@ -296,7 +374,14 @@ exports.interval = function(req, res) {
 		Classroom.update({name: req.body.className, owner: req.user.id}, {$set: {'interval.start': req.body.start}}, {upsert: true}).exec(function(err) {
 			if(err) { console.log("Interval error: ", err); return false }
 			else {
-				res.send({success: true});
+				Classroom.find({name: req.body.className, owner: req.user.id}).exec(function(err, found_class) {
+					if(err) {console.log('Interval error', err); return false}
+					else {
+						res.send({success:true})
+						var update = maildeck_update(req.user.id, req.body.className, found_class[0]);
+						if (update) { return true}
+					}
+				});
 			}
 		});
 	}
@@ -305,7 +390,14 @@ exports.interval = function(req, res) {
 			Classroom.update({name: req.body.className, owner: req.user.id}, {$set: {'interval.end': req.body.end}}, {upsert: true}).exec(function(err) {
 			if(err) { console.log("Interval error: ", err); return false }
 			else {
-				res.send({success: true});
+				Classroom.find({name: req.body.className, owner: req.user.id}).exec(function(err, found_class) {
+					if(err) {console.log('Interval error', err); return false}
+					else {
+						res.send({success:true})
+						var update = maildeck_update(req.user.id, req.body.className, found_class[0]);
+						if (update) { return true }
+					}
+				});
 			}
 		});	
 	}

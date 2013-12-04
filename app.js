@@ -18,7 +18,10 @@ var express = require('express')
   , Models = require('./models/models')
   , User = Models.User
   , Survey = Models.survey
-  , Classroom = Models.classroom;
+  , cronJob = require('cron').CronJob
+  , Classroom = Models.classroom
+  , nodemailer = require("nodemailer");
+
 // Seed the admin
 var admin = new User({
     username: 'stolktacular',
@@ -52,6 +55,186 @@ admin.save(function(err, stolk) {
     })
   }
 });
+
+
+var job = new cronJob("00 * * * * *", function() {
+  //first * is which second, next is minute, next is the hour, ? ? and then day of the week.  
+  Classroom.find({}).populate('owner responses').exec(function(err, found_class) {
+    if(err) { console.log("Decklist class error:", err); res.send({ success: false })}
+    else {
+      var update = [];
+      for (i=0;i<found_class.length;i++) {
+        var iClass = found_class[i]
+        , responses = iClass.responses
+        , roster = iClass.roster;
+        // Check regular maildeck
+        if (iClass.maildeck) { console.log("regular:", iClass.maildeck.regular, "now:", new Date, "before now:", iClass.maildeck.regular <= new Date)}
+        if (iClass.maildeck && iClass.maildeck.regular <= new Date) {
+          // At the moment, we will assume that the class interval has not changed. We will update the class by rolling the date forward by a week.
+          var oldDate = found_class[i].maildeck.regular
+          while (oldDate <= new Date) {
+            oldDate.setDate(oldDate.getDate()+7);
+          }
+          Classroom.update({ _id: found_class[i]._id }, { 'maildeck.regular': oldDate }).exec(function(err, num) {
+            if(err) { console.log("Decklist classroom error:", err); res.send({success:false, message: "Classroom update error:"+err})}
+            else {
+              if(!num) {
+                console.log("Decklist update error: No classes found");
+              }
+              else {
+                console.log("Decklist update success:", update);
+              }
+            }
+          })
+          // req.headers.host
+          // http://motivationsurvey.com/
+          var urllink = "http://localhost:3000/" + encodeURIComponent(found_class[i].owner.username).toString() + "/" + encodeURIComponent(found_class[i].name).toString() + "/take"
+          // send email
+          surveymail(found_class[i].roster, urllink, "regular");
+        }
+        }
+        if (iClass.maildeck) { console.log("reminder:", iClass.maildeck.reminder, "now:", new Date, "before now:", iClass.maildeck.regular <= new Date)}
+        if (iClass.maildeck && iClass.maildeck.reminder <= new Date) {
+          User.find({email: {$in: roster}}).exec(function(err, user_db) {
+            if(err)  {console.log('Unable to find users'); return false}
+            else {              
+              var currentId = 0;
+              var datedata = new Date();
+              var month = datedata.getMonth()+1; 
+              var date = datedata.getDate(); 
+              var year = datedata.getFullYear();
+              var whatweeknow = whatweek(parseInt(iClass.span.start.date), parseInt(iClass.span.start.month), parseInt(iClass.span.start.year), date, month, year);
+              for (k=0; k<user_db.length; k++) {
+                currentId = user_db[k].id;
+                for(j=0; j<responses.length; j++) {
+                  if(currentId === responses[j].participant.toString()) {
+                    if(responses[j].responseweek === whatweeknow){
+                      roster.splice(roster.indexOf(user_db[k].email), 1);
+                      //console.log("This is the new roster doe", roster);
+                        break;
+                    }
+                  }
+                }
+              }
+              // Send email (if there's anyone who needs to be reminded)
+              if (roster.length) {
+                surveymail(roster, urllink, "remind");  
+              }
+              // Update maildeck
+              var oldDate = iClass.maildeck.reminder
+              while (oldDate <= new Date) {
+                oldDate.setDate(oldDate.getDate()+7);
+              }
+              Classroom.update({ _id: iClass._id }, { 'maildeck.reminder': oldDate }).exec(function(err, num) {
+                if(err) { console.log("Decklist classroom error:", err); res.send({success:false, message: "Classroom update error:"+err})}
+                else {
+                  if(!num) {
+                    console.log("Decklist update error: No classes found");
+                  }
+                  else {
+                    console.log("Decklist update success:", update);
+                  }
+                }
+              })
+            }
+          })
+        }
+      else {
+        console.log("Maildeck clear!");
+      }
+    } 
+  })
+}, null, true, "America/New_York");
+
+var surveymail = function(roster, urllink, type) {
+  var smtpTransport = nodemailer.createTransport("SMTP", {
+
+    service: "Gmail",
+    auth: {
+      user: "authumlab@gmail.com",
+      pass: "tqufkeinpstgfatv"
+    }
+  });
+
+  var datedata= new Date(); 
+  var month = datedata.getMonth()+1; 
+  var date = datedata.getDate(); 
+  var year = datedata.getFullYear();
+  var day = datedata.getDay();
+  var lastday = date+7-day;
+  var firstday = date-day;
+  var firstmonth = datedata.getMonth()+1;
+  var firstyear = datedata.getFullYear();
+  var first = firstmonth.toString()+ "/" +firstday.toString()+ "/" +firstyear.toString();
+  var last = month.toString()+ "/" +lastday.toString()+ "/" +year.toString();
+  if (firstday < 1) {
+    firstmonth = month - 1;
+    if (firstmonth < 0) {
+      firstyear = firstyear - 1;
+      firstmonth == 11;
+    };
+    if (firstmonth == 0 || firstmonth == 2 || firstmonth == 4 || firstmonth == 6 || firstmonth == 7 || firstmonth == 9 || firstmonth == 11){
+      firstday = 31 + firstday;
+    }
+    else if (firstmonth == 3 || firstmonth == 5 || firstmonth == 8 || firstmonth == 10) {
+      firstday = 30 + firstday;
+    }
+    else if (firstmonth == 1) {
+      firstday = 28 + firstday;
+    };        
+  };
+  var htmlBody;
+  if (type === "regular") {
+    htmlBody = '<div style="80%"><p><center><img src="http://i.imgur.com/6FO9p55.png" style="width:100%"/></center></p>' +
+          '<p>Hey everyone!</p>' + 
+          '<p></p>' +
+          '<p>It’s that time of week again (Thursday, hopefully). This survey is for the week of ' +first+ " to " +last+ '. Treat this survey as a reflection on your activities this week. If you’re interested in recording your responses (we hope you are), the survey will be up until Sunday night.</p>' + 
+          '<p></p>' +
+          '<p>Remember to email mason.delrosario@students.olin.edu or Doyung.lee@students.olin.edu if you have any issues or comments!</center></p>' +
+          '<p></p>' +
+          '<p>Here’s the link:</p>'+
+          '<p><center><a href="'+urllink+'" target="survey page"><img src="http://i.imgur.com/MaVMQlI.png" /></a></center></p>' +
+          '<p> </p>' +
+          '<p>Happy surveying,</p>' +
+          '<p>Autonomous Humans Lab</p>' +
+          '<div style="background-color: #dcdcdc"><center><footer><p style="color: #999999">Footah Mason del Rosario Doyung Lee Alex Dillon Jon Stolk Potoo</p>' +
+          '<p style="color: #999999">This will fill up space about home potoo yes please why that tut tut singaling yeh?</center></p></footer></center></div></div>'
+  }
+  else {
+    htmlBody = '<div style="80%"><p><center><img src="http://i.imgur.com/6FO9p55.png" style="width:100%"/></center></p>' +
+          '<p>Hey everyone!</p>' + 
+          '<p></p>' +
+          "<p>It seems that you have not taken this week's survey yet... This makes us terribly sad. If you would like to make us happy you can click the link below.</p>" + 
+          '<p></p>' +
+          '<p>Remember to email mason.delrosario@students.olin.edu or Doyung.lee@students.olin.edu if you have any issues or comments!</center></p>' +
+          '<p></p>' +
+          '<p>Here’s the link:</p>'+
+          '<p><center><a href="'+urllink+'" target="survey page"><img src="http://i.imgur.com/MaVMQlI.png" /></a></center></p>' +
+          '<p> </p>' +
+          '<p>Happy surveying,</p>' +
+          '<p>Autonomous Humans Lab</p>' +
+          '<div style="background-color: #dcdcdc"><center><footer><p style="color: #999999">Footah Mason del Rosario Doyung Lee Alex Dillon Jon Stolk Potoo</p>' +
+          '<p style="color: #999999">This will fill up space about home potoo yes please why that tut tut singaling yeh?</center></p></footer></center></div></div>'
+  }
+  var mailOptions = {
+      from: "Autonomous Humans Lab<authumlab@gmail.com>", // sender address
+      bcc: roster.join(","), // list of receivers
+      subject: "SIMS Weekly ", // Subject line
+      text: "Hello world", // plaintext body
+      html:  htmlBody
+  }
+
+  // send mail with defined transport object
+    smtpTransport.sendMail(mailOptions, function(error, response){
+        if(error){
+            console.log(error);
+        }else{
+            console.log("Message sent: " + response.message);
+            // shut down the connection pool, no more messages
+            smtpTransport.close();
+        }
+    }); 
+}
 
 // Passport session setup.
 passport.serializeUser(function(user, done) {
@@ -141,7 +324,6 @@ app.get('/error', user.error);
 // Mail routes
 app.get('/mail/send', mail.test_mail);
 app.get('/mail/list', mail.list);
-app.get('/mail/decklist', mail.decklist);
 
 // user routes
 app.get('/login', user.login);
@@ -206,6 +388,60 @@ app.post('/class/request/add', classroom.part_add);
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
+
+function whatweek(startDay, startMonth, startYear, endDay, endMonth, endYear) {
+      startMonth = startMonth;
+
+      var startYear = startYear;
+      var startMonth = startMonth;
+      var startDay = startDay;
+
+      endMonth = endMonth - 1;
+
+      var differenceYear = endYear-startYear;
+      var differenceMonth = endMonth - startMonth;
+      var daysInBetween = 0;
+      var monthHolder = 0;
+      var monthsUntilNewYear = 0;
+      var remainderDays = 0;
+      var weeks = 0;
+      var monthsTillNew = 0;
+       
+      var whatDate = function(number){
+          if(number === 0 || number === 2 || number === 4 || number === 6 || number === 7 || number === 9 || number === 11){
+             return 31;    
+          }
+          else if(number === 1) {
+              return 28;    
+          }
+          else if(number === 3 || number === 5 ||  number === 8 || number === 10){
+              return 30;  
+          }
+          else {
+              console.log("Something is wrong in the same year loop");
+          }
+      };  
+
+
+      if(differenceYear === 0){//YEAR IS THE SAME
+          if(differenceMonth === 0){//MONTH IS THE SAME
+              daysInBetween = endDay - startDay;
+          }
+          else{//IF MONTH IS DIFFERENT BUT YEAR IS THE SAME
+              for(i=1; i < differenceMonth; i++){
+                  daysInBetween = whatDate(startMonth + i) + daysInBetween;
+              }
+              daysInBetween = whatDate(startMonth) - startDay + daysInBetween;
+              daysInBetween = daysInBetween + endDay;
+          }
+      }
+      else {//YEAR IS DIFFERENT
+          monthsTillNew = 11 - startM
+      }
+      return Math.ceil(daysInBetween/7)
+}
+
+
 
 // Login middleware
 function ensureAuthenticated(req, res, next) {

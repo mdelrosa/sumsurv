@@ -2,7 +2,8 @@
 // Handle sending emails
 var Models = require('../models/models')
     , Emaillist = Models.emaillist
-    , Classroom = Models.classroom;
+    , Classroom = Models.classroom
+    , User = Models.User;
 
 var nodemailer = require("nodemailer")
     , cronJob = require('cron').CronJob;
@@ -13,49 +14,10 @@ exports.list = function(req, res) {
 	res.send({success: true});
 }
 
-exports.decklist = function(req, res) {
-	// -- We would like something that will require auth between the GAE server and this node server
-	console.log("req.headers.host:",req.headers.host);
-	Classroom.find({}).populate('owner').exec(function(err, found_class) {
-		if(err) { console.log("Decklist class error:", err); res.send({ success: false })}
-		else {
-			var update = [];
-			for (i=0;i<found_class.length;i++) {
-				console.log("Class", found_class[i]._id, "Maildeck", i, ":", found_class[i].maildeck);
-				if (found_class[i].maildeck) { console.log("regular:",found_class[i].maildeck.regular, "now:", new Date, "before now:", found_class[i].maildeck.regular <= new Date)}
-				if (found_class[i].maildeck && found_class[i].maildeck.regular <= new Date) {
-					// At the moment, we will assume that the class interval has not changed. We will update the class by rolling the date forward by a week.
-					var oldDate = found_class[i].maildeck.regular
-					oldDate.setDate(oldDate.getDate()+7);
-					update.push(found_class[i]._id);
-					var urllink = "http://" + req.headers.host + "/" + encodeURIComponent(found_class[i].owner.username).toString() + "/" + encodeURIComponent(found_class[i].name).toString() + "/take"
-					surveymail(found_class[i].roster, urllink);
-				}
-			}
-			if(update.length > 0) {
-				Classroom.update({ _id: {$in: update } }, { 'maildeck.regular': oldDate }).exec(function(err, num) {
-					if(err) { console.log("Decklist classroom error:", err); res.send({success:false, message: "Classroom update error:"+err})}
-					else {
-						if(!num) {
-							res.send({success: false, message: "Classroom update error: No classes found."})
-						}
-						else {
-							res.send({success: true, updated: true, classes: update})
-						}
-					}
-				})
-			}
-			else {
-				res.send({success: true, updated: false, message: "Maildeck clear!"})
-			}
-		}	
-	})
-}
-
 exports.test_mail = function(req, res) {
-	  Classroom.find({name: req.query.name}).populate("owner").exec(function(err, classroom_db) {
-		   if(err) {console.log('Unable to find responses'); return false}
-		   else{
+	Classroom.find({name: req.query.name}).populate("owner responses").exec(function(err, classroom_db) {
+		if(err) {console.log('Unable to find responses'); return false}
+		else {
 			var smtpTransport = nodemailer.createTransport("SMTP", {
 				service: "Gmail",
 				auth: {
@@ -120,101 +82,183 @@ exports.test_mail = function(req, res) {
 			    		//html body
 			}
 				// send mail with defined transport object
-			smtpTransport.sendMail(mailOptions, function(error, response){
-			    if(error){
-			        console.log(error);
-			    }else{
-			        console.log("Message sent: " + response.message);
-			        smtpTransport.close();
-			        res.send("success");
-			    }
-				    // if you don't want to use this transport object anymore, uncomment following line
-			        // shut down the connection pool, no more messages
-			});	
+			// smtpTransport.sendMail(mailOptions, function(error, response){
+			//     if(error){
+			//         console.log(error);
+			//     }else{
+			//         console.log("Message sent: " + response.message);
+			//         smtpTransport.close();
+			//         res.send("success");
+			//     }
+			// 	    // if you don't want to use this transport object anymore, uncomment following line
+			//         // shut down the connection pool, no more messages
+			// });	
 			// setup e-mail data with unicode symbols
 			var hour = parseInt(classroom_db[0].interval.start.hour);
 			var day = parseInt(classroom_db[0].interval.start.day);
 			hour = (classroom_db[0].interval.start.time === "AM") ? hour : hour+12;
 			day = (day === 7) ? 0 : day;
+			var spanEnd = {
+				"date": parseInt(classroom_db[0].span.end.date),
+				"month": parseInt(classroom_db[0].span.end.month),
+				"year": parseInt(classroom_db[0].span.end.year)
+			}
+			var datedata = new Date()
+				, date = datedata.getDate()
+				, month = datedata.getMonth()
+				, year = datedata.getFullYear();
 			var cronTime = '00 '+classroom_db[0].interval.start.minute+" "+hour.toString()+" * * "+day.toString();
+
 			console.log(cronTime);
-			var job = new cronJob(cronTime, function() {
-			//first * is which second, next is minute, next is the hour, ? ? and then day of the week.	
-				surveymail(classroom_db[0].roster, urllink);
-			}, null, true, "America/New_York");
-		   };
+			// var job = new cronJob(cronTime, function() {
+			// //first * is which second, next is minute, next is the hour, ? ? and then day of the week.	
+			// 	surveymail(classroom_db[0].roster, urllink);
+			// }, null, true, "America/New_York");
 
-	  });	
+			//var job2 = new cronJob(cronTime, function()) {
+			//this job is to send emails to only the people who have not taken a survey for the week.
+			//	remindmail(classroom_db[0].roster, classroom_db[0].responses);	
+			//}
+	  	}	
+	})  	
 }
 
-var surveymail = function(roster, urllink) {
-	var smtpTransport = nodemailer.createTransport("SMTP", {
+// var surveymail = function(roster, spanEnd, urllink) {
+// 	var smtpTransport = nodemailer.createTransport("SMTP", {
 
-		service: "Gmail",
-		auth: {
-			user: "authumlab@gmail.com",
-			pass: "tqufkeinpstgfatv"
-		}
-	});
+// 		service: "Gmail",
+// 		auth: {
+// 			user: "authumlab@gmail.com",
+// 			pass: "tqufkeinpstgfatv"
+// 		}
+// 	});
 
-	var datedata= new Date(); 
-	var month = datedata.getMonth()+1; 
-	var date = datedata.getDate(); 
-	var year = datedata.getFullYear();
-	var day = datedata.getDay();
-	var lastday = date+7-day;
-	var firstday = date-day;
-	var firstmonth = datedata.getMonth()+1;
-	var firstyear = datedata.getFullYear();
-	var first = firstmonth.toString()+ "/" +firstday.toString()+ "/" +firstyear.toString();
-	var last = month.toString()+ "/" +lastday.toString()+ "/" +year.toString();
-	if (firstday < 1) {
-		firstmonth = month - 1;
-		if (firstmonth < 0) {
-			firstyear = firstyear - 1;
-			firstmonth == 11;
-		};
-		if (firstmonth == 0 || firstmonth == 2 || firstmonth == 4 || firstmonth == 6 || firstmonth == 7 || firstmonth == 9 || firstmonth == 11){
-			firstday = 31 + firstday;
-		}
-		else if (firstmonth == 3 || firstmonth == 5 || firstmonth == 8 || firstmonth == 10) {
-			firstday = 30 + firstday;
-		}
-		else if (firstmonth == 1) {
-			firstday = 28 + firstday;
-		};				
-	};
-	var mailOptions = {
-	    from: "Autonomous Humans Lab<authumlab@gmail.com>", // sender address
-	    bcc: roster.join(","), // list of receivers
-	    subject: "SIMS Weekly ", // Subject line
-	    text: "Hello world", // plaintext body
-	    html:        
-		            '<div style="80%"><p><center><img src="http://i.imgur.com/6FO9p55.png" style="width:100%"/></center></p>' +
-	    		'<p>Hey everyone!</p>' + 
-	    		'<p></p>' +
-	    		'<p>It’s that time of week again (Thursday, hopefully). This survey is for the week of ' +first+ " to " +last+ '. Treat this survey as a reflection on your activities this week. If you’re interested in recording your responses (we hope you are), the survey will be up until Sunday night.</p>' + 
-	    		'<p></p>' +
-	    		'<p>Remember to email mason.delrosario@students.olin.edu or Doyung.lee@students.olin.edu if you have any issues or comments!</center></p>' +
-	    		'<p></p>' +
-	    		'<p>Here’s the link:</p>'+
-	    		'<p><center><a href="'+urllink+'" target="survey page"><img src="http://i.imgur.com/MaVMQlI.png" /></a></center></p>' +
-	    		'<p> </p>' +
-	    		'<p>Happy surveying,</p>' +
-	    		'<p>Autonomous Humans Lab</p>' +
-	    		'<div style="background-color: #dcdcdc"><center><footer><p style="color: #999999">Footah Mason del Rosario Doyung Lee Alex Dillon Jon Stolk Potoo</p>' +
-	    		'<p style="color: #999999">This will fill up space about home potoo yes please why that tut tut singaling yeh?</center></p></footer></center></div></div>'
-	    		,//html body
-	}
-		// send mail with defined transport object
-	smtpTransport.sendMail(mailOptions, function(error, response){
-	    if(error){
-	        console.log(error);
-	    }else{
-	        console.log("Message sent: " + response.message);
-	        smtpTransport.close();
-	    }
-		    // if you don't want to use this transport object anymore, uncomment following line
-	        // shut down the connection pool, no more messages
-	});	
-}
+// 	var datedata= new Date(); 
+// 	var month = datedata.getMonth()+1; 
+// 	var date = datedata.getDate(); 
+// 	var year = datedata.getFullYear();
+// 	var day = datedata.getDay();
+// 	var lastday = date+7-day;
+// 	var firstday = date-day;
+// 	var firstmonth = datedata.getMonth()+1;
+// 	var firstyear = datedata.getFullYear();
+// 	var first = firstmonth.toString()+ "/" +firstday.toString()+ "/" +firstyear.toString();
+// 	var last = month.toString()+ "/" +lastday.toString()+ "/" +year.toString();
+// 	if (firstday < 1) {
+// 		firstmonth = month - 1;
+// 		if (firstmonth < 0) {
+// 			firstyear = firstyear - 1;
+// 			firstmonth == 11;
+// 		};
+// 		if (firstmonth == 0 || firstmonth == 2 || firstmonth == 4 || firstmonth == 6 || firstmonth == 7 || firstmonth == 9 || firstmonth == 11){
+// 			firstday = 31 + firstday;
+// 		}
+// 		else if (firstmonth == 3 || firstmonth == 5 || firstmonth == 8 || firstmonth == 10) {
+// 			firstday = 30 + firstday;
+// 		}
+// 		else if (firstmonth == 1) {
+// 			firstday = 28 + firstday;
+// 		};				
+// 	};
+// 	var mailOptions = {
+// 	    from: "Autonomous Humans Lab<authumlab@gmail.com>", // sender address
+// 	    bcc: roster.join(","), // list of receivers
+// 	    subject: "SIMS Weekly ", // Subject line
+// 	    text: "Hello world", // plaintext body
+// 	    html:        
+// 		            '<div style="80%"><p><center><img src="http://i.imgur.com/6FO9p55.png" style="width:100%"/></center></p>' +
+// 	    		'<p>Hey everyone!</p>' + 
+// 	    		'<p></p>' +
+// 	    		'<p>It’s that time of week again (Thursday, hopefully). This survey is for the week of ' +first+ " to " +last+ '. Treat this survey as a reflection on your activities this week. If you’re interested in recording your responses (we hope you are), the survey will be up until Sunday night.</p>' + 
+// 	    		'<p></p>' +
+// 	    		'<p>Remember to email mason.delrosario@students.olin.edu or Doyung.lee@students.olin.edu if you have any issues or comments!</center></p>' +
+// 	    		'<p></p>' +
+// 	    		'<p>Here’s the link:</p>'+
+// 	    		'<p><center><a href="'+urllink+'" target="survey page"><img src="http://i.imgur.com/MaVMQlI.png" /></a></center></p>' +
+// 	    		'<p> </p>' +
+// 	    		'<p>Happy surveying,</p>' +
+// 	    		'<p>Autonomous Humans Lab</p>' +
+// 	    		'<div style="background-color: #dcdcdc"><center><footer><p style="color: #999999">Footah Mason del Rosario Doyung Lee Alex Dillon Jon Stolk Potoo</p>' +
+// 	    		'<p style="color: #999999">This will fill up space about home potoo yes please why that tut tut singaling yeh?</center></p></footer></center></div></div>'
+// 	    		,//html body
+// 	}
+
+// 		// send mail with defined transport object
+// 	smtpTransport.sendMail(mailOptions, function(error, response){
+// 	    if(error){
+// 	        console.log(error);
+// 	    }else{
+// 	        console.log("Message sent: " + response.message);
+// 	        smtpTransport.close();
+// 	    }
+// 		    // if you don't want to use this transport object anymore, uncomment following line
+// 	        // shut down the connection pool, no more messages
+// 	});	
+
+// 	//checks what week the survey was taken (week1, week2, etc.)
+// 	function whatweek(startDay, startMonth, startYear, endDay, endMonth, endYear) {
+// 	    startMonth = startMonth;
+
+// 	    var startYear = startYear;
+// 	    var startMonth = startMonth;
+// 	    var startDay = startDay;
+
+// 	    endMonth = endMonth - 1;
+
+// 	    var differenceYear = endYear-startYear;
+// 	    var differenceMonth = endMonth - startMonth;
+// 	    var daysInBetween = 0;
+// 	    var monthHolder = 0;
+// 	    var monthsUntilNewYear = 0;
+// 	    var remainderDays = 0;
+// 	    var weeks = 0;
+// 	    var monthsTillNew = 0;
+	     
+// 	    var whatDate = function(number){
+// 	        if(number === 0 || number === 2 || number === 4 || number === 6 || number === 7 || number === 9 || number === 11){
+// 	           return 31;    
+// 	        }
+// 	        else if(number === 1) {
+// 	            return 28;    
+// 	        }
+// 	        else if(number === 3 || number === 5 ||  number === 8 || number === 10){
+// 	            return 30;  
+// 	        }
+// 	        else {
+// 	            console.log("Something is wrong in the same year loop");
+// 	        }
+// 	    };  
+
+
+// 	    if(differenceYear === 0){//YEAR IS THE SAME
+// 	        if(differenceMonth === 0){//MONTH IS THE SAME
+// 	            daysInBetween = endDay - startDay;
+// 	        }
+// 	        else{//IF MONTH IS DIFFERENT BUT YEAR IS THE SAME
+// 	            for(i=1; i < differenceMonth; i++){
+// 	                daysInBetween = whatDate(startMonth + i) + daysInBetween;
+// 	            }
+// 	            daysInBetween = whatDate(startMonth) - startDay + daysInBetween;
+// 	            daysInBetween = daysInBetween + endDay;
+// 	        }
+// 	    }
+// 	    else {//YEAR IS DIFFERENT
+// 	        monthsTillNew = 11 - startM
+// 			// send mail with defined transport object
+// 			var endDate = spanEnd.date
+// 			, endMonth = spanEnd.month
+// 			, endYear = spanEnd.year;
+// 			// if (year <= endYear && month <= endMonth && date <= endDate) {
+// 			smtpTransport.sendMail(mailOptions, function(error, response){
+// 		    if(error){
+// 		        console.log(error);
+// 		    }else{
+// 		        console.log("Message sent: " + response.message);
+// 		        smtpTransport.close();
+// 		    }
+// 			    // if you don't want to use this transport object anymore, uncomment following line
+// 		        // shut down the connection pool, no more messages
+// 		});	
+// 		}
+// 	}
+// }
