@@ -88,7 +88,7 @@ var job = new cronJob("00 * * * * *", function() {
           })
           // req.headers.host
           // http://motivationsurvey.com/
-          var urllink = "http://localhost:3000/" + encodeURIComponent(found_class[i].owner.username).toString() + "/" + encodeURIComponent(found_class[i].name).toString() + "/take"
+          var urllink = "motivationsurvey.com/" + encodeURIComponent(found_class[i].owner.username).toString() + "/" + encodeURIComponent(found_class[i].name).toString() + "/take"
           // send email
           surveymail(found_class[i].roster, urllink, "regular");
         }
@@ -197,8 +197,8 @@ var surveymail = function(roster, urllink, type) {
           '<p> </p>' +
           '<p>Happy surveying,</p>' +
           '<p>Autonomous Humans Lab</p>' +
-          '<div style="background-color: #dcdcdc"><center><footer><p style="color: #999999">Footah Mason del Rosario Doyung Lee Alex Dillon Jon Stolk Potoo</p>' +
-          '<p style="color: #999999">This will fill up space about home potoo yes please why that tut tut singaling yeh?</center></p></footer></center></div></div>'
+          '<div style="background-color: #dcdcdc"><center><footer><p style="color: #999999">Autonomous Humans Lab</p>' +
+          '<p style="color: #999999">motivationsurvey.com</center></p></footer></center></div></div>'
   }
   else {
     htmlBody = '<div style="80%"><p><center><img src="http://i.imgur.com/6FO9p55.png" style="width:100%"/></center></p>' +
@@ -213,8 +213,8 @@ var surveymail = function(roster, urllink, type) {
           '<p> </p>' +
           '<p>Happy surveying,</p>' +
           '<p>Autonomous Humans Lab</p>' +
-          '<div style="background-color: #dcdcdc"><center><footer><p style="color: #999999">Footah Mason del Rosario Doyung Lee Alex Dillon Jon Stolk Potoo</p>' +
-          '<p style="color: #999999">This will fill up space about home potoo yes please why that tut tut singaling yeh?</center></p></footer></center></div></div>'
+          '<div style="background-color: #dcdcdc"><center><footer><p style="color: #999999">Autonomous Humans Lab</p>' +
+          '<p style="color: #999999">motivationsurvey.com</center></p></footer></center></div></div>'
   }
   var mailOptions = {
       from: "Autonomous Humans Lab<authumlab@gmail.com>", // sender address
