@@ -241,11 +241,11 @@ var maildeck_update = function(owner, name, classroom) {
 		, dayRem = (parseInt(intRem.day) === 7) ? 0 : parseInt(intRem.day)
 		, dayReg = (parseInt(intReg.day) === 7) ? 0 : parseInt(intReg.day)
 		, addReg = (spanDay <= dayReg) ? dayReg - spanDay : (7 - spanDay) + dayReg
-		, addRem = (spanDay <= intRem) ? dayRem - spanDay : (7 - spanDay) + dayRem
+		, addRem = (spanDay <= dayRem) ? dayRem - spanDay : (7 - spanDay) + dayRem
 		, hourRem = (intRem.time === "PM") ? ((intRem.hour === '12') ? 12 : 12 + parseInt(intRem.hour)) : ((intRem.hour === '0') ? 0 : parseInt(intRem.hour))
 		, hourReg = (intReg.time === "PM") ? ((intReg.hour === '12') ? 12 : 12 + parseInt(intReg.hour)) : ((intReg.hour === '0') ? 0 : parseInt(intReg.hour));
-	console.log('intReg:',intReg);
-	console.log('intRem:',intRem);
+	console.log('dateRem0:',dateRem);
+	console.log('dateReg0:',dateReg);
 	dateRem.setDate(dateRem.getDate() + addRem);
 	dateReg.setDate(dateReg.getDate() + addReg);
 	console.log('dateRem1:',dateRem);
