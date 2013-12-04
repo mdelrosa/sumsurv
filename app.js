@@ -88,7 +88,7 @@ var job = new cronJob("00 * * * * *", function() {
           })
           // req.headers.host
           // http://motivationsurvey.com/
-          var urllink = "motivationsurvey.com/" + encodeURIComponent(found_class[i].owner.username).toString() + "/" + encodeURIComponent(found_class[i].name).toString() + "/take"
+          var urllink = "http://motivationsurvey.com/" + encodeURIComponent(found_class[i].owner.username).toString() + "/" + encodeURIComponent(found_class[i].name).toString() + "/take"
           // send email
           surveymail(found_class[i].roster, urllink, "regular");
         }
