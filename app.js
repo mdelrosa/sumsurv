@@ -57,6 +57,44 @@ admin.save(function(err, stolk) {
 });
 
 
+// New Sub-Functions for handling date incrementing and mail sending.
+function bumpEmailTime(class, type){
+  if(type === "regular"){
+    //Code to increment regular date
+  }
+  else if(type === "reminder"){
+    //Code to increment reminder date
+  }
+  else{console.log('WTF?? from bumpEmailTime! class, type are: ',class,type)}
+}
+
+function makeRoster(class, type, callback){
+  if(type==="regular"){
+    //Just return entire roster if it is the regular email
+    roster=class.roster;
+    callback(class, type, roster);
+  }
+  else if(type==="reminder"){
+    //Insert code for paring down roster
+
+    callback(class, type, roster);
+  }
+  else{console.log('WTF from makeRoster: class, type, roster are: ',class,type,roster)}
+}
+
+function sendMail(class, type, roster){
+  //This is the final function! paste in email sending code here (fill body per type, etc. Class info can go in here now!)
+
+}
+
+function goPostal(class,type){
+  //This is what starts the chain, and what is called from the cron loop
+  bumpEmailTime(class, type);
+  makeRoster(class, type, sendMail);
+  console.log('goPostal sequence complete!')
+}
+
+
 var job = new cronJob("00 * * * * *", function() {
   //first * is which second, next is minute, next is the hour, ? ? and then day of the week.  
   Classroom.find({}).populate('owner responses').exec(function(err, found_class) {
