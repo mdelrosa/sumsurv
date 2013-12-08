@@ -92,9 +92,10 @@ var job = new cronJob("00 * * * * *", function() {
           // http://motivationsurvey.com/
           var urllink = "http://motivationsurvey.com/" + encodeURIComponent(found_class[i].owner.username).toString() + "/" + encodeURIComponent(found_class[i].name).toString() + "/take"
           // send email
+          console.log('sending regular email, urllink is: ', urllink);
           surveymail(found_class[i].roster, urllink, "regular");
         }
-        if (iClass.maildeck) { console.log("reminder:", iClass.maildeck.reminder, "now:", new Date, "before now:", iClass.maildeck.regular <= new Date)}
+        if (iClass.maildeck) { console.log("reminder:", iClass.maildeck.reminder, "now:", new Date, "before now:", iClass.maildeck.reminder <= new Date)}
         else {console.log("Reminder not defined.")}
         if (iClass.maildeck && iClass.maildeck.reminder <= new Date) {
           User.find({email: {$in: roster}}).exec(function(err, user_db) {
@@ -117,16 +118,20 @@ var job = new cronJob("00 * * * * *", function() {
                     }
                   }
                 }
+              console.log('post-check reminder roster: ', roster);
               }
               // Send email (if there's anyone who needs to be reminded)
               if (roster.length) {
+                console.log('sending email from app.js ~line 125');
                 surveymail(roster, urllink, "remind");  
               }
               // Update maildeck
-              var oldDate = iClass.maildeck.reminder
+              var oldDate = iClass.maildeck.reminder;
+              console.log('old oldDate from iClass: ', oldDate, ' .reminder from found[i]: ', found_class[i].maildeck.reminder);
               while (oldDate <= new Date) {
                 oldDate.setDate(oldDate.getDate()+7);
               }
+              console.log('new oldDate: ', oldDate);
               Classroom.update({ _id: iClass._id }, { 'maildeck.reminder': oldDate }).exec(function(err, num) {
                 if(err) { console.log("Decklist classroom error:", err); res.send({success:false, message: "Classroom update error:"+err})}
                 else {
@@ -134,7 +139,7 @@ var job = new cronJob("00 * * * * *", function() {
                     console.log("Decklist update error: No classes found");
                   }
                   else {
-                    console.log("Decklist update success:", update);
+                    console.log("Decklist update success:", oldDate);
                   }
                 }
               })
