@@ -62,16 +62,16 @@ var job = new cronJob("00 * * * * *", function() {
   Classroom.find({}).populate('owner responses').exec(function(err, found_class) {
     if(err) { console.log("Decklist class error:", err); res.send({ success: false })}
     else {
-      var update = [];
+      //var update = [];
       for (i=0;i<found_class.length;i++) {
         console.log('Class name:'+found_class[i].name+ " ---");
-        var iClass = found_class[i]
-        , responses = iClass.responses
-        , roster = iClass.roster;
+        //var iClass = found_class[i]
+        //, responses = iClass.responses
+        //, roster = iClass.roster;
         // Check regular maildeck
-        if (iClass.maildeck) { console.log("regular:", iClass.maildeck.regular, "now:", new Date, "before now:", iClass.maildeck.regular <= new Date)}
+        if (found_class[i].maildeck) { console.log("regular:", found_class[i].maildeck.regular, "now:", new Date, "before now:", found_class[i].maildeck.regular <= new Date)}
         else {console.log("Regular not defined.")}
-        if (iClass.maildeck && iClass.maildeck.regular <= new Date) {
+        if (found_class[i].maildeck && found_class[i].maildeck.regular <= new Date) {
           // At the moment, we will assume that the class interval has not changed. We will update the class by rolling the date forward by a week.
           var oldDate = found_class[i].maildeck.regular
           while (oldDate <= new Date) {
@@ -84,7 +84,7 @@ var job = new cronJob("00 * * * * *", function() {
                 console.log("Decklist update error: No classes found");
               }
               else {
-                console.log("Decklist update success:", update);
+                console.log("Decklist update success:");
               }
             }
           })
@@ -95,57 +95,61 @@ var job = new cronJob("00 * * * * *", function() {
           console.log('sending regular email, urllink is: ', urllink);
           surveymail(found_class[i].roster, urllink, "regular");
         }
-        if (iClass.maildeck) { console.log("reminder:", iClass.maildeck.reminder, "now:", new Date, "before now:", iClass.maildeck.reminder <= new Date)}
-        else {console.log("Reminder not defined.")}
-        if (iClass.maildeck && iClass.maildeck.reminder <= new Date) {
-          User.find({email: {$in: roster}}).exec(function(err, user_db) {
-            if(err)  {console.log('Unable to find users'); return false}
-            else {              
-              var currentId = 0;
-              var datedata = new Date();
-              var month = datedata.getMonth()+1; 
-              var date = datedata.getDate(); 
-              var year = datedata.getFullYear();
-              var whatweeknow = whatweek(parseInt(iClass.span.start.date), parseInt(iClass.span.start.month), parseInt(iClass.span.start.year), date, month, year);
-              for (k=0; k<user_db.length; k++) {
-                currentId = user_db[k].id;
-                for(j=0; j<responses.length; j++) {
-                  if(currentId === responses[j].participant.toString()) {
-                    if(responses[j].responseweek === whatweeknow){
-                      roster.splice(roster.indexOf(user_db[k].email), 1);
-                      //console.log("This is the new roster doe", roster);
-                        break;
+        if (found_class[i].maildeck) { 
+          console.log("reminder:", found_class[i].maildeck.reminder, "now:", new Date, "before now:", found_class[i].maildeck.reminder <= new Date);
+          if (found_class[i].maildeck && found_class[i].maildeck.reminder <= new Date) {
+            User.find({email: {$in: found_class[i].roster}}).exec(function(err, user_db) {
+              if(err)  {console.log('Unable to find users'); return false}
+              else {
+                console.log('found_class[i] within user find: ', found_class[i]);
+                var currentId = 0;
+                var datedata = new Date();
+                var month = datedata.getMonth()+1; 
+                var date = datedata.getDate(); 
+                var year = datedata.getFullYear();
+                var whatweeknow = whatweek(parseInt(found_class[i].span.start.date), parseInt(found_class[i].span.start.month), parseInt(found_class[i].span.start.year), date, month, year);
+                var roster = found_class[i].roster;
+                for (k=0; k<user_db.length; k++) {
+                  currentId = user_db[k].id;
+                  for(j=0; j<found_class[i].responses.length; j++) {
+                    if(currentId === found_class[i].responses[j].participant.toString()) {
+                      if(found_class[i].responses[j].responseweek === whatweeknow){
+                        roster.splice(roster.indexOf(user_db[k].email), 1);
+                        //console.log("This is the new roster doe", roster);
+                          break;
+                      }
                     }
                   }
+                console.log('post-check reminder roster: ', roster);
                 }
-              console.log('post-check reminder roster: ', roster);
-              }
-              // Send email (if there's anyone who needs to be reminded)
-              if (roster.length) {
-                console.log('sending email from app.js ~line 125');
-                surveymail(roster, urllink, "remind");  
-              }
-              // Update maildeck
-              var oldDate = iClass.maildeck.reminder;
-              console.log('old oldDate from iClass: ', oldDate, ' .reminder from found[i]: ', found_class[i].maildeck.reminder);
-              while (oldDate <= new Date) {
-                oldDate.setDate(oldDate.getDate()+7);
-              }
-              console.log('new oldDate: ', oldDate);
-              Classroom.update({ _id: iClass._id }, { 'maildeck.reminder': oldDate }).exec(function(err, num) {
-                if(err) { console.log("Decklist classroom error:", err); res.send({success:false, message: "Classroom update error:"+err})}
-                else {
-                  if(!num) {
-                    console.log("Decklist update error: No classes found");
-                  }
+                // Send email (if there's anyone who needs to be reminded)
+                if (roster.length) {
+                  console.log('sending email from app.js ~line 125');
+                  surveymail(roster, urllink, "remind");  
+                }
+                // Update maildeck
+                var oldDate = found_class[i].maildeck.reminder;
+                console.log('old oldDate: ', oldDate, ' .reminder from found[i]: ', found_class[i].maildeck.reminder);
+                while (oldDate <= new Date) {
+                  oldDate.setDate(oldDate.getDate()+7);
+                }
+                console.log('new oldDate: ', oldDate);
+                Classroom.update({ _id: found_class[i]._id }, { 'maildeck.reminder': oldDate }).exec(function(err, num) {
+                  if(err) { console.log("Decklist classroom error:", err); res.send({success:false, message: "Classroom update error:"+err})}
                   else {
-                    console.log("Decklist update success:", oldDate);
+                    if(!num) {
+                      console.log("Decklist update error: No classes found");
+                    }
+                    else {
+                      console.log("Decklist update success! new Reminder Date for class ", found_class[i].name, ' : ', oldDate);
+                    }
                   }
-                }
-              })
-            }
-          })
+                })
+              }
+            })
+          }
         }
+        else {console.log("Reminder not defined.")}
       }
     } 
   })
