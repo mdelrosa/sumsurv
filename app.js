@@ -537,9 +537,11 @@ function ensureDemo(req, res, next) {
 }
 
 //date confirmation middleware
-function ensureDate(req, res, next) {
+function ensureDate(req, res, next){
   var d = new Date();
   // Helper function that parses/formats interval objects
+  // Translates from interface-readable string format to date string readable format 
+  // AKA [day hour minute AMPM] => [DD HH MM]
   function intCheckFormat(obj) {
     var day = (parseInt(obj.day) === 7) ? 0 : parseInt(obj.day);
     if (parseInt(obj.hour) === 12) {
@@ -551,9 +553,14 @@ function ensureDate(req, res, next) {
     var minute = parseInt(obj.minute);
     return { day: day, hour: hour, minute: minute }
   }
+  //This is taking the URL parameters (req.params.etc) and getting the data from them
+  //User here is actually the user that created the survey, not the user that's taking it.
+  //First call is just to get ID of user so it can be looked up in Classrooms... better way to do this?
   User.find({ username: req.params.user }).exec(function(err, found_user) {
     if(err) { console.log('ensureDate user search error:', err); return false }
     else {
+      //So after finding the creater's UserID, look through classrooms to find a match with both userID and name
+      //Allows different people to have surveys of same name, nice... i think?
       Classroom.find({ name: req.params.class, owner: found_user[0].id }).exec(function(err, found_class) {
         if(err) { console.log('ensureDate class search error:', err); return false }
         else {
@@ -566,73 +573,41 @@ function ensureDate(req, res, next) {
             console.log('begin:', begin, '\nfinish', finish);
 
             if (today >= begin && today <= finish) {
-              var start = intCheckFormat(found_class[0].interval.start)
-                  , end = intCheckFormat(found_class[0].interval.end);
-              if (end.day > start.day) {
-                // End comes after start; make sure d falls in between them
-                console.log('end.day > start.day');
-                if ( (d.getDay() > start.day && d.getDay()<end.day) || 
-                     (d.getHours() >= start.hour && d.getMinutes() >= start.minute && d.getDay() === start.day) ||
-                     (d.getHours() <= end.hour && d.getMinutes() <= end.minute && d.getDay() === end.day)) {
-                  return next()
-                }
-                else { res.redirect('/reject') }
+              //present day minus intStart day
+              var intStart = intCheckFormat(found_class[0].interval.start)
+                , intStop = intCheckFormat(found_class[0].interval.end);
+              var startDiff = today.getDay()-intStart.day;
+              if(startDiff < 0){
+                //This means start comes later in week, so subtract dates to get to last week
+                //This variable will be subtracted from current date later, so adding to it makes it go back farther
+                startDiff = startDiff + 7;
               }
-              else if (end.day < start.day) {
-                console.log('end.day < start.day');
-                // End comes earlier in week than start; make sure d falls outside of them
-                if ( (d.getDay() > start.day || d.getDay() < end.day) ||
-                     (d.getHours() >= start.hour && d.getMinutes() >= start.minute && d.getDay() === start.day) ||
-                     (d.getHours() <= end.hour && d.getMinutes() <= end.minute && d.getDay() === end.day) ) {
-                  return next()
-                }
-                else { res.redirect('/reject') }
+              var dateStart = new Date();
+              console.log('startDiff: ',startDiff);
+              dateStart.setDate(dateStart.getDate()-startDiff);
+              dateStart.setHours(intStart.hour);
+              dateStart.setMinutes(intStart.minute);
+              console.log('dateStart after 1st massage: ', dateStart);
+              var intDiff = intStop.day - intStart.day;
+              console.log('intDiff at first: ', intDiff);
+              if(intDiff < 0){
+                //This will be ADDED this time, as looking for next instead of previous
+                intDiff = intDiff + 7;
               }
-              else if (end.day===start.day) {
-                console.log('end.day === start.day');
-                // The end day is the same as the start day; check start/end times to see if we check between or outside
-                if (end.hour > start.hour) {
-                  console.log('end.hour > start.hour');
-                  // The end hour comes after the start hour; check in between times
-                  if ( (d.getHours() > start.hour || ( d.getHours() === start.hour && d.getMinutes() >= start.minute)) &&
-                       (d.getHours() < end.hour || (d.getHours() === end.hour && d.getMinutes() < end.minute)) && 
-                       (d.getDay() === start.day) ) {
-                    return next()
-                  }
-                  else { res.redirect('/reject') }
-                }
-                else if (end.hour < start.hour) {
-                  console.log('end.hour < start.hour');
-                  // The end hour comes before the start hour; check outside the times
-                  if ( (d.getDay() === start.day && ((d.getHours() >= start.hour && d.getMinutes() >= start.minute) || (d.getHours() <= end.hour && d.getMinutes() <= end.minute)) ) ||
-                       (d.getDay() !== start.day) ) {
-                    return next()
-                  }
-                  else { res.redirect('/reject') }
-                }
-                else if (end.hour === start.hour) {
-                  console.log('end.hour === start.hour');
-                  // Interval starts/ends in the same hour of the same day... wut.
-                  if (end.minute > start.minute) {
-                    console.log('end.minute > start.minute');
-                    // End after start; check between
-                    if ( (d.getMinutes() >= start.minute && d.getMinutes() <= end.minute) &&
-                         start.day === d.getDay() && start.hour === d.getHours() ) {
-                      return next()
-                    }
-                    else { res.redirect('/reject') }
-                  }
-                  else if (end.minute < start.minute) {
-                    console.log('end.minute < start.minute');
-                    // End before start; reject between
-                    if ( (d.getMinutes() < start.minute && d.getMinutes() > end.minute) &&
-                         start.day === d.getDay() && start.hour === d.getHours() ) {
-                      res.redirect('/reject')
-                    }
-                    else { return next() }
-                  }
-                }
+              var dateStop = new Date(dateStart.valueOf());
+              dateStop.setDate(dateStart.getDate()+intDiff);
+              dateStop.setHours(intStop.hour);
+              dateStop.setMinutes(intStop.minute);
+              console.log('dateStop is: ', dateStop);
+              //OK! Use the dates to check for various logical conditions - all set, or any number of rejection reasons
+              if(today > dateStart && today < dateStop && dateStart > begin && dateStop < finish){
+                return next();
               }
+              else if(today < dateStart){console.log('today is before calculated interval start: ', today, dateStart)}
+              else if(today > dateStop){console.log('today is after calculated interval stop: ', today, dateStop)}
+              else if(dateStart < begin){console.log('calculated interval start is before survey start date', dateStart, begin)}
+              else if(dateStop > finish){console.log('calculated interval stop is after survey stop date', dateStop, finish)}
+              else {console.log('Some condition was not met in date validation: begin, dateStart, today, dateStop, finish are: ', begin, dateStart, today, dateStop, finish)}
             }
             else {
               if (today < begin) {
