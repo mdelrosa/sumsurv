@@ -69,8 +69,10 @@ function bumpEmailTime(classroom, type){
   if(type === "regular"){
     //Code to increment regular date
     var bumpDate = classroom.maildeck.regular;
+    console.log('regular original bumpDate: ', bumpDate);
     while (bumpDate <= new Date) {
-      bumpDate.setDate(bumpDate.getDate()+7);
+      var newdate = bumpDate.getDate()+7;
+      bumpDate.setDate(newdate);
     }
     Classroom.update({ _id: classroom._id }, { 'maildeck.regular': bumpDate }).exec(function(err, num) {
       if(err) { console.log("Decklist regular classroom error:", err); res.send({success:false, message: "Classroom regular update error:"+err})}
@@ -81,6 +83,7 @@ function bumpEmailTime(classroom, type){
   else if(type === "reminder"){
     //Code to increment reminder date
     var bumpDate = classroom.maildeck.reminder;
+    console.log('reminder original bumpDate: ', bumpDate);
     while (bumpDate <= new Date) {
       bumpDate.setDate(bumpDate.getDate()+7);
     }
@@ -148,7 +151,7 @@ function sendMail(classroom, type, roster){
 
 function goPostal(classroom,type){
   //This is what starts the chain, and what is called from the cron loop
-  bumpEmailTime(classroom, type);
+  // bumpEmailTime(classroom, type);
   makeRoster(classroom, type, sendMail);
   console.log('goPostal sequence complete!')
 }
@@ -185,43 +188,33 @@ var job = new cronJob("00 * * * * *", function() {
   })
 }, null, true, "America/New_York");
 
-var surveymail = function(classroom, type, roster, urllink) {
-  var smtpTransport = nodemailer.createTransport("SMTP", {
+//This is to effeciently determine present Sunday to Saturday interval dates
+//based off date object instead of strings, makes calculating dates at month rollover easier
+makeWeekGap = function(classroom, type, callback){
+  if(type === 'regular') {var intStart = classroom.maildeck.regular;}
+  else if(type === 'reminder'){
+    var intStart = classroom.maildeck.regular;
+    intStart.setDate(intStart.getDate()-7);
+  }
+  console.log('intStart0: ',intStart);
+  var daygap = intStart.getDay();
+  console.log('daygap: ', daygap);
+  intStart.setDate(intStart.getDate()-daygap);
+  console.log('intStart1: ',intStart);
+  var intStop = new Date(intStart.valueOf());
+  console.log('intStop0: ', intStop);
+  console.log('intStart2: ',intStart);
+  intStop.setDate(intStop.getDate()+6);
+  console.log('intStop1: ', intStop);
+  console.log('intStart3: ', intStart);
+  var first = intStart.toLocaleDateString();
+  var last = intStop.toLocaleDateString();
+  console.log('first, last: ',first,last);
+  callback(first, last);
+}
 
-    service: "Gmail",
-    auth: {
-      user: "authumlab@gmail.com",
-      pass: "tqufkeinpstgfatv"
-    }
-  });
-
-  var datedata= new Date(); 
-  var month = datedata.getMonth()+1; 
-  var date = datedata.getDate(); 
-  var year = datedata.getFullYear();
-  var day = datedata.getDay();
-  var lastday = date+7-day;
-  var firstday = date-day;
-  var firstmonth = datedata.getMonth()+1;
-  var firstyear = datedata.getFullYear();
-  var first = firstmonth.toString()+ "/" +firstday.toString()+ "/" +firstyear.toString();
-  var last = month.toString()+ "/" +lastday.toString()+ "/" +year.toString();
-  if (firstday < 1) {
-    firstmonth = month - 1;
-    if (firstmonth < 0) {
-      firstyear = firstyear - 1;
-      firstmonth == 11;
-    };
-    if (firstmonth == 0 || firstmonth == 2 || firstmonth == 4 || firstmonth == 6 || firstmonth == 7 || firstmonth == 9 || firstmonth == 11){
-      firstday = 31 + firstday;
-    }
-    else if (firstmonth == 3 || firstmonth == 5 || firstmonth == 8 || firstmonth == 10) {
-      firstday = 30 + firstday;
-    }
-    else if (firstmonth == 1) {
-      firstday = 28 + firstday;
-    };        
-  };
+function makeEmailBody(first, last, urllink, type, callback){
+  console.log('urllink within callback is: ', urllink);
   var htmlBody;
   if (type === "regular") {
     htmlBody = '<div style="80%"><p><center><img src="http://i.imgur.com/6FO9p55.png" style="width:100%"/></center></p>' +
@@ -243,7 +236,7 @@ var surveymail = function(classroom, type, roster, urllink) {
     htmlBody = '<div style="80%"><p><center><img src="http://i.imgur.com/6FO9p55.png" style="width:100%"/></center></p>' +
           '<p>Hey everyone!</p>' + 
           '<p></p>' +
-          "<p>It seems that you have not taken this week's survey yet... This makes us terribly sad. If you would like to make us happy you can click the link below.</p>" + 
+          '<p>It seems that you have not taken the survey for the week of ' +first+ " to " +last+ ' yet... If you would like to make us happy you can click the link below.</p>' + 
           '<p></p>' +
           '<p>Remember to email alexander.dillon@olin.edu if you have any issues or comments!</center></p>' +
           '<p></p>' +
@@ -255,25 +248,59 @@ var surveymail = function(classroom, type, roster, urllink) {
           '<div style="background-color: #dcdcdc"><center><footer><p style="color: #999999">Autonomous Humans Lab</p>' +
           '<p style="color: #999999">motivationsurvey.com</center></p></footer></center></div></div>'
   }
-  else{console.log('Unrecognized type in email construction: ', type)}
-  var mailOptions = {
-      from: "Autonomous Humans Lab<authumlab@gmail.com>", // sender address
-      bcc: roster.join(","), // list of receivers
-      subject: "SIMS Weekly ", // Subject line
-      text: "Hello world", // plaintext body
-      html:  htmlBody
-  }
+  else{console.log('Unrecognized type in email construction: ', type);}
+  callback(htmlBody);
+}
 
-  // send mail with defined transport object
-    smtpTransport.sendMail(mailOptions, function(error, response){
-        if(error){
-            console.log(error);
-        }else{
-            console.log("Message sent: " + response.message);
-            // shut down the connection pool, no more messages
-            smtpTransport.close();
-        }
-    }); 
+
+function makeTheMail(roster, htmlBody, callback){
+  //Create mailer object
+  var smtpTransport = nodemailer.createTransport("SMTP", {
+
+    service: "Gmail",
+    auth: {
+      user: "authumlab@gmail.com",
+      pass: "tqufkeinpstgfatv"
+    }
+  });
+  //Make mail object
+  var mailOptions = {
+    from: "MotivationSurvey.com<authumlab@gmail.com>", // sender address
+    bcc: roster.join(","), // list of receivers
+    subject: "SIMS Weekly ", // Subject line
+    text: "Please log into motivationsurvey.com to complete your survey!", // plaintext body
+    html:  htmlBody
+  }
+  callback(mailOptions, smtpTransport);
+}
+
+function sendTheMail(mailOptions, smtpTransport, callback){
+  //Send 
+  smtpTransport.sendMail(mailOptions, function(error, response){
+      if(error){
+          console.log(error);
+      }else{
+          console.log("Message sent: " + response.message);
+          // shut down the connection pool, no more messages
+          smtpTransport.close();
+          callback();
+      }
+  });
+}
+
+
+var surveymail = function(classroom, type, roster, urllink) {
+  makeWeekGap(classroom, type, function(first,last){
+    makeEmailBody(first, last, urllink, type, function(htmlBody){
+      makeTheMail(roster, htmlBody, function(mailOptions, smtpTransport){
+        sendTheMail(mailOptions, smtpTransport, function(){
+          //sendTheMail only calls callback when email send is successful
+          //be sure date is re-set or emails will loop!
+          bumpEmailTime(classroom, type);
+        });
+      });
+    });
+  });
 }
 
 // Passport session setup.
