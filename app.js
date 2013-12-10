@@ -569,11 +569,12 @@ function ensureDate(req, res, next){
                 , span = found_class[0].span
                 , begin = new Date(span.start.year, span.start.month, span.start.date)
                 , finish = new Date(span.end.year, span.end.month, span.end.date)
-            console.log('span:', span, '\ntoday:',today);
-            console.log('begin:', begin, '\nfinish', finish);
+            //console.log('span:', span, '\ntoday:',today);
+            //console.log('begin:', begin, '\nfinish', finish);
 
             if (today >= begin && today <= finish) {
               //present day minus intStart day
+              console.log('running date validation for classroom: ', found_class[0].name)
               var intStart = intCheckFormat(found_class[0].interval.start)
                 , intStop = intCheckFormat(found_class[0].interval.end);
               var startDiff = today.getDay()-intStart.day;
@@ -583,13 +584,13 @@ function ensureDate(req, res, next){
                 startDiff = startDiff + 7;
               }
               var dateStart = new Date();
-              console.log('startDiff: ',startDiff);
+              //console.log('startDiff: ',startDiff);
               dateStart.setDate(dateStart.getDate()-startDiff);
               dateStart.setHours(intStart.hour);
               dateStart.setMinutes(intStart.minute);
-              console.log('dateStart after 1st massage: ', dateStart);
+              console.log('dateStart is: ', dateStart);
               var intDiff = intStop.day - intStart.day;
-              console.log('intDiff at first: ', intDiff);
+              //console.log('intDiff at first: ', intDiff);
               if(intDiff < 0){
                 //This will be ADDED this time, as looking for next instead of previous
                 intDiff = intDiff + 7;
@@ -603,11 +604,11 @@ function ensureDate(req, res, next){
               if(today > dateStart && today < dateStop && dateStart > begin && dateStop < finish){
                 return next();
               }
-              else if(today < dateStart){console.log('today is before calculated interval start: ', today, dateStart)}
-              else if(today > dateStop){console.log('today is after calculated interval stop: ', today, dateStop)}
-              else if(dateStart < begin){console.log('calculated interval start is before survey start date', dateStart, begin)}
-              else if(dateStop > finish){console.log('calculated interval stop is after survey stop date', dateStop, finish)}
-              else {console.log('Some condition was not met in date validation: begin, dateStart, today, dateStop, finish are: ', begin, dateStart, today, dateStop, finish)}
+              else if(today < dateStart){console.log('today is before calculated interval start: ', today, dateStart); res.redirect('/reject')}
+              else if(today > dateStop){console.log('today is after calculated interval stop: ', today, dateStop); res.redirect('/reject')}
+              else if(dateStart < begin){console.log('calculated interval start is before survey start date', dateStart, begin); res.redirect('/reject')}
+              else if(dateStop > finish){console.log('calculated interval stop is after survey stop date', dateStop, finish); res.redirect('/reject')}
+              else {console.log('Some condition was not met in date validation: begin, dateStart, today, dateStop, finish are: ', begin, dateStart, today, dateStop, finish); res.redirect('/reject')}
             }
             else {
               if (today < begin) {
