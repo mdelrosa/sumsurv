@@ -568,7 +568,7 @@ function ensureDate(req, res, next){
             var today = new Date
                 , span = found_class[0].span
                 , begin = new Date(span.start.year, span.start.month, span.start.date)
-                , finish = new Date(span.end.year, span.end.month, span.end.date)
+                , finish = new Date(span.end.year, span.end.month, span.end.date);
             //console.log('span:', span, '\ntoday:',today);
             //console.log('begin:', begin, '\nfinish', finish);
 
@@ -580,7 +580,7 @@ function ensureDate(req, res, next){
               var startDiff = today.getDay()-intStart.day;
               if(startDiff < 0){
                 //This means start comes later in week, so subtract dates to get to last week
-                //This variable will be subtracted from current date later, so adding to it makes it go back farther
+                //This variable will be subtracted from current date later, so adding to it now will make it go back farther
                 startDiff = startDiff + 7;
               }
               var dateStart = new Date();
@@ -592,18 +592,25 @@ function ensureDate(req, res, next){
               var intDiff = intStop.day - intStart.day;
               //console.log('intDiff at first: ', intDiff);
               if(intDiff < 0){
-                //This will be ADDED this time, as looking for next instead of previous
+                //This will be ADDED later, as looking for next instead of previous
                 intDiff = intDiff + 7;
               }
               var dateStop = new Date(dateStart.valueOf());
               dateStop.setDate(dateStart.getDate()+intDiff);
               dateStop.setHours(intStop.hour);
               dateStop.setMinutes(intStop.minute);
+              if(dateStop < dateStart){
+                //If stop is sooner than start, then it occurs on the same day. If so, add a week for proper stop time
+                dateStop.setDate(dateStop.getDate()+7);
+              }
               console.log('dateStop is: ', dateStop);
-              //OK! Use the dates to check for various logical conditions - all set, or any number of rejection reasons
+              //OK! Use the dates to check for various logical conditions
+              //This check to ensure dateStop is < finish... does that matter? Naaahhh, I'll take it out
               if(today > dateStart && today < dateStop && dateStart > begin && dateStop < finish){
+                //You're GOOD TO GO!
                 return next();
               }
+              //Log messages depending on failing condition and redirect
               else if(today < dateStart){console.log('today is before calculated interval start: ', today, dateStart); res.redirect('/reject')}
               else if(today > dateStop){console.log('today is after calculated interval stop: ', today, dateStop); res.redirect('/reject')}
               else if(dateStart < begin){console.log('calculated interval start is before survey start date', dateStart, begin); res.redirect('/reject')}
