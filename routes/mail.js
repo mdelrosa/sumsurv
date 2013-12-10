@@ -109,7 +109,7 @@ exports.test_mail = function(req, res) {
 				, year = datedata.getFullYear();
 			var cronTime = '00 '+classroom_db[0].interval.start.minute+" "+hour.toString()+" * * "+day.toString();
 
-			console.log(cronTime);
+			console.log('PEEKABOO!!', cronTime);
 			// var job = new cronJob(cronTime, function() {
 			// //first * is which second, next is minute, next is the hour, ? ? and then day of the week.	
 			// 	surveymail(classroom_db[0].roster, urllink);
