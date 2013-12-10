@@ -13,5 +13,9 @@ results
 node_modules/
 .env
 
+deploy
+deploy.conf
+
+
 npm-debug.log
 ~*
