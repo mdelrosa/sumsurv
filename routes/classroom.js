@@ -244,27 +244,30 @@ var maildeck_update = function(owner, name, classroom) {
 		, addRem = (spanDay <= dayRem) ? dayRem - spanDay : (7 - spanDay) + dayRem
 		, hourRem = (intRem.time === "PM") ? ((intRem.hour === '12') ? 12 : 12 + parseInt(intRem.hour)) : ((intRem.hour === '0') ? 0 : parseInt(intRem.hour))
 		, hourReg = (intReg.time === "PM") ? ((intReg.hour === '12') ? 12 : 12 + parseInt(intReg.hour)) : ((intReg.hour === '0') ? 0 : parseInt(intReg.hour));
-	console.log('dateRem0:',dateRem);
 	console.log('dateReg0:',dateReg);
+	console.log('dateRem0:',dateRem);
 	dateRem.setDate(dateRem.getDate() + addRem);
 	dateReg.setDate(dateReg.getDate() + addReg);
+	console.log('dateReg1:',dateReg);	
 	console.log('dateRem1:',dateRem);
-	console.log('dateReg1:',dateReg);
-	dateRem.setUTCHours(hourRem+4);
-	dateReg.setUTCHours(hourReg+4);
-	console.log('dateRem2:',dateRem);
+	dateReg.setHours(hourReg);
+	dateRem.setHours(hourRem);
 	console.log('dateReg2:',dateReg);
-	dateRem.setUTCMinutes(parseInt(intRem.minute));
-	dateReg.setUTCMinutes(parseInt(intReg.minute));
-	dateRem.setUTCHours(dateRem.getUTCHours()-12);
-	console.log('dateRem3:',dateRem);
+	console.log('dateRem2:',dateRem);
+	dateReg.setMinutes(parseInt(intReg.minute));
+	dateRem.setMinutes(parseInt(intRem.minute));
+	//Now could check to see if dateRem is short time from dateReg, set .reminder time commensurately
+	dateRem.setHours(dateRem.getHours()-12);
 	console.log('dateReg3:',dateReg);
-	while ( new Date > dateRem ) {
-		dateRem.setDate(dateRem.getDate()+7);
-	}
+	console.log('dateRem3:',dateRem);
 	while ( new Date > dateReg ) {
 		dateReg.setDate(dateReg.getDate()+7);
 	}
+	while ( new Date > dateRem ) {
+		dateRem.setDate(dateRem.getDate()+7);
+	}
+	console.log('dateReg4:', dateReg);
+	console.log('dateRem4:', dateRem);
 	Classroom.update({ owner: owner, name: name }, { $set: { 'maildeck.reminder': dateRem, 'maildeck.regular': dateReg } }, function(err, num) {
 		if (err || !num) { console.log("Classroom maildeck update err:", err); return false }
 		else {
