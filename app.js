@@ -191,25 +191,25 @@ var job = new cronJob("00 * * * * *", function() {
 //This is to effeciently determine present Sunday to Saturday interval dates
 //based off date object instead of strings, makes calculating dates at month rollover easier
 makeWeekGap = function(classroom, type, callback){
-  if(type === 'regular') {var intStart = classroom.maildeck.regular;}
-  else if(type === 'reminder'){
-    var intStart = classroom.maildeck.regular;
+  console.log('Finding Sunday to Saturday dates for email to classroom: ', classroom)
+  var intStart = new Date(classroom.maildeck.regular.valueOf());
+  if(type === 'reminder'){
     intStart.setDate(intStart.getDate()-7);
   }
-  console.log('intStart0: ',intStart);
+  //console.log('intStart0: ',intStart);
   var daygap = intStart.getDay();
-  console.log('daygap: ', daygap);
+  //console.log('daygap: ', daygap);
   intStart.setDate(intStart.getDate()-daygap);
-  console.log('intStart1: ',intStart);
+  //console.log('intStart1: ',intStart);
   var intStop = new Date(intStart.valueOf());
-  console.log('intStop0: ', intStop);
-  console.log('intStart2: ',intStart);
+  //console.log('intStop0: ', intStop);
+  //console.log('intStart2: ',intStart);
   intStop.setDate(intStop.getDate()+6);
-  console.log('intStop1: ', intStop);
-  console.log('intStart3: ', intStart);
+  //console.log('intStop1: ', intStop);
+  //console.log('intStart3: ', intStart);
   var first = intStart.toLocaleDateString();
   var last = intStop.toLocaleDateString();
-  console.log('first, last: ',first,last);
+  console.log('Sunday, Saturday: ',first,last);
   callback(first, last);
 }
 
@@ -611,19 +611,19 @@ function ensureDate(req, res, next){
                 return next();
               }
               //Log messages depending on failing condition and redirect
-              else if(today < dateStart){console.log('today is before calculated interval start: ', today, dateStart); res.redirect('/reject')}
-              else if(today > dateStop){console.log('today is after calculated interval stop: ', today, dateStop); res.redirect('/reject')}
-              else if(dateStart < begin){console.log('calculated interval start is before survey start date', dateStart, begin); res.redirect('/reject')}
-              else if(dateStop > finish){console.log('calculated interval stop is after survey stop date', dateStop, finish); res.redirect('/reject')}
-              else {console.log('Some condition was not met in date validation: begin, dateStart, today, dateStop, finish are: ', begin, dateStart, today, dateStop, finish); res.redirect('/reject')}
+              else if(today < dateStart){console.log('ensureDate: today is before calculated interval start: ', today, dateStart); res.redirect('/reject')}
+              else if(today > dateStop){console.log('ensureDate: today is after calculated interval stop: ', today, dateStop); res.redirect('/reject')}
+              else if(dateStart < begin){console.log('ensureDate: calculated interval start is before survey start date', dateStart, begin); res.redirect('/reject')}
+              else if(dateStop > finish){console.log('ensureDate: calculated interval stop is after survey stop date', dateStop, finish); res.redirect('/reject')}
+              else {console.log('ensureDate: Some condition was not met in date validation: begin, dateStart, today, dateStop, finish are: ', begin, dateStart, today, dateStop, finish); res.redirect('/reject')}
             }
             else {
               if (today < begin) {
-                console.log("Before begin");
+                console.log("ensureDate: Before begin");
                 res.redirect('/reject');
               }
               else {
-                console.log("After finish");
+                console.log("ensureDate: After finish");
                 res.redirect('/reject')
               }
             }
