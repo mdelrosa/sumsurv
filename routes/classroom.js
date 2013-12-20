@@ -157,6 +157,7 @@ exports.edit_span = function(req, res) {
 		Classroom.update({ owner: req.user.id, name: req.body.name }, { $set: { 'span.start':  req.body.n } }).exec(function(err, num) {
 			if(err || !num) { console.log("edit_span error:", err); return false }
 			else {
+				//OK, still want to do classroom find, need to get all date settings to set dates
 				Classroom.find({ owner: req.user.id, name: req.body.name }).exec(function(err, found_class) {
 					if(err) { console.log("edit_span search error:", err); return false}
 					else {
@@ -186,7 +187,7 @@ exports.edit_span = function(req, res) {
 // This will theoretically be redundant with setEmailTimes in utils lib?
 // Therefore, sub in utls function right where this is called?
 // 4 instances of being called: start and stop for both interval and span
-
+// owner and name are redundant with classroom parameters, not needed
 var maildeck_update = function(owner, name, classroom) {
 	t.testmsg();
 

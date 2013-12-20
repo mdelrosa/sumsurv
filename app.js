@@ -70,7 +70,7 @@ function bumpEmailTime(classroom, type){
     //Code to increment regular date
     var bumpDate = classroom.maildeck.regular;
     console.log('regular original bumpDate: ', bumpDate);
-    while (bumpDate <= new Date) {
+    while (bumpDate <= new Date()) {
       var newdate = bumpDate.getDate()+7;
       bumpDate.setDate(newdate);
     }
@@ -168,15 +168,15 @@ var job = new cronJob("00 * * * * *", function() {
         console.log('Class name:'+found_class[i].name+ " ---");
         //Check for maildeck
         if (found_class[i].maildeck) {
-          console.log("regular:", found_class[i].maildeck.regular, "now:", new Date, "before now:", found_class[i].maildeck.regular <= new Date);
-          console.log("reminder:", found_class[i].maildeck.reminder, "now:", new Date, "before now:", found_class[i].maildeck.reminder <= new Date);
+          console.log("regular:", found_class[i].maildeck.regular, "now:", new Date(), "before now:", found_class[i].maildeck.regular <= new Date);
+          console.log("reminder:", found_class[i].maildeck.reminder, "now:", new Date(), "before now:", found_class[i].maildeck.reminder <= new Date);
           //After printing maildeck properties, let's keep everything inside this yes maildeck condition
-          if(found_class[i].maildeck.regular <= new Date){
+          if(found_class[i].maildeck.regular <= new Date()){
             var classroom = found_class[i];
             goPostal(classroom,"regular");
             console.log('Regular postal has gone for classroom: ', classroom.name);
           }
-          else if(found_class[i].maildeck.reminder <= new Date){
+          else if(found_class[i].maildeck.reminder <= new Date(){
             var classroom = found_class[i];
             goPostal(classroom,"reminder");
             console.log('Reminder postal has gone for classroom: ', classroom.name);
@@ -192,23 +192,23 @@ var job = new cronJob("00 * * * * *", function() {
 //based off date object instead of strings, makes calculating dates at month rollover easier
 makeWeekGap = function(classroom, type, callback){
   console.log('Finding Sunday to Saturday dates for email to classroom: ', classroom)
-  var intStart = new Date(classroom.maildeck.regular.valueOf());
+  var weekStart = new Date(classroom.maildeck.regular.valueOf());
   if(type === 'reminder'){
-    intStart.setDate(intStart.getDate()-7);
+    weekStart.setDate(weekStart.getDate()-7);
   }
-  //console.log('intStart0: ',intStart);
-  var daygap = intStart.getDay();
+  //console.log('weekStart0: ',weekStart);
+  var daygap = weekStart.getDay();
   //console.log('daygap: ', daygap);
-  intStart.setDate(intStart.getDate()-daygap);
-  //console.log('intStart1: ',intStart);
-  var intStop = new Date(intStart.valueOf());
-  //console.log('intStop0: ', intStop);
-  //console.log('intStart2: ',intStart);
-  intStop.setDate(intStop.getDate()+6);
-  //console.log('intStop1: ', intStop);
-  //console.log('intStart3: ', intStart);
-  var first = intStart.toLocaleDateString();
-  var last = intStop.toLocaleDateString();
+  weekStart.setDate(weekStart.getDate()-daygap);
+  //console.log('weekStart1: ',weekStart);
+  var weekStop = new Date(weekStart.valueOf());
+  //console.log('weekStop0: ', weekStop);
+  //console.log('weekStart2: ',weekStart);
+  weekStop.setDate(weekStop.getDate()+6);
+  //console.log('weekStop1: ', weekStop);
+  //console.log('weekStart3: ', weekStart);
+  var first = weekStart.toLocaleDateString();
+  var last = weekStop.toLocaleDateString();
   console.log('Sunday, Saturday: ',first,last);
   callback(first, last);
 }
@@ -296,6 +296,7 @@ var surveymail = function(classroom, type, roster, urllink) {
         sendTheMail(mailOptions, smtpTransport, function(){
           //sendTheMail only calls callback when email send is successful
           //be sure date is re-set or emails will loop!
+          //This call will be replaced by util.js setEmailTimes, which sets both types
           bumpEmailTime(classroom, type);
         });
       });
@@ -536,14 +537,12 @@ function ensureDemo(req, res, next) {
 	}
 }
 
-//Find 
-//function findIntDates()
 
-//function setIntDates()
 
-//function setEmailTimes(){
-  //use output from findIntDates
-//}
+
+
+
+
 
 
 
