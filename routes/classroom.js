@@ -6,7 +6,8 @@ var Models = require('../models/models')
     , Survey = Models.survey
     , Page = Models.page
     , Emaillist = Models.emaillist
-    , Classroom = Models.classroom;
+    , Classroom = Models.classroom
+    , t = require('../libs/testlib');
 
 var nodemailer = require("nodemailer")
 
@@ -160,29 +161,6 @@ exports.edit_span = function(req, res) {
 					if(err) { console.log("edit_span search error:", err); return false}
 					else {
 						res.send({success:true})
-						// console.log('req.body.n',req.body.n);
-						// var n = req.body.n
-						// 	, intStart = found_class[0].interval.start
-						// 	, date = new Date(n.year, n.month, n.date )
-						// 	, intDay = (parseInt(intStart.day) === 7) ? 0 : parseInt(intStart.day)
-						// 	, spanDay = date.getDay()
-						// 	, addToDate = (spanDay <= intDay) ? intDay - spanDay : (7 - spanDay) + intDay;
-						// date.setDate(date.getDate()+addToDate);
-						// // change to 24 hour
-						// var hourUp = (intStart.time === "PM") ? ((intStart.hour === '12') ? 12 : 12 + parseInt(intStart.hour)) : ((intStart.hour === '12') ? 0 : parseInt(intStart.hour));
-						// // add four to time to standardize for EST, add one more for each time zone to the left
-						// date.setUTCHours(hourUp+4);
-						// date.setUTCMinutes(parseInt(intStart.minute));
-						// // If we are initializing the span such that it begins before today, set maildeck for next week's int
-						// while (new Date > date) {
-						// 	date.setDate(date.getDate()+7);
-						// }
-						// Classroom.update({ owner: req.user.id, name: req.body.name }, { $set: { 'maildeck.regular': date } }, function(err, num) {
-						// 	if (err || !num) { console.log("Classroom maildeck update err:", err); return false}
-						// 	else {
-						// 		res.send({success: true})
-						// 	}
-						// });
 						var update = maildeck_update(req.user.id, req.body.name, found_class[0]);
 						if (update) { return true };
 					}
@@ -196,31 +174,6 @@ exports.edit_span = function(req, res) {
 			else {
 				res.send({success:true})
 				Classroom.find({ owner: req.user.id, name: req.body.name }).exec( function(err, found_class) {
-					// // Initialize reminder time
-					// var n = found_class[0].span.start
-					// 	, intEnd = found_class[0].interval.end
-					// 	, remindDate = new Date(n.year, n.month, n.date)
-					// 	, intDay = (parseInt(intEnd.day)===7) ? 0 : parseInt(intEnd.day)
-					// 	, spanDay = remindDate.getDay()
-				 //    	, addToDate = (spanDay <= intDay) ? intDay - spanDay : (7 - spanDay) + intDay;
-			  //   	console.log('remindDate first:', remindDate);
-					// remindDate.setDate(remindDate.getDate() + addToDate);
-					// console.log('remindDate second:', remindDate);
-					// // Change to 24 hour
-					// var hourUp = (intEnd.time === "PM") ? ((intEnd.hour === '12') ? 12 : 12 + parseInt(intEnd.hour)) : ((intEnd.hour === '12') ? 0 : parseInt(intEnd.hour));
-					// // Add 4 hours to standardize for EST time
-					// remindDate.setUTCHours(hourUp+4);
-					// remindDate.setUTCMinutes(parseInt(intEnd.minute));
-					// console.log('remindDate third:', remindDate);
-					// // Subtract ten hours from reminderDate
-					// remindDate.setUTCHours(remindDate.getUTCHours()-12);
-					// console.log('remindDate fourth:', remindDate);
-					// Classroom.update({ owner: req.user.id, name: req.body.name }, { $set: { 'maildeck.reminder': remindDate } }, function(err, num) {
-					// 	if (err || !num) { console.log("Classroom maildeck update err:", err); return false }
-					// 	else {
-					// 		res.send({success: true});
-					// 	}
-					// })
 					var update = maildeck_update(req.user.id, req.body.name, found_class[0]);
 					if (update) { return true };
 				})
@@ -230,7 +183,13 @@ exports.edit_span = function(req, res) {
 }
 
 // Update maildeck of a classroom
+// This will theoretically be redundant with setEmailTimes in utils lib?
+// Therefore, sub in utls function right where this is called?
+// 4 instances of being called: start and stop for both interval and span
+
 var maildeck_update = function(owner, name, classroom) {
+	t.testmsg();
+
 	var s = classroom.span.start
 		, intStart = classroom.interval.start
 		, dateRem = new Date(s.year, s.month, s.date)
@@ -268,6 +227,7 @@ var maildeck_update = function(owner, name, classroom) {
 	}
 	console.log('dateReg4:', dateReg);
 	console.log('dateRem4:', dateRem);
+	console.log('Classroom as in maildeck update: ', classroom);
 	Classroom.update({ owner: owner, name: name }, { $set: { 'maildeck.reminder': dateRem, 'maildeck.regular': dateReg } }, function(err, num) {
 		if (err || !num) { console.log("Classroom maildeck update err:", err); return false }
 		else {

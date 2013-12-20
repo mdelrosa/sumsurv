@@ -536,6 +536,17 @@ function ensureDemo(req, res, next) {
 	}
 }
 
+//Find 
+//function findIntDates()
+
+//function setIntDates()
+
+//function setEmailTimes(){
+  //use output from findIntDates
+//}
+
+
+
 //date confirmation middleware
 function ensureDate(req, res, next){
   var d = new Date();
@@ -554,7 +565,7 @@ function ensureDate(req, res, next){
     return { day: day, hour: hour, minute: minute }
   }
   //This is taking the URL parameters (req.params.etc) and getting the data from them
-  //User here is actually the user that created the survey, not the user that's taking it.
+  //User here is actually the user that created the survey, not the user who is taking it.
   //First call is just to get ID of user so it can be looked up in Classrooms... better way to do this?
   User.find({ username: req.params.user }).exec(function(err, found_user) {
     if(err) { console.log('ensureDate user search error:', err); return false }
@@ -564,14 +575,17 @@ function ensureDate(req, res, next){
       Classroom.find({ name: req.params.class, owner: found_user[0].id }).exec(function(err, found_class) {
         if(err) { console.log('ensureDate class search error:', err); return false }
         else {
-            if(found_class.length > 0) {
+          if(found_class.length > 0) {
+            ///////////////////////////////////
+            //Use in findPresentInt function
+            ///////////////////////////////////
+            //Gotta take intCheckFormat with it
             var today = new Date
                 , span = found_class[0].span
                 , begin = new Date(span.start.year, span.start.month, span.start.date)
                 , finish = new Date(span.end.year, span.end.month, span.end.date);
             //console.log('span:', span, '\ntoday:',today);
             //console.log('begin:', begin, '\nfinish', finish);
-
             if (today >= begin && today <= finish) {
               //present day minus intStart day
               console.log('running date validation for classroom: ', found_class[0].name)
@@ -604,6 +618,12 @@ function ensureDate(req, res, next){
                 dateStop.setDate(dateStop.getDate()+7);
               }
               console.log('dateStop is: ', dateStop);
+              ///////////////////////////////////
+              //Use in findPresentInt function
+              ///////////////////////////////////
+
+
+
               //OK! Use the dates to check for various logical conditions
               //This check to ensure dateStop is < finish... does that matter? Naaahhh, I'll take it out
               if(today > dateStart && today < dateStop && dateStart > begin && dateStop < finish){
@@ -632,9 +652,9 @@ function ensureDate(req, res, next){
             res.redirect('/');
           }
         } 
-      })
+      });
     }  
-  })
+  });
 }
 
 // Login auth @ post /login
