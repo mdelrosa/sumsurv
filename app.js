@@ -503,7 +503,7 @@ function whatweek(startDay, startMonth, startYear, endDay, endMonth, endYear) {
           }
       }
       else {//YEAR IS DIFFERENT
-          monthsTillNew = 11 - startM
+          monthsTillNew = 11 - startMonth;
       }
       return Math.ceil(daysInBetween/7)
 }
