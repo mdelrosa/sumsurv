@@ -15,113 +15,121 @@ exports.list = function(req, res) {
 }
 
 exports.test_mail = function(req, res) {
-	Classroom.find({name: req.query.name}).populate("owner responses").exec(function(err, classroom_db) {
-		if(err) {console.log('Unable to find responses'); return false}
-		else {
-			var smtpTransport = nodemailer.createTransport("SMTP", {
-				service: "Gmail",
-				auth: {
-					user: "authumlab@gmail.com",
-					pass: "tqufkeinpstgfatv"
-				}
-			});
-			var datedata= new Date(); 
-			var month = datedata.getMonth()+1; 
-			var date = datedata.getDate(); 
-			var year = datedata.getFullYear();
-			var day = datedata.getDay();
-			var lastday = date+7-day;
-			var firstday = date-day;
-			var firstmonth = datedata.getMonth()+1;
-			var firstyear = datedata.getFullYear();
-			var first = firstmonth.toString()+ "/" +firstday.toString()+ "/" +firstyear.toString();
-			var last = month.toString()+ "/" +lastday.toString()+ "/" +year.toString();
-			if (firstday < 1) {
-				firstmonth = month - 1;
-				if (firstmonth < 0) {
-					firstyear = firstyear - 1;
-					firstmonth == 11;
-				};
-				if (firstmonth == 0 || firstmonth == 2 || firstmonth == 4 || firstmonth == 6 || firstmonth == 7 || firstmonth == 9 || firstmonth == 11){
-					firstday = 31 + firstday;
-				}
-				else if (firstmonth == 3 || firstmonth == 5 || firstmonth == 8 || firstmonth == 10) {
-					firstday = 30 + firstday;
-				}
-				else if (firstmonth == 1) {
-					firstday = 28 + firstday;
-				};				
-			};
-			var urllink = "survo.herokuapp.com/" + encodeURIComponent(classroom_db[0].owner.username).toString() + "/" + encodeURIComponent(classroom_db[0].name).toString() + "/take"
-			var mailOptions = {
-			    from: "Autonomous Humans Lab<authumlab@gmail.com>", // sender address
-			    bcc: classroom_db[0].roster.join(","), // list of receivers
-			    subject: "Welcome to SIMS.2", // Subject line
-			    text: "Hello world", // plaintext body
-			    html:        
-   			            '<div style="80%"><p><center><img src="http://i.imgur.com/6FO9p55.png" style="width:100%"/></center></p>' +
-			    		'<p>Survey from ' +first+ " to " +last+ '.</p>' +
-			    		'<p>Hi there!</p>' +
-			    		'<p>You\'re getting this email because, in your infinite wisdom, you decided to participate in our study regarding motivation during your summer research experience. Good choice! We feel this will be a very interesting and useful study which may positively affect your very own summer experience.</p>' + 
-			    		'<p></p>' +
-			    		'<p>These emails will be sent out on a weekly basis, probably on a Thursday. You will be able to access the motivation survey from Thursday to Sunday. The survey questions will be asking you about the week you are in currently.</p>' +
-			    		'<p></p>' +
-			    		'<p>You will need to make an account before you take these surveys. Please ensure that this account is linked to the email address you gave us (if it is not, you will not be able to participate).</p>' +
-			    		'<p></p>' +
-			    		'<p>You’ll be using a web-app called Survo. Keep in mind that this app is in super alpha stage and many things may break while you use it. We ask you to be patient with us and let us know ASAP if anything goes wrong. That being said, we are looking for feedback in both the usability and the robustness of this app, so your comments are sincerely appreciated.</p>' +
-			    		'<p></p>' +
-			    		'<p>That’s about it for now! Here\'s the link:</p>' +
-			    		'<p></p>' +
-			    		'<p><center><a href="'+urllink+'" target="survey page"><img src="http://i.imgur.com/MaVMQlI.png" /></a></center></p>' +
-			    		'<p> </p>' +
-			    		'<p>Happy surveying,</p>' +
-			    		'<p>Autonomous Humans Lab</p>' +
-			    		'<p>P.S. This is a no-reply email, so don’t reply to this! To contact us, email mason.delrosario@students.olin.edu or Doyung.lee@students.olin.edu. Thanks!</p>' +
-			    		'<div style="background-color: #dcdcdc"><center><footer><p style="color: #999999">Mason del Rosario Doyung Lee Alex Dillon Jon Stolk</p>' +
-			    		'<p style="color: #999999">Footer.</center></p></footer></center></div></div>'
-			    		//html body
-			}
-				// send mail with defined transport object
-			// smtpTransport.sendMail(mailOptions, function(error, response){
-			//     if(error){
-			//         console.log(error);
-			//     }else{
-			//         console.log("Message sent: " + response.message);
-			//         smtpTransport.close();
-			//         res.send("success");
-			//     }
-			// 	    // if you don't want to use this transport object anymore, uncomment following line
-			//         // shut down the connection pool, no more messages
-			// });	
-			// setup e-mail data with unicode symbols
-			var hour = parseInt(classroom_db[0].interval.start.hour);
-			var day = parseInt(classroom_db[0].interval.start.day);
-			hour = (classroom_db[0].interval.start.time === "AM") ? hour : hour+12;
-			day = (day === 7) ? 0 : day;
-			var spanEnd = {
-				"date": parseInt(classroom_db[0].span.end.date),
-				"month": parseInt(classroom_db[0].span.end.month),
-				"year": parseInt(classroom_db[0].span.end.year)
-			}
-			var datedata = new Date()
-				, date = datedata.getDate()
-				, month = datedata.getMonth()
-				, year = datedata.getFullYear();
-			var cronTime = '00 '+classroom_db[0].interval.start.minute+" "+hour.toString()+" * * "+day.toString();
-
-			console.log('PEEKABOO!!', cronTime);
-			// var job = new cronJob(cronTime, function() {
-			// //first * is which second, next is minute, next is the hour, ? ? and then day of the week.	
-			// 	surveymail(classroom_db[0].roster, urllink);
-			// }, null, true, "America/New_York");
-
-			//var job2 = new cronJob(cronTime, function()) {
-			//this job is to send emails to only the people who have not taken a survey for the week.
-			//	remindmail(classroom_db[0].roster, classroom_db[0].responses);	
-			//}
+	Classroom.update({name: req.query.name},{$set: {'maildeck.regular': new Date(),'maildeck.reminder': new Date()}}).exec(function(err, classroom_db) {
+		if(err){
+			console.log('test mail classroom update error: ', err);
+		}
+		else{
+			console.log('reset maildeck.reminder and .regular on button push!');
 	  	}	
 	})  	
 }
+
+
+		// if(err) {console.log('Unable to find responses'); return false}
+		// else {
+		// 	var smtpTransport = nodemailer.createTransport("SMTP", {
+		// 		service: "Gmail",
+		// 		auth: {
+		// 			user: "authumlab@gmail.com",
+		// 			pass: "tqufkeinpstgfatv"
+		// 		}
+		// 	});
+		// 	var datedata= new Date(); 
+		// 	var month = datedata.getMonth()+1; 
+		// 	var date = datedata.getDate(); 
+		// 	var year = datedata.getFullYear();
+		// 	var day = datedata.getDay();
+		// 	var lastday = date+7-day;
+		// 	var firstday = date-day;
+		// 	var firstmonth = datedata.getMonth()+1;
+		// 	var firstyear = datedata.getFullYear();
+		// 	var first = firstmonth.toString()+ "/" +firstday.toString()+ "/" +firstyear.toString();
+		// 	var last = month.toString()+ "/" +lastday.toString()+ "/" +year.toString();
+		// 	if (firstday < 1) {
+		// 		firstmonth = month - 1;
+		// 		if (firstmonth < 0) {
+		// 			firstyear = firstyear - 1;
+		// 			firstmonth == 11;
+		// 		};
+		// 		if (firstmonth == 0 || firstmonth == 2 || firstmonth == 4 || firstmonth == 6 || firstmonth == 7 || firstmonth == 9 || firstmonth == 11){
+		// 			firstday = 31 + firstday;
+		// 		}
+		// 		else if (firstmonth == 3 || firstmonth == 5 || firstmonth == 8 || firstmonth == 10) {
+		// 			firstday = 30 + firstday;
+		// 		}
+		// 		else if (firstmonth == 1) {
+		// 			firstday = 28 + firstday;
+		// 		};				
+		// 	};
+		// 	var urllink = "survo.herokuapp.com/" + encodeURIComponent(classroom_db[0].owner.username).toString() + "/" + encodeURIComponent(classroom_db[0].name).toString() + "/take"
+		// 	var mailOptions = {
+		// 	    from: "Autonomous Humans Lab<authumlab@gmail.com>", // sender address
+		// 	    bcc: classroom_db[0].roster.join(","), // list of receivers
+		// 	    subject: "Welcome to SIMS.2", // Subject line
+		// 	    text: "Hello world", // plaintext body
+		// 	    html:        
+  //  			            '<div style="80%"><p><center><img src="http://i.imgur.com/6FO9p55.png" style="width:100%"/></center></p>' +
+		// 	    		'<p>Survey from ' +first+ " to " +last+ '.</p>' +
+		// 	    		'<p>Hi there!</p>' +
+		// 	    		'<p>You\'re getting this email because, in your infinite wisdom, you decided to participate in our study regarding motivation during your summer research experience. Good choice! We feel this will be a very interesting and useful study which may positively affect your very own summer experience.</p>' + 
+		// 	    		'<p></p>' +
+		// 	    		'<p>These emails will be sent out on a weekly basis, probably on a Thursday. You will be able to access the motivation survey from Thursday to Sunday. The survey questions will be asking you about the week you are in currently.</p>' +
+		// 	    		'<p></p>' +
+		// 	    		'<p>You will need to make an account before you take these surveys. Please ensure that this account is linked to the email address you gave us (if it is not, you will not be able to participate).</p>' +
+		// 	    		'<p></p>' +
+		// 	    		'<p>You’ll be using a web-app called Survo. Keep in mind that this app is in super alpha stage and many things may break while you use it. We ask you to be patient with us and let us know ASAP if anything goes wrong. That being said, we are looking for feedback in both the usability and the robustness of this app, so your comments are sincerely appreciated.</p>' +
+		// 	    		'<p></p>' +
+		// 	    		'<p>That’s about it for now! Here\'s the link:</p>' +
+		// 	    		'<p></p>' +
+		// 	    		'<p><center><a href="'+urllink+'" target="survey page"><img src="http://i.imgur.com/MaVMQlI.png" /></a></center></p>' +
+		// 	    		'<p> </p>' +
+		// 	    		'<p>Happy surveying,</p>' +
+		// 	    		'<p>Autonomous Humans Lab</p>' +
+		// 	    		'<p>P.S. This is a no-reply email, so don’t reply to this! To contact us, email mason.delrosario@students.olin.edu or Doyung.lee@students.olin.edu. Thanks!</p>' +
+		// 	    		'<div style="background-color: #dcdcdc"><center><footer><p style="color: #999999">Mason del Rosario Doyung Lee Alex Dillon Jon Stolk</p>' +
+		// 	    		'<p style="color: #999999">Footer.</center></p></footer></center></div></div>'
+		// 	    		//html body
+		// 	}
+		// 		// send mail with defined transport object
+		// 	// smtpTransport.sendMail(mailOptions, function(error, response){
+		// 	//     if(error){
+		// 	//         console.log(error);
+		// 	//     }else{
+		// 	//         console.log("Message sent: " + response.message);
+		// 	//         smtpTransport.close();
+		// 	//         res.send("success");
+		// 	//     }
+		// 	// 	    // if you don't want to use this transport object anymore, uncomment following line
+		// 	//         // shut down the connection pool, no more messages
+		// 	// });	
+		// 	// setup e-mail data with unicode symbols
+		// 	var hour = parseInt(classroom_db[0].interval.start.hour);
+		// 	var day = parseInt(classroom_db[0].interval.start.day);
+		// 	hour = (classroom_db[0].interval.start.time === "AM") ? hour : hour+12;
+		// 	day = (day === 7) ? 0 : day;
+		// 	var spanEnd = {
+		// 		"date": parseInt(classroom_db[0].span.end.date),
+		// 		"month": parseInt(classroom_db[0].span.end.month),
+		// 		"year": parseInt(classroom_db[0].span.end.year)
+		// 	}
+		// 	var datedata = new Date()
+		// 		, date = datedata.getDate()
+		// 		, month = datedata.getMonth()
+		// 		, year = datedata.getFullYear();
+		// 	var cronTime = '00 '+classroom_db[0].interval.start.minute+" "+hour.toString()+" * * "+day.toString();
+
+		// 	console.log('PEEKABOO!!', cronTime);
+		// 	// var job = new cronJob(cronTime, function() {
+		// 	// //first * is which second, next is minute, next is the hour, ? ? and then day of the week.	
+		// 	// 	surveymail(classroom_db[0].roster, urllink);
+		// 	// }, null, true, "America/New_York");
+
+		// 	//var job2 = new cronJob(cronTime, function()) {
+		// 	//this job is to send emails to only the people who have not taken a survey for the week.
+		// 	//	remindmail(classroom_db[0].roster, classroom_db[0].responses);	
+		// 	//}
+
 
 // var surveymail = function(roster, spanEnd, urllink) {
 // 	var smtpTransport = nodemailer.createTransport("SMTP", {

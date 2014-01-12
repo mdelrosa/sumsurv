@@ -21,7 +21,8 @@ var express = require('express')
   , cronJob = require('cron').CronJob
   , Classroom = Models.classroom
   , nodemailer = require("nodemailer")
-  , utils = require('./libs/utils');
+  , utils = require('./libs/utils')
+  , dateFormat = require('dateformat');
 
 // Seed the admin
 var admin = new User({
@@ -217,43 +218,66 @@ makeWeekGap = function(classroom, type, callback){
   callback(first, last);
 }
 
-function makeEmailBody(first, last, urllink, type, callback){
+function makeEmailBody(classroom, urllink, type, callback){
   console.log('urllink within callback is: ', urllink);
-  var htmlBody;
-  if (type === "regular") {
-    htmlBody = '<div style="80%"><p><center><img src="http://i.imgur.com/6FO9p55.png" style="width:100%"/></center></p>' +
-          '<p>Hello, students!</p>' + 
-          '<p></p>' +
-          '<p>It’s that time of week again. This survey is for the week of ' +first+ " to " +last+ '. Treat this survey as a reflection on your activities this week.</p>' + 
-          '<p></p>' +
-          '<p>Remember to email alexander.dillon@olin.edu if you have any issues or comments!</center></p>' +
-          '<p></p>' +
-          '<p>Here’s the link:</p>'+
-          '<p><center><a href="'+urllink+'" target="survey page"><img src="http://i.imgur.com/MaVMQlI.png" /></a></center></p>' +
-          '<p> </p>' +
-          '<p>Happy surveying,</p>' +
-          '<p>Autonomous Humans Lab</p>' +
-          '<div style="background-color: #dcdcdc"><center><footer><p style="color: #999999">Autonomous Humans Lab</p>' +
-          '<p style="color: #999999">motivationsurvey.com</center></p></footer></center></div></div>'
-  }
-  else if (type === "reminder") {
-    htmlBody = '<div style="80%"><p><center><img src="http://i.imgur.com/6FO9p55.png" style="width:100%"/></center></p>' +
-          '<p>Hey everyone!</p>' + 
-          '<p></p>' +
-          '<p>It seems that you have not taken the survey for the week of ' +first+ " to " +last+ ' yet... If you would like to make us happy you can click the link below.</p>' + 
-          '<p></p>' +
-          '<p>Remember to email alexander.dillon@olin.edu if you have any issues or comments!</center></p>' +
-          '<p></p>' +
-          '<p>Here’s the link:</p>'+
-          '<p><center><a href="'+urllink+'" target="survey page"><img src="http://i.imgur.com/MaVMQlI.png" /></a></center></p>' +
-          '<p> </p>' +
-          '<p>Happy surveying,</p>' +
-          '<p>Autonomous Humans Lab</p>' +
-          '<div style="background-color: #dcdcdc"><center><footer><p style="color: #999999">Autonomous Humans Lab</p>' +
-          '<p style="color: #999999">motivationsurvey.com</center></p></footer></center></div></div>'
-  }
-  else{console.log('Unrecognized type in email construction: ', type);}
-  callback(htmlBody);
+  utils.findIntDates(classroom,'present', function(dateStart, dateStop) {
+    var htmlBody
+    , start = dateStart.toLocaleString()
+    , stop = dateStop.toLocaleString();
+    var options = {hour12: "true", hour: "numeric", minute: "numeric", weekday: "long", month: "long", day: "numeric", year: "numeric"};
+    console.log('start, stop:',start,stop);
+    if (type === "regular") {
+      htmlBody = '<div style="80%"><p><center><img src="http://i.imgur.com/6FO9p55.png" style="width:100%"/></center></p>' +
+            '<p>Hello, students!</p>' + 
+            '<p></p>' +
+            '<p>It’s once again time for the weekly motivation survey in your class: '+ classroom.name + ' </p>' + 
+            '<p></p>' +
+            '<p>Please reflect on your course activities from the past week, and take a few minutes to complete this week’s survey.</p>' + 
+            '<p></p>' +
+            '<p>This survey will only be available until '+dateFormat(dateStop, "h:MM TT dddd, mmmm dS yyyy")+'.</p>'+
+            '<p></p>' +
+            '<p>Remember to email alexander.dillon@olin.edu if you have any issues or comments!</center></p>' +
+            '<p></p>' +
+            '<p>Here’s the link:</p>'+
+            '<p><center><a href="'+urllink+'" target="survey page"><img src="http://i.imgur.com/MaVMQlI.png" /></a></center></p>' +
+            '<p> </p>' +
+            '<p>We very much appreciate your taking the time to participate in this study!</p>' +
+            '<p> </p>'+
+            '<p>Thanks! </p>'+
+            '<p> </p>'+
+            '<p>Jon, Zhenya, Mike, and Alex</p>'+
+            '<p>The Motivation Research Team</p>' +
+            '<div style="background-color: #dcdcdc"><center><footer><p style="color: #999999">Autonomous Humans Lab</p>' +
+            '<p style="color: #999999">motivationsurvey.com</center></p></footer></center></div></div>'
+    }
+    else if (type === "reminder") {
+      htmlBody = '<div style="80%"><p><center><img src="http://i.imgur.com/6FO9p55.png" style="width:100%"/></center></p>' +
+            '<p>Hello, students!</p>' + 
+            '<p></p>' +
+            '<p>This is a friendly reminder to complete the weekly motivation survey for your class: '+ classroom.name + ' </p>' + 
+            '<p></p>' +
+            '<p>Please reflect on your course activities from the past week, and take a few minutes to complete this week’s survey.</p>' + 
+            '<p></p>' +
+            '<p>This survey will cease to be accessible after '+dateFormat(dateStop, "h:MM TT dddd, mmmm dS yyyy")+'.</p>'+
+            '<p></p>' +
+            '<p>Remember to email alexander.dillon@olin.edu if you have any issues or comments!</center></p>' +
+            '<p></p>' +
+            '<p>Here’s the link:</p>'+
+            '<p><center><a href="'+urllink+'" target="survey page"><img src="http://i.imgur.com/MaVMQlI.png" /></a></center></p>' +
+            '<p> </p>' +
+            '<p>We very much appreciate your taking the time to participate in this study!</p>' +
+            '<p> </p>'+
+            '<p>Thanks! </p>'+
+            '<p> </p>'+
+            '<p>Jon, Zhenya, Mike, and Alex</p>'+
+            '<p>The Motivation Research Team</p>' +
+            '<div style="background-color: #dcdcdc"><center><footer><p style="color: #999999">Autonomous Humans Lab</p>' +
+            '<p style="color: #999999">motivationsurvey.com</center></p></footer></center></div></div>'
+    }
+    else{console.log('Unrecognized type in email construction: ', type);}
+    callback(htmlBody);  
+  });
+  
 }
 
 
@@ -303,26 +327,17 @@ function msgLogger(classroom, type, cb){
   })
 }
 
-
+//Chain of commands to send mail
 var surveymail = function(classroom, type, roster, urllink) {
-  makeWeekGap(classroom, type, function(first,last){
-    makeEmailBody(first, last, urllink, type, function(htmlBody){
-      makeTheMail(roster, htmlBody, function(mailOptions, smtpTransport){
-        sendTheMail(mailOptions, smtpTransport, function(){
-          msgLogger(classroom, type, function(){
-            utils.setEmails(classroom, type);
-          })
-          //write info about last send email to database, then set email time
-
-
-          //sendTheMail only calls callback when email send is successful
-          //be sure date is re-set or emails will loop!
-          //This call will be replaced by util.js setEmailTimes, which sets both types
-          
-        });
+  makeEmailBody(classroom, urllink, type, function(htmlBody){
+    makeTheMail(roster, htmlBody, function(mailOptions, smtpTransport){
+      sendTheMail(mailOptions, smtpTransport, function(){
+        msgLogger(classroom, type, function(){
+          utils.setEmails(classroom, type);
+        })         
       });
     });
-  });
+  });  
 }
 
 // Passport session setup.

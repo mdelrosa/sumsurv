@@ -18,27 +18,32 @@ function intToDHM(obj){
 }
 
 
-function findIntDates(classroom, cb){
-  //This function finds this week's interval - now could be before, during or after it. 
+function findIntDates(classroom, intType, cb){
+  //This function finds the most recently activated interval - it can only be during or after it. 
   //Suitable for use in survey availability date check? Maybe...
   //Dates need to be advanced in order to determine next email times, that is done in findEmailTimes
   var today = new Date;
   //present day minus intStart day
-  console.log('Finding interval dates for classroom: ', classroom.name)
+  console.log('Finding interval dates for classroom, intType: ', classroom.name, intType);
   var intStart = intToDHM(classroom.interval.start)
     , intStop = intToDHM(classroom.interval.end);
+  var dateStart = new Date();
   var startDiff = today.getDay()-intStart.day;
   if(startDiff < 0){
     //This means start comes later in week, so subtract dates to get to last week
     //This variable will be subtracted from current date later, so adding to it now will make it go back farther
     startDiff = startDiff + 7;
   }
-  var dateStart = new Date();
-  //console.log('startDiff: ',startDiff);
+  console.log('startDiff: ',startDiff);
   dateStart.setDate(dateStart.getDate()-startDiff);
   dateStart.setHours(intStart.hour);
   dateStart.setMinutes(intStart.minute);
   console.log('dateStart is: ', dateStart);
+  var dateDiff = today - dateStart;
+  console.log('dateDiff: ',dateDiff);
+  //may be possible to use dateDiff to check 
+
+  
   var intDiff = intStop.day - intStart.day;
   //console.log('intDiff at first: ', intDiff);
   if(intDiff < 0){
@@ -61,6 +66,23 @@ function findIntDates(classroom, cb){
   console.log('dateStop is: ', dateStop);
   //pass found dates to callback
   //console.log('end of findIntDates, intStart and intStop: ',dateStart,dateStop);
+  if(intType === 'next'){
+    console.log('bumping int dates to find next')
+    dateStart.setDate(dateStart.getDate()+7);
+    dateStop.setDate(dateStop.getDate()+7);
+  }
+  var span = classroom.span;
+  if(span.start){ var spanBegin = new Date(span.start.year, span.start.month, span.start.date)}
+  if(span.end){ var spanEnd = new Date(span.end.year, span.end.month, span.end.date)}
+
+
+  if(dateStop > spanEnd){dateStop = spanEnd};
+  if(dateStart > spanEnd){
+    dateStop='After Span';
+    dateStart = 'After Span';
+  }
+  console.log('end of findIntDates. dateStart, dateStop, spanBegin, spanEnd: ',dateStart, dateStop, spanBegin, spanEnd);
+
 	cb(dateStart, dateStop);
 }
 
@@ -84,81 +106,89 @@ function findIntDates(classroom, cb){
 
 function findEmailTimes(classroom, cb){
   //use above function
-	findIntDates(classroom, function(dateStart, dateStop){
+	findIntDates(classroom, 'present', function(dateStart, dateStop){
     //Find Span dates for ultimate start and stop times
-    console.log('classroom in setEmailDates: ',classroom);
-
-    console.log('span in setEmailDates:',classroom.span);
+    console.log('classroom in findEmailDates: ',classroom);
+    console.log('findIntDates version of dateStart, dateStop:', dateStart, dateStop);
+    console.log('span in findEmailDates:',classroom.span);
     var span = classroom.span;
     if(span.start){ var spanBegin = new Date(span.start.year, span.start.month, span.start.date)}
     if(span.end){ var spanEnd = new Date(span.end.year, span.end.month, span.end.date)}
 		//Translate intStart and intStop to next/finished instances, aka dateReg and dateRem
 		//Get time difference (intDelta) for later
-		var dateReg = new Date(dateStart.valueOf())
-		, dateRem = new Date(dateStop.valueOf())
-		, intDelta = dateStop - dateStart
-		, now = new Date();
-		
-		while(dateReg <= now || dateReg <= spanBegin) {
-			dateReg.setDate(dateReg.getDate()+7);
-      console.log('dateReg in setEmailDates: ', dateReg);
-		}
-		//Make adjDate, check to see if a given dateRem had an dateReg that was before spanBegin
-		var adjDate = new Date(dateRem - intDelta);
-    console.log('dateRem before manipulation: ', dateRem);
-		while(dateRem <= now || adjDate <= spanBegin){
-			console.log('adjDate in loop: ',adjDate);
-      dateRem.setDate(dateRem.getDate()+7);
-			adjDate = new Date(dateRem-intDelta);
-		}
-		//Dates are now after now and start
-		//Now check they are before the span end
-		if(dateReg > spanEnd){dateReg = "After Span"}
-		//dateReg now good to be reported!
-		console.log('adjDate: ',adjDate);
+		var dateReg;
+    var dateRem;
+    if(dateStart === 'After Span'){var dateReg = "After Span"}
+    else{
+      var dateReg = new Date(dateStart.valueOf())
+  		, dateRem = new Date(dateStop.valueOf())
+  		, intDelta = dateStop - dateStart
+  		, now = new Date();
+  		//advance regular time until it is both after now and the span start
+  		while(dateReg <= now || dateReg <= spanBegin) {
+  			dateReg.setDate(dateReg.getDate()+7);
+        console.log('dateReg in setEmailDates: ', dateReg);
+  		}
+    }
+    if(dateStop === 'After Span'){var dateRem = "After Span"}
+    else{
+      //Make adjDate, check to see if a given dateRem had an dateReg that was before spanBegin
+      var adjDate = new Date(dateRem - intDelta);
+      console.log('dateRem before manipulation: ', dateRem);
+      while(dateRem <= now || adjDate <= spanBegin){
+        console.log('adjDate in loop: ',adjDate);
+        dateRem.setDate(dateRem.getDate()+7);
+        adjDate = new Date(dateRem-intDelta);
+      }
+      //Dates are now after now and start
+      //Now check they are before the span end
+      if(dateReg > spanEnd){dateReg = "After Span"}
+      //dateReg now good to be reported!
+    
 
-    //see if reminder has already been sent for the present interval. If so, advance things another week.
-    if(classroom.maildeck){  
-      if(classroom.maildeck.last){
-        var doneThat = (classroom.maildeck.last.type === "reminder" && classroom.maildeck.last.time >= adjDate && classroom.maildeck.last.time < dateRem);
-        // console.log('classroom.maildeck.last.type : ',classroom.maildeck.last.type);
-        // console.log('classroom.maildeck.last.time',classroom.maildeck.last.time);
-        // console.log('dateReg and dateRem and adjDate: ',dateReg, dateRem, adjDate);
-        // console.log('classroom.maildeck.last.type === "reminder"?', classroom.maildeck.last.type === "reminder");
-        // console.log('classroom.maildeck.last.time >= dateReg?',classroom.maildeck.last.time >= dateReg);
-        // console.log('classroom.maildeck.last.time < dateRem?',classroom.maildeck.last.time < dateRem);
-        // console.log('classroom.maildeck.last.time < dateRem?',classroom.maildeck.last.time < dateRem);
-        console.log('done that? : ', doneThat);
-        if(doneThat){
-          dateRem.setDate(dateRem.getDate()+7);
-          adjDate = dateRem-intDelta;
+  		//console.log('adjDate: ',adjDate);
+
+      //see if reminder has already been sent for the present interval. If so, advance things another week.
+      if(classroom.maildeck){  
+        if(classroom.maildeck.last){
+          var doneThat = (classroom.maildeck.last.type === "reminder" && classroom.maildeck.last.time >= adjDate && classroom.maildeck.last.time < dateRem);
+          console.log('classroom.maildeck.last.type : ',classroom.maildeck.last.type);
+          console.log('classroom.maildeck.last.time',classroom.maildeck.last.time);
+          console.log('dateReg and dateRem and adjDate: ',dateReg, dateRem, adjDate);
+          console.log('classroom.maildeck.last.type === "reminder"?', classroom.maildeck.last.type === "reminder");
+          console.log('classroom.maildeck.last.time >= dateReg?',classroom.maildeck.last.time >= dateReg);
+          console.log('classroom.maildeck.last.time < dateRem?',classroom.maildeck.last.time < dateRem);
+          console.log('classroom.maildeck.last.time < dateRem?',classroom.maildeck.last.time < dateRem);
+          console.log('done that? : ', doneThat);
+          if(doneThat){
+            dateRem.setDate(dateRem.getDate()+7);
+            adjDate = dateRem-intDelta;
+          }
+        }
+      }
+      //into dateRem, which is trickier...
+      if(adjDate < spanEnd){
+        console.log('got adjDate < spanEnd');
+        //this means reminder is valid
+        //check to see if span will end it early
+        if(dateRem > spanEnd){
+          dateRem = new Date(spanEnd.valueOf());
+          console.log('got dateRem < spanEnd, resetting dateRem = spanEnd');
+        }
+        var window = dateRem.valueOf()-adjDate.valueOf();
+        console.log('window: ', window);
+        if(window<86400000){
+          console.log('got under 24hrs between intStart and intStop');
+          dateRem = new Date(dateRem.valueOf() - (window/2));
+          console.log('split dateRem: ', dateRem);
+        }
+        else{
+          dateRem = new Date(dateRem.valueOf() - 86400000/2);
+          console.log('12hrs prior dateRem:', dateRem);
         }
       }
     }
-    //into dateRem, which is trickier...
-    if(adjDate < spanEnd){
-      console.log('got adjDate < spanEnd');
-      //this means reminder is valid
-      //check to see if span will end it early
-      if(dateRem > spanEnd){
-        dateRem = new Date(spanEnd.valueOf());
-        console.log('got dateRem < spanEnd, resetting dateRem = spanEnd');
-      }
-      var window = dateRem.valueOf()-adjDate.valueOf();
-      console.log('window: ', window);
-      if(window<86400000){
-        console.log('got under 24hrs between intStart and intStop');
-        dateRem = new Date(dateRem.valueOf() - (window/2));
-        console.log('split dateRem: ', dateRem);
-      }
-      else{
-        dateRem = new Date(dateRem.valueOf() - 86400000/2);
-        console.log('12hrs prior dateRem:', dateRem);
-      }
-
-
-    }
-    else{dateRem = "After Span"}
+    //else{dateRem = "After Span"}
 		console.log('end of findEmailTimes function Reg and Rem: ',dateReg,dateRem);
 	  cb(dateReg, dateRem);
 	})
@@ -191,4 +221,5 @@ function setEmails(classroom){
 }
 
 exports.setEmails = setEmails;
+exports.findIntDates = findIntDates;
 
