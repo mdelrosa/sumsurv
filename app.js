@@ -20,7 +20,8 @@ var express = require('express')
   , Survey = Models.survey
   , cronJob = require('cron').CronJob
   , Classroom = Models.classroom
-  , nodemailer = require("nodemailer");
+  , nodemailer = require("nodemailer")
+  , utils = require('./libs/utils');
 
 // Seed the admin
 var admin = new User({
@@ -70,7 +71,7 @@ function bumpEmailTime(classroom, type){
     //Code to increment regular date
     var bumpDate = classroom.maildeck.regular;
     console.log('regular original bumpDate: ', bumpDate);
-    while (bumpDate <= new Date) {
+    while (bumpDate <= new Date()) {
       var newdate = bumpDate.getDate()+7;
       bumpDate.setDate(newdate);
     }
@@ -137,6 +138,7 @@ function makeRoster(classroom, type, callback){
 
 function makeLink(classroom, type, roster, callback){
   if (roster.length){
+    console.log('classroom within makeLink: ', classroom);
     var urllink = "http://motivationsurvey.com/" + encodeURIComponent(classroom.owner.username).toString() + "/" + encodeURIComponent(classroom.name).toString() + "/take";
     callback(classroom, type, roster, urllink);
   }
@@ -168,15 +170,15 @@ var job = new cronJob("00 * * * * *", function() {
         console.log('Class name:'+found_class[i].name+ " ---");
         //Check for maildeck
         if (found_class[i].maildeck) {
-          console.log("regular:", found_class[i].maildeck.regular, "now:", new Date, "before now:", found_class[i].maildeck.regular <= new Date);
-          console.log("reminder:", found_class[i].maildeck.reminder, "now:", new Date, "before now:", found_class[i].maildeck.reminder <= new Date);
+          console.log("regular:", found_class[i].maildeck.regular, "now:", new Date(), "before now:", found_class[i].maildeck.regular <= new Date);
+          console.log("reminder:", found_class[i].maildeck.reminder, "now:", new Date(), "before now:", found_class[i].maildeck.reminder <= new Date);
           //After printing maildeck properties, let's keep everything inside this yes maildeck condition
-          if(found_class[i].maildeck.regular <= new Date){
+          if(found_class[i].maildeck.regular <= new Date()){
             var classroom = found_class[i];
             goPostal(classroom,"regular");
             console.log('Regular postal has gone for classroom: ', classroom.name);
           }
-          else if(found_class[i].maildeck.reminder <= new Date){
+          else if(found_class[i].maildeck.reminder <= new Date()) {
             var classroom = found_class[i];
             goPostal(classroom,"reminder");
             console.log('Reminder postal has gone for classroom: ', classroom.name);
@@ -191,25 +193,27 @@ var job = new cronJob("00 * * * * *", function() {
 //This is to effeciently determine present Sunday to Saturday interval dates
 //based off date object instead of strings, makes calculating dates at month rollover easier
 makeWeekGap = function(classroom, type, callback){
-  if(type === 'regular') {var intStart = classroom.maildeck.regular;}
-  else if(type === 'reminder'){
-    var intStart = classroom.maildeck.regular;
-    intStart.setDate(intStart.getDate()-7);
+  console.log('Finding Sunday to Saturday dates for email to classroom: ', classroom)
+  //want to sub in adjDate, calculated from 
+
+  var weekStart = new Date(classroom.maildeck.regular.valueOf());
+  if(type === 'reminder'){
+    weekStart.setDate(weekStart.getDate()-7);
   }
-  console.log('intStart0: ',intStart);
-  var daygap = intStart.getDay();
-  console.log('daygap: ', daygap);
-  intStart.setDate(intStart.getDate()-daygap);
-  console.log('intStart1: ',intStart);
-  var intStop = new Date(intStart.valueOf());
-  console.log('intStop0: ', intStop);
-  console.log('intStart2: ',intStart);
-  intStop.setDate(intStop.getDate()+6);
-  console.log('intStop1: ', intStop);
-  console.log('intStart3: ', intStart);
-  var first = intStart.toLocaleDateString();
-  var last = intStop.toLocaleDateString();
-  console.log('first, last: ',first,last);
+  //console.log('weekStart0: ',weekStart);
+  var daygap = weekStart.getDay();
+  //console.log('daygap: ', daygap);
+  weekStart.setDate(weekStart.getDate()-daygap);
+  //console.log('weekStart1: ',weekStart);
+  var weekStop = new Date(weekStart.valueOf());
+  //console.log('weekStop0: ', weekStop);
+  //console.log('weekStart2: ',weekStart);
+  weekStop.setDate(weekStop.getDate()+6);
+  //console.log('weekStop1: ', weekStop);
+  //console.log('weekStart3: ', weekStart);
+  var first = weekStart.toLocaleDateString();
+  var last = weekStop.toLocaleDateString();
+  console.log('Sunday, Saturday: ',first,last);
   callback(first, last);
 }
 
@@ -218,7 +222,7 @@ function makeEmailBody(first, last, urllink, type, callback){
   var htmlBody;
   if (type === "regular") {
     htmlBody = '<div style="80%"><p><center><img src="http://i.imgur.com/6FO9p55.png" style="width:100%"/></center></p>' +
-          '<p>Hey everyone!</p>' + 
+          '<p>Hello, students!</p>' + 
           '<p></p>' +
           '<p>It’s that time of week again. This survey is for the week of ' +first+ " to " +last+ '. Treat this survey as a reflection on your activities this week.</p>' + 
           '<p></p>' +
@@ -288,15 +292,33 @@ function sendTheMail(mailOptions, smtpTransport, callback){
   });
 }
 
+function msgLogger(classroom, type, cb){
+  Classroom.update({ _id: classroom._id }, { 'maildeck.last.type': type, 'maildeck.last.time': new Date()}).exec(function(err, num) {
+    if(err) { console.log("msgLogger error on update", err); res.send({success:false, message: "Classroom message logger error:"+err})}
+    else if(!num) {console.log("msgLogger update error: No classes found");}
+    else {
+      console.log("msgLogger update success for classroom.name :",classroom.name);
+      cb();
+    }      
+  })
+}
+
 
 var surveymail = function(classroom, type, roster, urllink) {
   makeWeekGap(classroom, type, function(first,last){
     makeEmailBody(first, last, urllink, type, function(htmlBody){
       makeTheMail(roster, htmlBody, function(mailOptions, smtpTransport){
         sendTheMail(mailOptions, smtpTransport, function(){
+          msgLogger(classroom, type, function(){
+            utils.setEmails(classroom, type);
+          })
+          //write info about last send email to database, then set email time
+
+
           //sendTheMail only calls callback when email send is successful
           //be sure date is re-set or emails will loop!
-          bumpEmailTime(classroom, type);
+          //This call will be replaced by util.js setEmailTimes, which sets both types
+          
         });
       });
     });
@@ -503,7 +525,7 @@ function whatweek(startDay, startMonth, startYear, endDay, endMonth, endYear) {
           }
       }
       else {//YEAR IS DIFFERENT
-          monthsTillNew = 11 - startM
+          monthsTillNew = 11 - startMonth;
       }
       return Math.ceil(daysInBetween/7)
 }
@@ -536,6 +558,15 @@ function ensureDemo(req, res, next) {
 	}
 }
 
+
+
+
+
+
+
+
+
+
 //date confirmation middleware
 function ensureDate(req, res, next){
   var d = new Date();
@@ -554,7 +585,7 @@ function ensureDate(req, res, next){
     return { day: day, hour: hour, minute: minute }
   }
   //This is taking the URL parameters (req.params.etc) and getting the data from them
-  //User here is actually the user that created the survey, not the user that's taking it.
+  //User here is actually the user that created the survey, not the user who is taking it.
   //First call is just to get ID of user so it can be looked up in Classrooms... better way to do this?
   User.find({ username: req.params.user }).exec(function(err, found_user) {
     if(err) { console.log('ensureDate user search error:', err); return false }
@@ -564,14 +595,17 @@ function ensureDate(req, res, next){
       Classroom.find({ name: req.params.class, owner: found_user[0].id }).exec(function(err, found_class) {
         if(err) { console.log('ensureDate class search error:', err); return false }
         else {
-            if(found_class.length > 0) {
+          if(found_class.length > 0) {
+            ///////////////////////////////////
+            //Use in findPresentInt function
+            ///////////////////////////////////
+            //Gotta take intCheckFormat with it
             var today = new Date
                 , span = found_class[0].span
                 , begin = new Date(span.start.year, span.start.month, span.start.date)
                 , finish = new Date(span.end.year, span.end.month, span.end.date);
             //console.log('span:', span, '\ntoday:',today);
             //console.log('begin:', begin, '\nfinish', finish);
-
             if (today >= begin && today <= finish) {
               //present day minus intStart day
               console.log('running date validation for classroom: ', found_class[0].name)
@@ -604,6 +638,12 @@ function ensureDate(req, res, next){
                 dateStop.setDate(dateStop.getDate()+7);
               }
               console.log('dateStop is: ', dateStop);
+              ///////////////////////////////////
+              //Use in findPresentInt function
+              ///////////////////////////////////
+
+
+
               //OK! Use the dates to check for various logical conditions
               //This check to ensure dateStop is < finish... does that matter? Naaahhh, I'll take it out
               if(today > dateStart && today < dateStop && dateStart > begin && dateStop < finish){
@@ -611,19 +651,19 @@ function ensureDate(req, res, next){
                 return next();
               }
               //Log messages depending on failing condition and redirect
-              else if(today < dateStart){console.log('today is before calculated interval start: ', today, dateStart); res.redirect('/reject')}
-              else if(today > dateStop){console.log('today is after calculated interval stop: ', today, dateStop); res.redirect('/reject')}
-              else if(dateStart < begin){console.log('calculated interval start is before survey start date', dateStart, begin); res.redirect('/reject')}
-              else if(dateStop > finish){console.log('calculated interval stop is after survey stop date', dateStop, finish); res.redirect('/reject')}
-              else {console.log('Some condition was not met in date validation: begin, dateStart, today, dateStop, finish are: ', begin, dateStart, today, dateStop, finish); res.redirect('/reject')}
+              else if(today < dateStart){console.log('ensureDate: today is before calculated interval start: ', today, dateStart); res.redirect('/reject')}
+              else if(today > dateStop){console.log('ensureDate: today is after calculated interval stop: ', today, dateStop); res.redirect('/reject')}
+              else if(dateStart < begin){console.log('ensureDate: calculated interval start is before survey start date', dateStart, begin); res.redirect('/reject')}
+              else if(dateStop > finish){console.log('ensureDate: calculated interval stop is after survey stop date', dateStop, finish); res.redirect('/reject')}
+              else {console.log('ensureDate: Some condition was not met in date validation: begin, dateStart, today, dateStop, finish are: ', begin, dateStart, today, dateStop, finish); res.redirect('/reject')}
             }
             else {
               if (today < begin) {
-                console.log("Before begin");
+                console.log("ensureDate: Before begin");
                 res.redirect('/reject');
               }
               else {
-                console.log("After finish");
+                console.log("ensureDate: After finish");
                 res.redirect('/reject')
               }
             }
@@ -632,9 +672,9 @@ function ensureDate(req, res, next){
             res.redirect('/');
           }
         } 
-      })
+      });
     }  
-  })
+  });
 }
 
 // Login auth @ post /login

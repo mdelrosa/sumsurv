@@ -6,7 +6,9 @@ var Models = require('../models/models')
     , Survey = Models.survey
     , Page = Models.page
     , Emaillist = Models.emaillist
-    , Classroom = Models.classroom;
+    , Classroom = Models.classroom
+    //, t = require('../libs/testlib')
+    , utils = require('../libs/utils');
 
 var nodemailer = require("nodemailer")
 
@@ -27,8 +29,8 @@ exports.new_class = function(req, res) {
 				roster: [],
 				surveys: null,
 				responses: [],
-				interval: { start: 4, end: 7 },
-				span: { start: { date: date, month: month, year: year} }
+				interval: { start: 'undefined', end: 'undefined' },
+				span: { start: { date: date, month: month, year: year}, end: 'undefined' }
 			});
 			newClassroom.save(function(err) {
 	            if(err) {
@@ -156,39 +158,27 @@ exports.edit_span = function(req, res) {
 		Classroom.update({ owner: req.user.id, name: req.body.name }, { $set: { 'span.start':  req.body.n } }).exec(function(err, num) {
 			if(err || !num) { console.log("edit_span error:", err); return false }
 			else {
+				//OK, still want to do classroom find, need to get all four date vars (int/span, start/stop) to set dates
 				Classroom.find({ owner: req.user.id, name: req.body.name }).exec(function(err, found_class) {
 					if(err) { console.log("edit_span search error:", err); return false}
 					else {
 						res.send({success:true})
-						// console.log('req.body.n',req.body.n);
-						// var n = req.body.n
-						// 	, intStart = found_class[0].interval.start
-						// 	, date = new Date(n.year, n.month, n.date )
-						// 	, intDay = (parseInt(intStart.day) === 7) ? 0 : parseInt(intStart.day)
-						// 	, spanDay = date.getDay()
-						// 	, addToDate = (spanDay <= intDay) ? intDay - spanDay : (7 - spanDay) + intDay;
-						// date.setDate(date.getDate()+addToDate);
-						// // change to 24 hour
-						// var hourUp = (intStart.time === "PM") ? ((intStart.hour === '12') ? 12 : 12 + parseInt(intStart.hour)) : ((intStart.hour === '12') ? 0 : parseInt(intStart.hour));
-						// // add four to time to standardize for EST, add one more for each time zone to the left
-						// date.setUTCHours(hourUp+4);
-						// date.setUTCMinutes(parseInt(intStart.minute));
-						// // If we are initializing the span such that it begins before today, set maildeck for next week's int
-						// while (new Date > date) {
-						// 	date.setDate(date.getDate()+7);
-						// }
-						// Classroom.update({ owner: req.user.id, name: req.body.name }, { $set: { 'maildeck.regular': date } }, function(err, num) {
-						// 	if (err || !num) { console.log("Classroom maildeck update err:", err); return false}
-						// 	else {
-						// 		res.send({success: true})
-						// 	}
-						// });
-						var update = maildeck_update(req.user.id, req.body.name, found_class[0]);
-						if (update) { return true };
+						//sub in new set mail dates function here
+						//var update = maildeck_update(req.user.id, req.body.name, found_class[0]);//old line
+						//new code:
+						//check to see if all dates are filled, and if so use them to set the email dates
+						var passclass = found_class[0];
+						if (passclass.interval.start != 'undefined' && passclass.interval.end != 'undefined' && passclass.span.start != 'undefined'){
+							var update = utils.setEmails(passclass);
+							if (update) { return true };
+						}
+						else{console.log('info was added but still not enough to set email date')}
+						
+						
 					}
-				})
+				});
 			}
-		})
+		});
 	}
 	else {
 		Classroom.update({ owner: req.user.id, name: req.body.name }, { $set: { 'span.end': req.body.n } }).exec(function(err, num) {
@@ -196,41 +186,33 @@ exports.edit_span = function(req, res) {
 			else {
 				res.send({success:true})
 				Classroom.find({ owner: req.user.id, name: req.body.name }).exec( function(err, found_class) {
-					// // Initialize reminder time
-					// var n = found_class[0].span.start
-					// 	, intEnd = found_class[0].interval.end
-					// 	, remindDate = new Date(n.year, n.month, n.date)
-					// 	, intDay = (parseInt(intEnd.day)===7) ? 0 : parseInt(intEnd.day)
-					// 	, spanDay = remindDate.getDay()
-				 //    	, addToDate = (spanDay <= intDay) ? intDay - spanDay : (7 - spanDay) + intDay;
-			  //   	console.log('remindDate first:', remindDate);
-					// remindDate.setDate(remindDate.getDate() + addToDate);
-					// console.log('remindDate second:', remindDate);
-					// // Change to 24 hour
-					// var hourUp = (intEnd.time === "PM") ? ((intEnd.hour === '12') ? 12 : 12 + parseInt(intEnd.hour)) : ((intEnd.hour === '12') ? 0 : parseInt(intEnd.hour));
-					// // Add 4 hours to standardize for EST time
-					// remindDate.setUTCHours(hourUp+4);
-					// remindDate.setUTCMinutes(parseInt(intEnd.minute));
-					// console.log('remindDate third:', remindDate);
-					// // Subtract ten hours from reminderDate
-					// remindDate.setUTCHours(remindDate.getUTCHours()-12);
-					// console.log('remindDate fourth:', remindDate);
-					// Classroom.update({ owner: req.user.id, name: req.body.name }, { $set: { 'maildeck.reminder': remindDate } }, function(err, num) {
-					// 	if (err || !num) { console.log("Classroom maildeck update err:", err); return false }
-					// 	else {
-					// 		res.send({success: true});
-					// 	}
-					// })
-					var update = maildeck_update(req.user.id, req.body.name, found_class[0]);
-					if (update) { return true };
-				})
+					if(err) { console.log("edit_span search error:", err); return false}
+					else{
+						res.send({success:true})
+						//sub in new set mail dates function here
+						//var update = maildeck_update(req.user.id, req.body.name, found_class[0]);//old line
+						//new code:
+						//check to see if all dates are filled, and if so use them to set the email dates
+						var passclass = found_class[0];
+						if (passclass.interval.start != 'undefined' && passclass.interval.end != 'undefined' && passclass.span.start != 'undefined'){
+							var update = utils.setEmails(passclass);
+							if (update) { return true };
+						}
+						else{console.log('info was added but still not enough to set email date')}
+					}
+				});
 			}
-		})
+		});
 	}
 }
 
 // Update maildeck of a classroom
+// This will theoretically be redundant with setEmailTimes in utils lib?
+// Therefore, sub in utils function right where this is called?
+// 4 instances of being called: start and stop for both interval and span
+// owner and name are redundant with classroom parameters, not needed
 var maildeck_update = function(owner, name, classroom) {
+	
 	var s = classroom.span.start
 		, intStart = classroom.interval.start
 		, dateRem = new Date(s.year, s.month, s.date)
@@ -268,6 +250,7 @@ var maildeck_update = function(owner, name, classroom) {
 	}
 	console.log('dateReg4:', dateReg);
 	console.log('dateRem4:', dateRem);
+	console.log('Classroom as in maildeck update: ', classroom);
 	Classroom.update({ owner: owner, name: name }, { $set: { 'maildeck.reminder': dateRem, 'maildeck.regular': dateReg } }, function(err, num) {
 		if (err || !num) { console.log("Classroom maildeck update err:", err); return false }
 		else {
@@ -381,8 +364,16 @@ exports.interval = function(req, res) {
 					if(err) {console.log('Interval error', err); return false}
 					else {
 						res.send({success:true})
-						var update = maildeck_update(req.user.id, req.body.className, found_class[0]);
-						if (update) { return true}
+						//sub in new set mail dates function here
+						//var update = maildeck_update(req.user.id, req.body.name, found_class[0]);//old line
+						//new code:
+						//check to see if all dates are filled, and if so use them to set the email dates
+						var passclass = found_class[0];
+						if (passclass.interval.start != 'undefined' && passclass.interval.end != 'undefined' && passclass.span.start != 'undefined'){
+							var update = utils.setEmails(passclass);
+							if (update) { return true };
+						}
+						else{console.log('info was added but still not enough to set email date')}
 					}
 				});
 			}
@@ -397,8 +388,16 @@ exports.interval = function(req, res) {
 					if(err) {console.log('Interval error', err); return false}
 					else {
 						res.send({success:true})
-						var update = maildeck_update(req.user.id, req.body.className, found_class[0]);
-						if (update) { return true }
+						//sub in new set mail dates function here
+						//var update = maildeck_update(req.user.id, req.body.name, found_class[0]);//old line
+						//new code:
+						//check to see if all dates are filled, and if so use them to set the email dates
+						var passclass = found_class[0];
+						if (passclass.interval.start != 'undefined' && passclass.interval.end != 'undefined' && passclass.span.end != 'undefined'){
+							var update = utils.setEmails(passclass);
+							if (update) { return true };
+						}
+						else{console.log('info was added but still not enough to set email date')}
 					}
 				});
 			}
