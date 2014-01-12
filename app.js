@@ -20,7 +20,8 @@ var express = require('express')
   , Survey = Models.survey
   , cronJob = require('cron').CronJob
   , Classroom = Models.classroom
-  , nodemailer = require("nodemailer");
+  , nodemailer = require("nodemailer")
+  , utils = require('./libs/utils');
 
 // Seed the admin
 var admin = new User({
@@ -137,6 +138,7 @@ function makeRoster(classroom, type, callback){
 
 function makeLink(classroom, type, roster, callback){
   if (roster.length){
+    console.log('classroom within makeLink: ', classroom);
     var urllink = "http://motivationsurvey.com/" + encodeURIComponent(classroom.owner.username).toString() + "/" + encodeURIComponent(classroom.name).toString() + "/take";
     callback(classroom, type, roster, urllink);
   }
@@ -176,7 +178,7 @@ var job = new cronJob("00 * * * * *", function() {
             goPostal(classroom,"regular");
             console.log('Regular postal has gone for classroom: ', classroom.name);
           }
-          else if(found_class[i].maildeck.reminder <= new Date(){
+          else if(found_class[i].maildeck.reminder <= new Date()) {
             var classroom = found_class[i];
             goPostal(classroom,"reminder");
             console.log('Reminder postal has gone for classroom: ', classroom.name);
@@ -192,6 +194,8 @@ var job = new cronJob("00 * * * * *", function() {
 //based off date object instead of strings, makes calculating dates at month rollover easier
 makeWeekGap = function(classroom, type, callback){
   console.log('Finding Sunday to Saturday dates for email to classroom: ', classroom)
+  //want to sub in adjDate, calculated from 
+
   var weekStart = new Date(classroom.maildeck.regular.valueOf());
   if(type === 'reminder'){
     weekStart.setDate(weekStart.getDate()-7);
@@ -218,7 +222,7 @@ function makeEmailBody(first, last, urllink, type, callback){
   var htmlBody;
   if (type === "regular") {
     htmlBody = '<div style="80%"><p><center><img src="http://i.imgur.com/6FO9p55.png" style="width:100%"/></center></p>' +
-          '<p>Hey everyone!</p>' + 
+          '<p>Hello, students!</p>' + 
           '<p></p>' +
           '<p>It’s that time of week again. This survey is for the week of ' +first+ " to " +last+ '. Treat this survey as a reflection on your activities this week.</p>' + 
           '<p></p>' +
@@ -288,16 +292,33 @@ function sendTheMail(mailOptions, smtpTransport, callback){
   });
 }
 
+function msgLogger(classroom, type, cb){
+  Classroom.update({ _id: classroom._id }, { 'maildeck.last.type': type, 'maildeck.last.time': new Date()}).exec(function(err, num) {
+    if(err) { console.log("msgLogger error on update", err); res.send({success:false, message: "Classroom message logger error:"+err})}
+    else if(!num) {console.log("msgLogger update error: No classes found");}
+    else {
+      console.log("msgLogger update success for classroom.name :",classroom.name);
+      cb();
+    }      
+  })
+}
+
 
 var surveymail = function(classroom, type, roster, urllink) {
   makeWeekGap(classroom, type, function(first,last){
     makeEmailBody(first, last, urllink, type, function(htmlBody){
       makeTheMail(roster, htmlBody, function(mailOptions, smtpTransport){
         sendTheMail(mailOptions, smtpTransport, function(){
+          msgLogger(classroom, type, function(){
+            utils.setEmails(classroom, type);
+          })
+          //write info about last send email to database, then set email time
+
+
           //sendTheMail only calls callback when email send is successful
           //be sure date is re-set or emails will loop!
           //This call will be replaced by util.js setEmailTimes, which sets both types
-          bumpEmailTime(classroom, type);
+          
         });
       });
     });
@@ -504,7 +525,7 @@ function whatweek(startDay, startMonth, startYear, endDay, endMonth, endYear) {
           }
       }
       else {//YEAR IS DIFFERENT
-          monthsTillNew = 11 - startM
+          monthsTillNew = 11 - startMonth;
       }
       return Math.ceil(daysInBetween/7)
 }
