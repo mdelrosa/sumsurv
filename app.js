@@ -241,6 +241,8 @@ function makeEmailBody(classroom, urllink, type, callback){
             '<p>Here’s the link:</p>'+
             '<p><center><a href="'+urllink+'" target="survey page"><img src="http://i.imgur.com/MaVMQlI.png" /></a></center></p>' +
             '<p> </p>' +
+            '<p><center>'+urllink+'</center></p>'+
+            '<p> </p>' +
             '<p>We very much appreciate your taking the time to participate in this study!</p>' +
             '<p> </p>'+
             '<p>Thanks! </p>'+
@@ -265,6 +267,8 @@ function makeEmailBody(classroom, urllink, type, callback){
             '<p>Here’s the link:</p>'+
             '<p><center><a href="'+urllink+'" target="survey page"><img src="http://i.imgur.com/MaVMQlI.png" /></a></center></p>' +
             '<p> </p>' +
+            '<p><center>'+urllink+'</center></p>'+
+            '<p> </p>' +
             '<p>We very much appreciate your taking the time to participate in this study!</p>' +
             '<p> </p>'+
             '<p>Thanks! </p>'+
@@ -286,6 +290,7 @@ function makeTheMail(roster, htmlBody, callback){
   var smtpTransport = nodemailer.createTransport("SMTP", {
 
     service: "Gmail",
+    maxMessages: 95,
     auth: {
       user: "authumlab@gmail.com",
       pass: "tqufkeinpstgfatv"
