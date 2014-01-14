@@ -107,8 +107,9 @@ $(document).ready(function() {
 						// display success alert
 						$('#main-container').append("<div class='alert alert-success'>"+
 												"<button type='button' class='close' data-dismiss='alert'>&times;"+
-												"</button><strong>Thank You! </strong>"+
-												"Your cooperation is sincerely appreciated!</div>");
+												"</button><strong>Thank You for completing this week’s motivation survey! </strong>"+
+												"<br>We appreciate your input, and we look forward to hearing from you again next week."+
+												"<br><a class='btn btn-danger' href='/logout'> Log Out </a></div>");
 					});
 				}
 			});
