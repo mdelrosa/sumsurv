@@ -108,7 +108,7 @@ function findEmailTimes(classroom, cb){
   //use above function
 	findIntDates(classroom, 'present', function(dateStart, dateStop){
     //Find Span dates for ultimate start and stop times
-    console.log('classroom in findEmailDates: ',classroom);
+    //console.log('classroom in findEmailDates: ',classroom);
     console.log('findIntDates version of dateStart, dateStop:', dateStart, dateStop);
     console.log('span in findEmailDates:',classroom.span);
     var span = classroom.span;
@@ -142,7 +142,9 @@ function findEmailTimes(classroom, cb){
       }
       //Dates are now after now and start
       //Now check they are before the span end
-      if(dateReg > spanEnd){dateReg = "After Span"}
+      if(dateReg > spanEnd){
+        dateReg = "After Span";
+      }
       //dateReg now good to be reported!
     
 
@@ -167,7 +169,7 @@ function findEmailTimes(classroom, cb){
         }
       }
       //into dateRem, which is trickier...
-      if(adjDate < spanEnd){
+      if(adjDate <= spanEnd){
         console.log('got adjDate < spanEnd');
         //this means reminder is valid
         //check to see if span will end it early
@@ -187,10 +189,11 @@ function findEmailTimes(classroom, cb){
           console.log('12hrs prior dateRem:', dateRem);
         }
       }
+      else{dateRem = "After Span"}
     }
-    //else{dateRem = "After Span"}
+    //
 		console.log('end of findEmailTimes function Reg and Rem: ',dateReg,dateRem);
-	  cb(dateReg, dateRem);
+	  cb(doneThat, dateReg, dateRem);
 	})
 }
 
@@ -215,11 +218,12 @@ function saveEmailTimes(classroom, dateReg, dateRem){
 }
 
 function setEmails(classroom){
-  findEmailTimes(classroom, function(dateReg, dateRem){
+  findEmailTimes(classroom, function(doneThat, dateReg, dateRem){
     saveEmailTimes(classroom, dateReg, dateRem);
   });
 }
 
 exports.setEmails = setEmails;
 exports.findIntDates = findIntDates;
+exports.findEmailTimes = findEmailTimes;
 
