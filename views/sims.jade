@@ -24,69 +24,61 @@ block content
           i.icon-th-large.icon-white
           |  #{className}
         span.label.label-info.pad-small.margin#owner(name=owner)
-          i.icon-user.icon-white
-          |  #{owner}
+ 
     br
     if (demo)
       div#demo
         div#gender(name=demo.gender)
         div#year(name=demo.year)
+    div#owner(name=classOwner)
     div#survey-container
       ul.nav.nav-pills#myTab
         li.active
-          a(href='#status', data-toggle='pill') Status
+          a(href='#status', data-toggle='pill') Step 1: Course Activities
         li
-          a(href='#questions', data-toggle='pill') Questions
+          a(href='#questions', data-toggle='pill') Step 2: Questions
         li
-          a(href='#comments', data-toggle='pill') Comments
+          a(href='#comments', data-toggle='pill') Step 3: Comments
    
       .tab-content#formHolder
         #status.tab-pane.active
           div.text-question
             h4 Provide a brief description of your current activities in the course.
-            | Please list which, if any, of these terms describe your activities this week.
+            | Please list which, if any, of the terms below describe your activities this week. If an activity falls outside of these categories, please describe it.
+            ul
+            li Lectures
+            li Readings 
+            li Problem-Solving (in class or homework) 
+            li Lab Work
+            li Field Trips (industry, community, etc)
+            li Project Work  
+            li Design/Fabrication
+            li Discussion 
+            li Other?
             br
-            br
-            |  Lectures
-            br
-            | Readings 
-            br
-            | Problem-Solving (in class or homework) 
-            br
-            | Lab Work
-            br
-            |  Field Trips (industry, community, etc)
-            br
-            | Project Work  
-            br
-            | Design/Fabrication
-            br
-            |  Discussion 
-            br 
-            |  Other?
-            br
-            br
-            | If an activity falls outside of these categories, please describe it.
             | 
             textarea.status-text(placeholder='Example: lectures, project work, and discussion')
-          div.fluid-row
-            div.pull-right.tab-control
-              a.btn.btn-info(href="#questions") Next
+          div.row
+            div.span8
+            div.span2
+              div.pull-right.tab-control
+                a.btn.btn-info(href="#questions") Next
         #questions.tab-pane
-          h5 Directions: Read each item carefully. Using the scale below, please circle the number that best describes the reason why you engaged in your project activities. Answer each item according to the following scale: 
-          | 1: corresponds not at all;
+          h5 Directions: Read each item carefully. Using the scale below, please choose the number that best describes the reason why you engaged in the activities you described on the previous page. 
+          h6 The response scale is as follows: 
+          | 1: corresponds not at all
           br 
-          | 2: corresponds very little; 
+          | 2: corresponds very little 
           br
-          | 3: corresponds a little; 
+          | 3: corresponds a little
           br
-          | 4: corresponds moderately; 
+          | 4: corresponds moderately 
           br
-          | 5: corresponds enough; 
+          | 5: corresponds enough
           br
-          | 6: corresponds a lot; 
+          | 6: corresponds a lot 
           br
-          | 7: corresponds exactly.
+          | 7: corresponds exactly
           br
           h5 Why did you engage in your project activities this week?
           div#container
@@ -470,22 +462,32 @@ block content
                    td
                      label.radio
                        input#optionsRadios7(type='radio', name='optionsRadios16', value='option7')          
-          div.fluid-row
-            div.pull-left.tab-control
-              a.btn.btn-info(href="#status") Previous
-            div.pull-right.tab-control
-              a.btn.btn-info(href="#comments") Next  
+          div.row
+            div.span8
+              div.pull-left.tab-control
+                a.btn.btn-info(href="#status") Previous
+            div.span3
+              div.pull-right.tab-control
+                a.btn.btn-info(href="#comments") Next  
         #comments.tab-pane
           div.text-question
             h4 Is there any part of your experiences in this class since the last survey that sticks out in your mind?
             textarea.comment-text(placeholder='Optional')
             div
-          div.fluid-row
-            div.pull-left.tab-control
-              a.btn.btn-info(href="#questions") Previous
-            div.pull-right.tab-control
-              a.btn.btn-info.btn-large(id = 'submitform', value = 'Submit', name = 'submitform') Submit
-          div.pull-right#alertDiv
+          div.row
+            div.span8
+              div.pull-left.tab-control
+                a.btn.btn-info(href="#questions") Previous
+
+            div.span4
+              div.pull-left.tab-control
+                a.btn.btn-success.btn-large(id = 'submitform', value = 'Submit', name = 'submitform') Submit
+            div.pull-right#alertDiv
+
+
+
+            
+
 
     div.container.pad-top
       div.progress.progress-striped.active

@@ -187,6 +187,7 @@ exports.save_response = function(req, res) {
                     participant: req.user.id,
                     date: req.body.date,
                     time: req.body.time,
+                    classname: req.body.info.className,
                     classroom: found_class[0].id,
                     userid: found_class[0].checker[checknum][req.user.email],
                     responseweek: whatweek(parseInt(found_class[0].span.start.date), parseInt(found_class[0].span.start.month), parseInt(found_class[0].span.start.year), parseInt(req.body.date.date), parseInt(req.body.date.month), parseInt(req.body.date.year))
@@ -289,7 +290,7 @@ exports.export = function(req, res) {
                 console.log("response_db:",response_db);
             	if(err2) {console.log("Error in response export: ", err2); return false}
                 else {
-                    var csvstr = [' , Id, Response Week, Gender, Year, Status, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Comment, Answer Date, Time'];    	
+                    var csvstr = [' , ClassName, Id, Response Week, Gender, Year, Status, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Comment, Answer Date, Time'];    	
                 	var answerdate = "";
                     var answertime = ";"
                     for(i=1; i < response_db.length+1; i++) {
@@ -300,7 +301,7 @@ exports.export = function(req, res) {
                         answerdate = response_db[i-1].date.month.toString() + "/" + response_db[i-1].date.date.toString() + "/" + response_db[i-1].date.year.toString();
                         answertime = response_db[i-1].time.hour.toString() + ":" + response_db[i-1].time.minutes.toString() + ":" + response_db[i-1].time.seconds.toString();
                         //This just turns the array into a string with comma separated values.
-            			csvstr[i] = " ," + response_db[i-1].userid + "," + response_db[i-1].responseweek + "," + response_db[i-1].results.join(",") +","+ answerdate +  "," + answertime + ", ";
+            			csvstr[i] = " ," + response_db[i-1].classname +"," + response_db[i-1].userid + "," + response_db[i-1].responseweek + "," + response_db[i-1].results.join(",") +","+ answerdate +  "," + answertime + ", ";
             		}
                     res.header('Content-type', 'text/csv');
                     res.send(csvstr);
@@ -321,7 +322,7 @@ exports.export_survey_all = function(req, res) {
                     for (i=0;i<found_class.length;i++) {
                         response_db = response_db.concat(found_class[i].responses);
                     }
-                    var csvstr = [' , Id, Response Week, Gender, Year, Status, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Comment, Answer Date, Time'];        
+                    var csvstr = [' , ClassName, Id, Response Week, Gender, Year, Status, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q16, Comment, Answer Date, Time, '];             
                     var answerdate = "";
                     var answertime = ";"
                     for(i=1; i < response_db.length+1; i++) {
@@ -332,7 +333,7 @@ exports.export_survey_all = function(req, res) {
                         answerdate = response_db[i-1].date.month.toString() + "/" + response_db[i-1].date.date.toString() + "/" + response_db[i-1].date.year.toString();
                         answertime = response_db[i-1].time.hour.toString() + ":" + response_db[i-1].time.minutes.toString() + ":" + response_db[i-1].time.seconds.toString();
                         //This just turns the array into a string with comma separated values.
-                        csvstr[i] = " ," + response_db[i-1].userid + "," + response_db[i-1].responseweek + "," + response_db[i-1].results.join(",") +","+ answerdate +  "," + answertime + ", ";
+                        csvstr[i] = " ," + response_db[i-1].classname +"," + response_db[i-1].userid + "," + response_db[i-1].responseweek + "," + response_db[i-1].results.join(",") +","+ answerdate +  "," + answertime + ", ";
                     }
                     res.header('Content-type', 'text/csv');
                     res.send(csvstr);
