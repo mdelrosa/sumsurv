@@ -139,7 +139,7 @@ function makeRoster(classroom, type, callback){
 
 function makeLink(classroom, type, roster, callback){
   if (roster.length){
-    console.log('classroom within makeLink: ', classroom);
+    //console.log('classroom within makeLink: ', classroom);
     var urllink = "http://motivationsurvey.com/" + encodeURIComponent(classroom.owner.username).toString() + "/" + encodeURIComponent(classroom.name).toString() + "/take";
     callback(classroom, type, roster, urllink);
   }
@@ -334,14 +334,20 @@ function msgLogger(classroom, type, cb){
 
 //Chain of commands to send mail
 var surveymail = function(classroom, type, roster, urllink) {
-  makeEmailBody(classroom, urllink, type, function(htmlBody){
-    makeTheMail(roster, htmlBody, function(mailOptions, smtpTransport){
-      sendTheMail(mailOptions, smtpTransport, function(){
-        msgLogger(classroom, type, function(){
-          utils.setEmails(classroom, type);
-        })         
-      });
-    });
+  console.log('checking doneThat in email send loop:');
+  utils.findEmailTimes(classroom, function(dt){
+    if(dt === true){utils.setEmails(classroom, type)}
+    if(dt !== true){
+      makeEmailBody(classroom, urllink, type, function(htmlBody){
+        makeTheMail(roster, htmlBody, function(mailOptions, smtpTransport){
+          sendTheMail(mailOptions, smtpTransport, function(){
+            msgLogger(classroom, type, function(){
+              utils.setEmails(classroom, type);
+            })         
+          });
+        });
+      });  
+    }
   });  
 }
 
