@@ -383,7 +383,7 @@ var app = express();
 mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/sumsurv');
 
 app.configure(function(){
-  app.listen(process.env.NODE_ENV === 'production' ? 80 : 3000, function() {
+  app.listen(80, function() {
 	  console.log("Ready");
 
 	  // if run as root, downgrade to the owner of this file
