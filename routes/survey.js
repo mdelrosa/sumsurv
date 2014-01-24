@@ -207,6 +207,7 @@ exports.save_response = function(req, res) {
                                 date: req.body.date,
                                 time: req.body.time,
                                 classroom: found_class[0].id,
+                                classname: found_class[0].name,
                                 userid: 1,
                                 responseweek: whatweek(parseInt(found_class[0].span.start.date), parseInt(found_class[0].span.start.month), parseInt(found_class[0].span.start.year), parseInt(req.body.date.date), parseInt(req.body.date.month), parseInt(req.body.date.year))
                             });     
@@ -227,6 +228,7 @@ exports.save_response = function(req, res) {
                                 date: req.body.date,
                                 time: req.body.time,
                                 classroom: found_class[0].id,
+                                classname: found_class[0].name,
                                 userid: newid,
                                 responseweek: whatweek(parseInt(found_class[0].span.start.date), parseInt(found_class[0].span.start.month), parseInt(found_class[0].span.start.year), parseInt(req.body.date.date), parseInt(req.body.date.month), parseInt(req.body.date.year))
                             });     
