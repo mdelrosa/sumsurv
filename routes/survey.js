@@ -187,7 +187,7 @@ exports.save_response = function(req, res) {
                     participant: req.user.id,
                     date: req.body.date,
                     time: req.body.time,
-                    classname: req.body.info.className,
+                    classname: found_class[0].name,
                     classroom: found_class[0].id,
                     userid: found_class[0].checker[checknum][req.user.email],
                     responseweek: whatweek(parseInt(found_class[0].span.start.date), parseInt(found_class[0].span.start.month), parseInt(found_class[0].span.start.year), parseInt(req.body.date.date), parseInt(req.body.date.month), parseInt(req.body.date.year))
