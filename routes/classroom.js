@@ -128,6 +128,9 @@ exports.remove = function(req, res) {
 	})
 }
 
+
+
+
 // Render class span selection popover
 exports.view_span = function(req, res) {
 	Classroom.find({owner: req.user._id, name: req.query.name}).exec(function(err, found_class) {
@@ -294,7 +297,7 @@ exports.part_add = function(req, res) {
 					var urllink = "survo.herokuapp.com/classes"
 					var mailOptions = {
 					    from: "Autonomous Humans Lab<authumlab@gmail.com>", // sender address
-					    to: 'leedoyung@gmail.com', // list of receivers
+					    to: 'alexander.dillon@gmail.com', // list of receivers
 					    subject: "You have a request from a Survo user!", // Subject line
 					    text: "You Have a Request.", // plaintext body
 					    html:        

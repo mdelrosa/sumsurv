@@ -29,13 +29,17 @@ div.container-special
 			table.table.table-striped#table-roster
 				tr
 					th Student
-					th Edit
+					th PW
+					th Delete
 				for student in roster
 					tr
 						td #{student}
 						td
-							button.btn.btn-small.btn-remove
+							button.btn.btn-warning.btn-small.btn-pwtemp
+								i.icon-random
+						td
+							button.btn.btn-small.btn-danger.btn-remove
 								i.icon-minus
-								|  Remove
+							
 	else
 		p.pad Roster is empty!

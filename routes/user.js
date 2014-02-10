@@ -7,7 +7,9 @@ var baseHead = 'Survo'
 	, Models = require('../models/models')
 	, Survey = Models.survey
 	, Classroom = Models.classroom
-	, User = Models.User;
+	, User = Models.User
+	, bcrypt = require('bcrypt')
+	, SALT_WORK_FACTOR = 10;
 
 exports.list = function(req, res){
   res.send("respond with a resource");
@@ -75,6 +77,47 @@ exports.create = function(req, res) {
 	});
 }
 
+function hashit(SALT_WORK_FACTOR, orig, cb){
+	//console.log("new pw before encryption: ", orig)
+	bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
+		if(err) console.log("Error making salt: ", err);
+
+		bcrypt.hash(orig, salt, function(err, hash) {
+			if(err) return next(err);
+			//console.log("new pw after encryption: ", hash)
+			cb(hash);
+		})
+	})
+	
+
+}
+
+exports.pw_reset = function(req,res){
+	var newpw = "temp";
+	if(req.body.newpw){
+		newpw = req.body.newpw;
+	}
+	console.log(req.body);
+	hashit(10, newpw, function(pass){
+		User.update({email: req.body.participant}, {$set: {password: pass} }, function(err, userStuff){
+			if(err){
+				console.log("Error in password reset: ", err);
+			}
+			else console.log(userStuff);
+			req.session.message = "Password Change Success!"
+			if(req.session.nextpath){
+				res.redirect(req.session.nextpath);
+				req.session.nextpath = null;
+			}
+			return(true);
+		});
+
+	})
+
+}
+
+
+
 exports.splash = function(req, res) {
 	if (req.user) { var user = req.user.username }
 	else { var user = null }
@@ -114,9 +157,11 @@ exports.part = function(req, res) {
 				title: baseHead + " | Participating",
 				user: req.user.username,
 				classes: found_class,
+				message: req.session.message,
 				info: req.user.info
 			});
 		}
+		req.session.message = null;
 	})
 }
 
@@ -267,5 +312,18 @@ exports.testpage2 = function(req, res) {
 	res.render("testpage2", {
 		title: baseHead + " | Test Page 2",
 		user: user
+	});
+}
+
+exports.angles = function(req, res) {
+	Classroom.find({owner: req.user}).exec(function(err, db_classrooms) {
+		if (err) {console.log("Classroom my_classes error: ", err)}
+		else {
+			res.render('angle', {
+				title: baseHead + " | My Classes",
+				user: req.user.username,
+				classes: db_classrooms
+			});
+		}
 	});
 }

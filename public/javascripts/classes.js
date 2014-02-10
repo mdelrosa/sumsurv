@@ -220,7 +220,7 @@ $(document).ready(function() {
 					// initialize new-survey popover
 					$('button.roster-add').popover({trigger: 'click', html: true, placement: 'bottom', callback: popoverDismiss()});
 					$('.btn-remove').click(function() {
-						var participant = $(this).parent().prev().text()
+						var participant = $(this).parent().prev().prev().text()
 							, parentRow = $(this).parent().parent();
 						$.post('/class/roster/remove', { participant: participant, className: name}, function(res) {
 							if(res.err) {console.log("Unable to remove participant"); return false}
@@ -231,6 +231,22 @@ $(document).ready(function() {
 							}
 						});
 					});
+					$('.btn-pwtemp').click(function() {
+						var participant = $(this).parent().prev().text()
+							, parentRow = $(this).parent().parent();
+						console.log("participant is: ", participant);
+						$.post('/user/pwdelta', { participant: participant, magicwoid: "duck"}, function(res) {
+							if(res.err) {console.log("Unable to make temp password"); return false}
+							else {
+								if(res.success) {
+									console.log('Temp reset success!');
+								}
+							}
+						});
+					});
+
+
+
 					activateRosterEdit();
 					activateRequest(name);
 					sendemail();
