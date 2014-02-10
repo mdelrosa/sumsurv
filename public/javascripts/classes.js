@@ -209,7 +209,12 @@ $(document).ready(function() {
 	var setClassDiv = function(name) {
 		// Render current class' roster/survey
 		$('#class-header').fadeOut('fast', function() {
-			$(this).html('<h2 class="span6"> ' + name + '</h2><div class="span6 btn-group pull-right"><a class="btn btn-info" href="/class/export?className='+name+'">Export Data </a><a class="btn btn-danger" id="class-delete"> Delete Class</a></div>').fadeIn('fast');
+			$(this).html(
+				'<h2 class="span12 text-center"> ' +				
+				'<div class="span3 btn-group pull-right"><a class="btn btn-info" href="/class/export?className='+name+'">Export Data </a></div>'+
+ 				name +
+				'<div class="span3 btn-group pull-left"><a class="btn btn-danger" id="class-delete"> Delete Class</a></div>'+
+				'</h2>').fadeIn('fast');
 			setDeleteClass(name)
 		});
 		$.get('/class/roster', { className: name }, function(data) {
