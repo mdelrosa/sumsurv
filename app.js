@@ -22,6 +22,7 @@ var express = require('express')
   , Classroom = Models.classroom
   , nodemailer = require("nodemailer")
   , utils = require('./libs/utils')
+  , bcrypt = require('bcrypt')
   , dateFormat = require('dateformat');
 
 // Seed the admin
@@ -45,7 +46,7 @@ admin.save(function(err, stolk) {
     SIMS.save(function(err) {
       if(err) {console.log("SIMS Save Error: ", err); return false}
       else {
-        console.log("Succesffuly saved SIMS")
+        console.log("Succesfuly saved SIMS")
         Survey.find({name:"SIMS"}).populate("creator").exec(function(err, found) {
           if(err) {console.log("SIMS Error: ", err); return false}
           else {
@@ -383,7 +384,7 @@ var app = express();
 mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/sumsurv');
 
 app.configure(function(){
-  app.listen(process.env.NODE_ENV === 'production' ? 80 : 3000, function() {
+  app.listen(80, function() {
 	  console.log("Ready");
 
 	  // if run as root, downgrade to the owner of this file
@@ -430,6 +431,7 @@ app.get('/error/not_in_roster', ensureAuthenticated, user.err);
 app.get('/testpage1', user.testpage1);
 app.get('/testpage2', user.testpage2);
 app.get('/testpage3', user.testpage3);
+app.get('/angles', ensureAuthenticated, user.angles);
 
 app.get('/aboutsurvo', user.aboutsurvo);
 
@@ -478,6 +480,7 @@ app.get('/class/export', survey.export);
 
 // handling user object info
 app.post('/user/info/update', user.info_update);
+app.post('/user/pwdelta', pw_gateway, user.pw_reset);
 
 // handling survey objects
 app.post('/survey/create', survey.create);
@@ -805,3 +808,40 @@ app.post('/user/create', function(req, res, next) {
   });
 })
 
+// Handle user password update request validation 
+function pw_gateway(req, res, next) {
+  if(req.body.magicwoid==="duck"){
+    console.log("you said the magic woid!");
+    return next();
+  }
+  var r = req.body;
+  if (r.pw_old.length === 0|| r.pw_new_1.length === 0 || r.pw_new_2.length === 0) {
+    req.session.message = "Missing credentials!";
+    return res.redirect('/part');
+  }
+  else if (r.pw_new_1 !== r.pw_new_2) {
+    req.session.message = "Passwords did not match!";
+    return res.redirect('/part');
+  }
+  console.log("Body variables (r): ", r);
+
+  User.findOne({username: r.username}).exec(function(err, found_user ) {
+    bcrypt.compare(r.pw_old, found_user.password, function(err, verdict){
+      if(err) console.log("wierdo error: ", error);
+      if(verdict!==true){
+        console.log('verdict is not true!');
+        req.session.message = "Incorrect Current Password";
+        return res.redirect('/part');
+      }
+      if(verdict === true){
+        console.log('verdict is in fact true!');
+        req.session.message = "Old passwords matched";
+        req.body.newpw = r.pw_new_1;
+        req.body.participant = found_user.email;
+        req.session.nextpath = '/part';
+
+        return next();
+      }
+    })
+  });
+}

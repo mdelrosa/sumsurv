@@ -38,14 +38,36 @@ block content
 					p Please fill this out!
 			div.pad-top
 				a.btn.btn-mini.btn-info(data-toggle="tooltip", title data-original-title="This information is only available to researchers, not instructors. However, neither researchers nor instructors will ever see any data associated with your personally identifiable information such as name or email address.") Who Sees This?
+			div.pad-top
+				if message
+					console.log('there seems to be a message: ',message)
+					div.alert #{message}
+
+				form.form-vertical.form-login(action="/user/pwdelta", method="post")
+					fieldset
+						h5 Change Password
+						.control-group
+							.controls
+								input(type="password", style = "width: 160px", placeholder="Current Password", name="pw_old")
+								input(type="password", style = "width: 160px", placeholder="Select a new password", name="pw_new_1")
+								input(type="password", style = "width: 160px", placeholder="Re-enter new password", name="pw_new_2")
+								input(type="hidden", name="username", value= user)
+						.control-group
+							.controls
+								input.btn.btn-med(type="submit", value="Submit") Submit
+
+
 		div.span9.outline.pad
-			p.lead You are participating in:
+			p.lead You are participating in
 			div.row-fluid
 				if (classes.length)
+					div
 					for room in classes
-						div.span3.outline.text-center
+						div.span5.outline.text-center.classtile
 							h3 #{room.name}
+							br
 							img#class-img(src="paperbig.png")
+							br
 							a.btn.btn-info.margin#class-link(href='/'+room.owner.username+'/'+room.name+'/take') Take Survey
 				else
 					div.span3.outline.text-center

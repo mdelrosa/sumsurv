@@ -23,19 +23,7 @@ block content
 					div.roster-header
 						h4.text-center Roster
 					p.muted Please select a class
-					if (roster && roster.length > 0)
-						table.table.table-striped
-							tr
-								th Student
-								th Edit
-							for student in roster
-								tr
-									td #{student}
-									td
-										button.btn.btn-small
-											i.icon-minus
-											|  Remove
-					else
+					
 				div.span6.outline.survey
 					div.survey-header
 						h4.text-center Survey
