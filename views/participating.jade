@@ -63,12 +63,31 @@ block content
 				if (classes.length)
 					div
 					for room in classes
-						div.span5.outline.text-center.classtile
-							h3 #{room.name}
-							br
-							img#class-img(src="paperbig.png")
-							br
-							a.btn.btn-info.margin#class-link(href='/'+room.owner.username+'/'+room.name+'/take') Take Survey
+						div.span5.paperbg
+							div.span12.classtile
+								br 
+								br 
+																
+								h3 #{room.name}
+								-var m1 = room.span.start.month.toString() ? parseInt(room.span.start.month) + 1 : "undefined"
+								-var m2 = room.span.end.month ? parseInt(room.span.end.month) + 1 : "undefined"
+								-var daze = ["Mondays","Tuesdays","Wednesdays","Thursdays","Fridays","Saturdays","Sundays"]
+								-var d1 = daze[room.interval.start.day]
+								-var d2 = daze[room.interval.end.day]
+								b #{m1}/#{room.span.start.date}/#{room.span.start.year} - #{m2}/#{room.span.end.date}/#{room.span.end.year} 
+								br 
+								br 
+								br
+								br
+								br
+								br
+								br
+								b.margin - Availability -
+								p.dull #{d1} at #{room.interval.start.hour}:#{room.interval.start.minute} #{room.interval.start.time} EST
+								p.dull until
+								p.dull #{d2} at #{room.interval.end.hour}:#{room.interval.end.minute} #{room.interval.end.time} EST
+								
+								a.btn.btn-info.margin#class-link(href='/'+room.owner.username+'/'+room.name+'/take') Take Survey
 				else
 					div.span3.outline.text-center
 						h3 Sorry!

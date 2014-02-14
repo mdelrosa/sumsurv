@@ -201,7 +201,7 @@ textarea {
 	float: right;
 }
 
-navbar .nav1 li.dropdown.open > .dropdown-toggle1, .navbar .nav1 li.dropdown.active > .dropdown-toggle1, .navbar .nav1 li.dropdown.open.active > .dropdown-toggle1 {
+.navbar .nav1 li.dropdown.open > .dropdown-toggle1, .navbar .nav1 li.dropdown.active > .dropdown-toggle1, .navbar .nav1 li.dropdown.open.active > .dropdown-toggle1 {
 	background-color: rgb(255, 255, 255);
 	color: rgb(255, 255, 255);
 	outline: none
@@ -541,4 +541,36 @@ input[type='range'] {
 
 .right-align{
 	float: right;
+}
+
+.classtile{
+	background: transparent;
+
+	text-align: center;
+	align-items: center;
+	border: 2px solid #000;
+	text-shadow: 2px 3px 4px rgba(225,225,225,.95), 0 0 30px rgba(225,225,225,.75);
+	color: #000000;
+	opacity: 1.5;
+	height: 360px;
+	width: 300px;
+	padding: 0px;
+	margin: 0px;
+
+	overflow: hidden;
+
+}
+
+.dull{
+	margin: 0px;
+	padding: 0px;
+}
+
+.paperbg{
+	background-image: url(../paperbig.png);
+	background-repeat: no-repeat;
+	background-position: center;
+	background-color: rgb(157, 131,181);
+	background-size:345px 356px ;
+	opacity: .75;
 }
