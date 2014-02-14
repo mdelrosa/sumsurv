@@ -201,7 +201,7 @@ textarea {
 	float: right;
 }
 
-navbar .nav1 li.dropdown.open > .dropdown-toggle1, .navbar .nav1 li.dropdown.active > .dropdown-toggle1, .navbar .nav1 li.dropdown.open.active > .dropdown-toggle1 {
+.navbar .nav1 li.dropdown.open > .dropdown-toggle1, .navbar .nav1 li.dropdown.active > .dropdown-toggle1, .navbar .nav1 li.dropdown.open.active > .dropdown-toggle1 {
 	background-color: rgb(255, 255, 255);
 	color: rgb(255, 255, 255);
 	outline: none
@@ -356,8 +356,8 @@ table.fixed td {
 
 /* Outlines for testing */
 .outline {
-	border: 3px solid black;
-	border-radius: 5px;
+	border: 2px solid black;
+	border-radius: 15px;
 }
 
 input#files {
@@ -541,4 +541,66 @@ input[type='range'] {
 
 .right-align{
 	float: right;
+}
+
+.classtile{
+	background: rgba(63,62,138,.001);
+	text-align: center;
+	align-items: center;
+	border: 2px solid #000;
+	border-radius: 15px;
+	text-shadow: 0px 0px 2px rgba(255,255,255,.99), -2px 2px 4px rgba(0,0,0,.25);
+	color: rgb(0,0,0);
+	opacity: 1;
+	padding: 0px;
+	margin: 0px;
+
+	overflow: hidden;
+
+}
+
+.dull{
+	margin: 0px;
+	padding: 0px;
+}
+
+.paperbg{
+	background-image: url(../paperbig.png);
+	background-repeat: no-repeat;
+	background-position: center 55px ;
+	background-color: white;
+	background-size:148px 152px ;
+	border-radius: 15px;
+	opacity: 1;
+	width: 60px;
+}
+.tiny{
+	font-size: .8em;
+}
+.marg5{
+	margin: 9px;
+}
+.pagespacer{
+	margin-top: 87px;
+}
+.cozy{
+	padding-bottom: 0px;
+	margin-bottom: 0px;
+}
+.classholder{
+	text-align: center;
+	align-items: center;
+	justify-content: space-between;
+	border: 2px solid #000;
+	border-radius: 15px;
+
+}
+.pencil{
+	color: rgb(120,120,120);
+	text-align: center;
+	border: 1px solid black;
+	border-radius: 3px;
+	padding:5px;
+	margin: 3px;
+	overflow: hidden;
 }

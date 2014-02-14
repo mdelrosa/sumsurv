@@ -8,7 +8,7 @@ block scripts
 
 block content
 	div.row-fluid.pad
-		div.span3.pad.outline#user-info
+		div.span3.pad.text-center.outline#user-info
 			h4 #{user}'s Information
 			label I identify as:
 			if (!info || !info.gender)
@@ -37,8 +37,8 @@ block content
 					button(type="button", class="close", data-dismiss="alert") &times;
 					p Please fill this out!
 			div.pad-top
-				a.btn.btn-mini.btn-info(data-toggle="tooltip", title data-original-title="This information is only available to researchers, not instructors. However, neither researchers nor instructors will ever see any data associated with your personally identifiable information such as name or email address.") Who Sees This?
-			div.pad-top
+				a.margin.btn.btn-small.btn-info(data-toggle="tooltip", title data-original-title="This information is only available to researchers, not instructors. However, neither researchers nor instructors will ever see any data associated with your personally identifiable information such as name or email address.") Who Sees This?
+			div.pad-top.pencil
 				if message
 					console.log('there seems to be a message: ',message)
 					div.alert #{message}
@@ -54,21 +54,36 @@ block content
 								input(type="hidden", name="username", value= user)
 						.control-group
 							.controls
-								input.btn.btn-med(type="submit", value="Submit") Submit
+								input.btn.btn-mini.btn-warning(type="submit", value="Change Password")
 
 
-		div.span9.outline.pad
-			p.lead You are participating in
+		div.span9.classholder
+			h3 Enlisted Classes
 			div.row-fluid
 				if (classes.length)
 					div
 					for room in classes
-						div.span5.outline.text-center.classtile
-							h3 #{room.name}
-							br
-							img#class-img(src="paperbig.png")
-							br
-							a.btn.btn-info.margin#class-link(href='/'+room.owner.username+'/'+room.name+'/take') Take Survey
+						div.span5.paperbg.margin
+							div.classtile
+								console.log(room)
+								h3.dull #{room.name}
+								-var m1 = room.span.start.month.toString() ? parseInt(room.span.start.month) + 1 : "undefined"
+								-var m2 = room.span.end.month ? parseInt(room.span.end.month) + 1 : "undefined"
+								-var daze = ["Mondays","Tuesdays","Wednesdays","Thursdays","Fridays","Saturdays","Sundays"]
+								-var d1 = daze[room.interval.start.day-1]
+								-var d2 = daze[room.interval.end.day-1]
+								p #{m1}/#{room.span.start.date}/#{room.span.start.year} - #{m2}/#{room.span.end.date}/#{room.span.end.year} 
+							
+								p.pagespacer
+								a.btn.btn-info.marg5#class-link(href='/'+room.owner.username+'/'+room.name+'/take') Take Survey
+								br
+								p.dull.tiny Available from							
+								p.dull #{d1} at #{room.interval.start.hour}:#{room.interval.start.minute} #{room.interval.start.time} EST
+								p.dull.tiny until
+								p.dull #{d2} at #{room.interval.end.hour}:#{room.interval.end.minute} #{room.interval.end.time} EST
+								p
+								
+								
 				else
 					div.span3.outline.text-center
 						h3 Sorry!

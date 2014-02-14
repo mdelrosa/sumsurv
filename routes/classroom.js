@@ -106,14 +106,14 @@ exports.roster_add = function(req, res) {
 
 // Render roster partial
 exports.roster = function(req, res) {
-	Classroom.find({name: req.query.className, owner: req.user}).exec(function(err, found_class) {
+	Classroom.find({name: req.query.className, owner: req.user}).exec(function(err, temp_db) {
 		if(err) { console.log("Roster error: ", err); return false}
 		else {
-			console.log(found_class[0]);
+			console.log('All found classes in roster search: ',temp_db);
 			res.render("_roster", {
-				roster: found_class[0].roster,
-				requests: found_class[0].requests
-			})
+				roster: temp_db[0].roster,
+				requests: temp_db[0].requests
+			});
 		}
 	})
 }
