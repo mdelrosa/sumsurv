@@ -220,7 +220,7 @@ $(document).ready(function() {
 		$.get('/class/roster', { className: name }, function(data) {
 			if(data.err) { console.log("Unable to fetch roster.") }
 			else {
-				$(".roster").fadeOut("fast", function() {
+				$(".rosterbox").fadeOut("fast", function() {
 					$(this).html(data).fadeIn("fast");
 					// initialize new-survey popover
 					$('button.roster-add').popover({trigger: 'click', html: true, placement: 'bottom', callback: popoverDismiss()});
