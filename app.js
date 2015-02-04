@@ -367,13 +367,13 @@ passport.deserializeUser(function(id, done) {
 passport.use(new LocalStrategy(function(username, password, done) {
   User.findOne({ username: username }, function(err, user) {
     if (err) { return done(err); }
-    if (!user) {return done(null, false, { message: 'Unknown user ' + username}); }
+    if (!user) {return done(null, false, { message: 'Unknown User \"' + username + '\". Note that your username is likely different than your email address. If problems persist, check out the tech support link at the bottom right'}); }
     user.comparePassword(password, function(err, isMatch) {
       if (err) return done(err)
       if (isMatch) {
         return done(null, user);
       } else {
-        return done(null, false, { message: 'Invalid password'});
+        return done(null, false, { message: 'Invalid Password! If problems persist, check out the Tech Support link at the bottom right.' });
       }
     })
   })
