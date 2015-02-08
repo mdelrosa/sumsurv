@@ -324,7 +324,7 @@ $(document).ready(function() {
 											"You didn't enter anything!</div>");
 				}
 				else {
-					var rosterAdd = csvRoster.split(", ");
+					var rosterAdd = csvRoster.split(",");
 					var className = $('td.editing').html();
 					console.log("classname", className);
 					$.post('/class/roster/update', {rAdd: rosterAdd, name: className}, function(res) {

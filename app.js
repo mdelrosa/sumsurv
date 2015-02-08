@@ -789,8 +789,8 @@ app.post('/user/create', function(req, res, next) {
       }
     }
     var newUser = new User({
-      username: r.username,
-      email: r.email.toLowerCase(),
+      username: r.username.trim(),
+      email: r.email.toLowerCase().trim(),
       password: r.password
     });
     newUser.save(function(err) {
