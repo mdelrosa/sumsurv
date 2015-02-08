@@ -137,7 +137,7 @@ exports.exportcsv = function(req, res) {
 }
 
 exports.my_classes = function(req, res) {
-	Classroom.find({owner: req.user}).exec(function(err, db_classrooms) {
+	Classroom.find({owner: req.user}).sort('name').exec(function(err, db_classrooms) {
 		if (err) {console.log("Classroom my_classes error: ", err)}
 		else {
 			res.render('classes', {

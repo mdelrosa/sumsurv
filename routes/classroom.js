@@ -59,9 +59,10 @@ exports.delete = function(req, res) {
 
 // Render all classes partial
 exports.all = function(req, res) {
-	Classroom.find({owner: req.user}).exec(function(err, class_db) {
+	Classroom.find({owner: req.user}).sort('-name').exec(function(err, class_db) {
 		if(err) {console.log("All error: ", err); return false}
 		else {
+			console.log('hey there',class_db);
 			res.render("_myClasses", {
 				classes: class_db
 			})
@@ -74,7 +75,8 @@ exports.roster_update = function(req, res) {
 	var rAddRaw = req.body.rAdd
 		, rAdd = [];
 	for (i=0;i<rAddRaw.length;i++) {
-		rAdd[i] = rAddRaw[i].toLowerCase();
+		var tmp = rAddRaw[i].toLowerCase().trim();
+		if (tmp.length) rAdd.push(tmp);
 	}
 	if (rAdd.length) {
 		Classroom.update({owner: req.user, name: req.body.name}, {$addToSet: {roster: {$each: rAdd}}}).populate('roster').exec(function(err) {
@@ -106,12 +108,14 @@ exports.roster_add = function(req, res) {
 
 // Render roster partial
 exports.roster = function(req, res) {
-	Classroom.find({name: req.query.className, owner: req.user}).exec(function(err, temp_db) {
+	Classroom.find({name: req.query.className, owner: req.user},null, {sort:{name:1}}).exec(function(err, temp_db) {
 		if(err) { console.log("Roster error: ", err); return false}
 		else {
 			console.log('All found classes in roster search: ',temp_db);
+			
+
 			res.render("_roster", {
-				roster: temp_db[0].roster,
+				roster: temp_db[0].roster.sort(),
 				requests: temp_db[0].requests
 			});
 		}
@@ -294,7 +298,7 @@ exports.part_add = function(req, res) {
 						}
 					});
 
-					var urllink = "survo.herokuapp.com/classes"
+					var urllink = "http://www.motivationsurvey.com/classes"
 					var mailOptions = {
 					    from: "Autonomous Humans Lab<authumlab@gmail.com>", // sender address
 					    to: 'alexander.dillon@gmail.com', // list of receivers
