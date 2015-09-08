@@ -3,9 +3,9 @@
 
 $(document).ready(function() {
 	var updateActivate = function() {
-		$('a.add-on').click(function() {
-			var type = $(this).attr('id') //button id
-				, val = $(this).prev().children(':selected').val(); //selected val
+		$('select').change(function() {
+			var type = $(this).next().attr('id') //button id
+				, val = $(this).children(':selected').val(); //selected val
 			$.post('/user/info/update', { type: type, value: val }, function(res) {
 				if (res.err) { console.log("User update info error:", res.err); return false}
 				else {
@@ -26,6 +26,7 @@ $(document).ready(function() {
 		$('.edit-info').click(function() {
 			if ($(this).attr('id') === "year") {
 				var html = '<div class="input-append"><select id="appendedInput">'+
+						   '<option value="NA">Please Select</option>'+
 						   '<option value="First-year">First-year</option>'+
 						   '<option value="Sophomore">Sophomore</option>'+
 						   '<option value="Junior">Junior</option>'+
@@ -34,10 +35,11 @@ $(document).ready(function() {
 			};
 			if ($(this).attr('id') === "gender") {
 				var html = '<div class="input-append"><select id="appendedInput">'+
+						   '<option value="NA">Please Select</option>'+
 						   '<option value="Male">Male</option>'+
 						   '<option value="Female">Female</option>'+
 						   '<option value="Other">Other</option>'+
-						   '<option value="N/A">Care not to specify</option>'+
+						   '<option value="N/A">Prefer not to disclose</option>'+
 						   '</select><a class="btn add-on" id="gender">Ok!</a></div>';
 			}
 			$(this).replaceWith(html);

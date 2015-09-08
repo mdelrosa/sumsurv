@@ -13,7 +13,7 @@
     "connect-mongo": "~0.3.2",
     "passport": ">= 0.0.0",
     "passport-local": ">= 0.0.0",
-    "bcrypt": "~0.7.6",
+    "bcrypt": ">=0.7.6",
     "nodemailer": ">= 0.0.0",
     "cron": ">= 0.0.0",
     "time": ">=0.0.0",

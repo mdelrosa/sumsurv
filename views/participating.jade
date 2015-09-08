@@ -9,39 +9,42 @@ block scripts
 block content
 	div.row-fluid.pad
 		div.span3.pad.text-center.outline#user-info
-			h4 #{user}'s Information
-			label I identify as:
-			if (!info || !info.gender)
-				div.input-append
-					select#appendedInput
-						option(value="Male") Male
-						option(value="Female") Female
-						option(value="Other") Other
-						option(value="N/A") Prefer not to disclose
-					a.btn.add-on#gender Ok!
-			else
-				a.edit-info#gender #{info.gender}
-			label.pad-top My year in school is:
-			if (!info || !info.year)
-				div.input-append
-					select#appendedInput
-						option(value="First-year") First-year
-						option(value="Sophomore") Sophomore
-						option(value="Junior") Junior
-						option(value="Senior") Senior
-					a.btn.add-on#year Ok!
-			else
-				a.edit-info#year #{info.year}
-			if (!info || !info.gender || !info.year)
-				div.alert
-					button(type="button", class="close", data-dismiss="alert") &times;
-					p Please fill this out!
-			div.pad-top
-				a.margin.btn.btn-small.btn-info(data-toggle="tooltip", title data-original-title="This information is only available to researchers, not instructors. However, neither researchers nor instructors will ever see any data associated with your personally identifiable information such as name or email address.") Who Sees This?
-			div.pad-top.pencil
-				if message
-					console.log('there seems to be a message: ',message)
-					div.alert #{message}
+			div.outline
+				h4 #{user}'s Information
+				label I identify as:
+				if (!info || !info.gender)
+					div.input-append
+						select#appendedInput
+							option(value="NA") Please Select
+							option(value="Male") Male
+							option(value="Female") Female
+							option(value="Other") Other
+							option(value="N/A") Prefer not to disclose
+						a.btn.add-on#gender Ok!
+				else
+					a.edit-info#gender #{info.gender}
+				label.pad-top My year in school is:
+				if (!info || !info.year)
+					div.input-append
+						select#appendedInput
+							option(value="NA") Please Select
+							option(value="First-year") First-year
+							option(value="Sophomore") Sophomore
+							option(value="Junior") Junior
+							option(value="Senior") Senior
+						a.btn.add-on#year Ok!
+				else
+					a.edit-info#year #{info.year}
+				if (!info || !info.gender || !info.year)
+					div.alert
+						button(type="button", class="close", data-dismiss="alert") &times;
+						p Please fill this out!
+				div.pad-top
+					a.margin.btn.btn-small.btn-info(data-toggle="tooltip", title data-original-title="This information is only available to researchers, not instructors. However, neither researchers nor instructors will ever see any data associated with your personally identifiable information such as name or email address.") Who Sees This?
+				div.pad-top.pencil
+					if message
+						console.log('there seems to be a message: ',message)
+						div.alert #{message}
 
 				form.form-vertical.form-login(action="/user/pwdelta", method="post")
 					fieldset
